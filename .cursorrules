@@ -1,0 +1,34 @@
+// TypeScript and Data Validation
+typescript strict mode required
+use zod for data validation
+
+// State Management and Actions
+use zustand for state management
+use actions.ts for server actions
+
+// Next.js App Router Structure and Patterns
+use server components by default
+implement client components only when necessary
+utilize file-based routing system
+use layout.tsx for shared layouts
+implement loading.tsx for loading states
+use error.tsx for error handling
+utilize route handlers for API routes
+
+// Folder Structure
+follow turborepo structure
+apps/app/ contains wizard application
+apps/web/ for web application
+packages/ui/ for shared components
+
+// File Naming
+files use lowercase with hyphens (example: location-step.tsx)
+components use PascalCase (example: LocationStep)
+steps components in components/steps/
+shared UI components in packages/ui/
+
+// Component Organization
+group related step components under components/report/
+keep configuration in lib/config.ts
+maintain types in lib/types.ts
+store state management in lib/store.ts
