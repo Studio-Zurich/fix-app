@@ -1,12 +1,54 @@
 import { submitReport } from "@/app/actions";
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+interface IncidentTypeInfo {
+  name: string;
+  subtype?: string;
+}
 
 export const SummaryStep = () => {
   const { reportData, reset, setCurrentStep } = useReportStore();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>();
+  const [incidentTypeInfo, setIncidentTypeInfo] = useState<IncidentTypeInfo>();
+
+  useEffect(() => {
+    const fetchIncidentTypeInfo = async () => {
+      if (!reportData.incidentTypeId) return;
+
+      const supabase = createClient();
+      try {
+        // Fetch incident type
+        const { data: typeData } = await supabase
+          .from("incident_types")
+          .select("name")
+          .eq("id", reportData.incidentTypeId)
+          .single();
+
+        // Fetch subtype if exists
+        let subtypeName;
+        if (reportData.incidentSubtypeId) {
+          const { data: subtypeData } = await supabase
+            .from("incident_subtypes")
+            .select("name")
+            .eq("id", reportData.incidentSubtypeId)
+            .single();
+          subtypeName = subtypeData?.name;
+        }
+
+        setIncidentTypeInfo({
+          name: typeData?.name || "Unknown",
+          subtype: subtypeName,
+        });
+      } catch (err) {
+        console.error("Error fetching incident type info:", err);
+      }
+    };
+
+    fetchIncidentTypeInfo();
+  }, [reportData.incidentTypeId, reportData.incidentSubtypeId]);
 
   const cleanupTempFiles = async () => {
     const tempPaths = reportData.images
@@ -75,6 +117,19 @@ export const SummaryStep = () => {
             <p className="mt-1 text-sm text-gray-600">
               {reportData.location.address}
             </p>
+          </div>
+        )}
+
+        {/* Incident Type */}
+        {incidentTypeInfo && (
+          <div>
+            <h3 className="text-sm font-medium text-gray-700">Incident Type</h3>
+            <div className="mt-1 text-sm text-gray-600">
+              <p>{incidentTypeInfo.name}</p>
+              {incidentTypeInfo.subtype && (
+                <p className="text-gray-500">{incidentTypeInfo.subtype}</p>
+              )}
+            </div>
           </div>
         )}
 

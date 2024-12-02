@@ -27,29 +27,38 @@ export const StepWrapper = ({ steps }: StepWrapperProps) => {
     <div className="w-full max-w-2xl mx-auto p-6">
       {/* Progress bar */}
       <div className="mb-8">
-        <div className="flex justify-between">
-          {steps.map((_, index) => (
-            <div key={index} className="flex items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  index === currentStep
-                    ? "bg-blue-600 text-white"
-                    : index < currentStep
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-600"
-                }`}
-              >
-                {index + 1}
-              </div>
-              {index < steps.length - 1 && (
+        <div>
+          {/* Full stepper for larger screens */}
+          <div className="hidden md:flex justify-between">
+            {steps.map((_, index) => (
+              <div key={index} className="flex items-center">
                 <div
-                  className={`w-20 h-1 ${
-                    index < currentStep ? "bg-green-500" : "bg-gray-200"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    index === currentStep
+                      ? "bg-blue-600 text-white"
+                      : index < currentStep
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-600"
                   }`}
-                />
-              )}
-            </div>
-          ))}
+                >
+                  {index + 1}
+                </div>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-20 h-1 ${
+                      index < currentStep ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Simple step counter for mobile */}
+          <div className="md:hidden flex items-center justify-center gap-1 text-sm">
+            <span className="font-medium">Step {currentStep + 1}</span>
+            <span className="text-gray-500">of {steps.length}</span>
+          </div>
         </div>
       </div>
 
