@@ -16,7 +16,7 @@ interface SubmitError {
     validation?: Array<{
       code: string;
       message: string;
-      path: string[];
+      path: (string | number)[];
     }>;
   };
 }
@@ -95,7 +95,7 @@ export const SummaryStep = () => {
       setCurrentStep(6); // Move to confirmation step
     } else {
       setError({
-        error: result.error,
+        error: result.error || "An unknown error occurred",
         details: result.details,
       });
     }

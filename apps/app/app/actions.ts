@@ -122,7 +122,7 @@ export async function submitReport(data: ReportData) {
 
     revalidatePath("/");
     return { success: true, reportId: report.id };
-  } catch (error) {
+  } catch (error: unknown) {
     // Log detailed error information
     console.error("Error submitting report:", {
       error,
@@ -146,7 +146,10 @@ export async function submitReport(data: ReportData) {
       details:
         process.env.NODE_ENV === "development"
           ? {
-              type: error.constructor.name,
+              type:
+                error instanceof Error
+                  ? error.constructor.name
+                  : "UnknownError",
               message: error instanceof Error ? error.message : String(error),
               validation: error instanceof ZodError ? error.errors : undefined,
             }
