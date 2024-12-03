@@ -8,10 +8,23 @@ interface IncidentTypeInfo {
   subtype?: string;
 }
 
+interface SubmitError {
+  error: string;
+  details?: {
+    type: string;
+    message: string;
+    validation?: Array<{
+      code: string;
+      message: string;
+      path: string[];
+    }>;
+  };
+}
+
 export const SummaryStep = () => {
   const { reportData, reset, setCurrentStep } = useReportStore();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<SubmitError>();
   const [incidentTypeInfo, setIncidentTypeInfo] = useState<IncidentTypeInfo>();
 
   useEffect(() => {
@@ -81,7 +94,10 @@ export const SummaryStep = () => {
       await cleanupTempFiles();
       setCurrentStep(6); // Move to confirmation step
     } else {
-      setError(result.error);
+      setError({
+        error: result.error,
+        details: result.details,
+      });
     }
 
     setSubmitting(false);
@@ -166,8 +182,26 @@ export const SummaryStep = () => {
 
       <div className="mt-6 flex flex-col gap-4">
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md space-y-2">
+            <p className="text-sm font-medium text-red-700">{error.error}</p>
+            {error.details && process.env.NODE_ENV === "development" && (
+              <div className="text-xs text-red-600 space-y-1">
+                <p>Type: {error.details.type}</p>
+                <p>Message: {error.details.message}</p>
+                {error.details.validation && (
+                  <div>
+                    <p>Validation Errors:</p>
+                    <ul className="list-disc pl-4">
+                      {error.details.validation.map((err, idx) => (
+                        <li key={idx}>
+                          {err.path.join(".")} - {err.message}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

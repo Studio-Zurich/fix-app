@@ -4,6 +4,7 @@ import { reportSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { ReportData } from "@/lib/types";
 import { revalidatePath } from "next/cache";
+import { ZodError } from "zod";
 
 export async function submitReport(data: ReportData) {
   const supabase = await createClient();
@@ -30,7 +31,10 @@ export async function submitReport(data: ReportData) {
       .select()
       .single();
 
-    if (reportError) throw reportError;
+    if (reportError) {
+      console.error("Error creating report record:", reportError);
+      throw new Error(`Failed to create report: ${reportError.message}`);
+    }
 
     // Process images: copy from temp to permanent location and create records
     for (const image of validatedData.images) {
@@ -43,14 +47,24 @@ export async function submitReport(data: ReportData) {
           .from("report-images")
           .download(image.storagePath);
 
-        if (downloadError) throw downloadError;
+        if (downloadError) {
+          console.error("Error downloading temp file:", downloadError);
+          throw new Error(
+            `Failed to download temp file: ${downloadError.message}`
+          );
+        }
 
         // Upload to permanent location
         const { error: uploadError } = await supabase.storage
           .from("report-images")
           .upload(permanentPath, fileData);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Error uploading to permanent location:", uploadError);
+          throw new Error(
+            `Failed to upload to permanent location: ${uploadError.message}`
+          );
+        }
 
         // Create report_images record
         const { error: imageRecordError } = await supabase
@@ -63,9 +77,26 @@ export async function submitReport(data: ReportData) {
             file_size: image.fileSize,
           });
 
-        if (imageRecordError) throw imageRecordError;
+        if (imageRecordError) {
+          console.error("Error creating image record:", imageRecordError);
+          throw new Error(
+            `Failed to create image record: ${imageRecordError.message}`
+          );
+        }
       } catch (error) {
         console.error("Error processing image:", error);
+        // Create error report entry
+        await supabase.from("report_history").insert({
+          report_id: report.id,
+          action: "error",
+          details: {
+            error:
+              error instanceof Error
+                ? error.message
+                : "Unknown error during image processing",
+            image: image.fileName,
+          },
+        });
         throw error;
       }
     }
@@ -76,15 +107,50 @@ export async function submitReport(data: ReportData) {
       .insert({
         report_id: report.id,
         action: "created",
-        details: { status: "submitted" },
+        details: {
+          status: "submitted",
+          timestamp: new Date().toISOString(),
+        },
       });
 
-    if (historyError) throw historyError;
+    if (historyError) {
+      console.error("Error creating history record:", historyError);
+      throw new Error(
+        `Failed to create history record: ${historyError.message}`
+      );
+    }
 
     revalidatePath("/");
     return { success: true, reportId: report.id };
   } catch (error) {
-    console.error("Error submitting report:", error);
-    return { success: false, error: "Failed to submit report" };
+    // Log detailed error information
+    console.error("Error submitting report:", {
+      error,
+      errorMessage: error instanceof Error ? error.message : "Unknown error",
+      errorStack: error instanceof Error ? error.stack : undefined,
+      validationErrors: error instanceof ZodError ? error.errors : undefined,
+    });
+
+    // Return user-friendly error message with more context
+    let errorMessage = "Failed to submit report";
+    if (error instanceof ZodError) {
+      errorMessage =
+        "Invalid report data: " + error.errors.map((e) => e.message).join(", ");
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+      details:
+        process.env.NODE_ENV === "development"
+          ? {
+              type: error.constructor.name,
+              message: error instanceof Error ? error.message : String(error),
+              validation: error instanceof ZodError ? error.errors : undefined,
+            }
+          : undefined,
+    };
   }
 }
