@@ -1,5 +1,8 @@
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
 import { ChangeEvent, useEffect, useState } from "react";
 
 export const ImageStep = () => {
@@ -123,7 +126,7 @@ export const ImageStep = () => {
       </p>
 
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <input
+        <Input
           type="file"
           accept="image/*"
           multiple
@@ -132,14 +135,14 @@ export const ImageStep = () => {
           id="image-upload"
           disabled={uploading}
         />
-        <label
+        <Label
           htmlFor="image-upload"
           className={`px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 ${
             uploading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           {uploading ? "Uploading..." : "Select Images"}
-        </label>
+        </Label>
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -153,13 +156,13 @@ export const ImageStep = () => {
                 alt={`Upload ${index + 1}`}
                 className="w-full h-48 object-cover rounded-lg"
               />
-              <button
+              <Button
                 onClick={() => removeImage(index)}
                 className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
                 aria-label="Remove image"
               >
                 ✕
-              </button>
+              </Button>
             </div>
           ))}
         </div>

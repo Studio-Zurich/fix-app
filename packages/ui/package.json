@@ -7,14 +7,7 @@
     "./postcss.config": "./postcss.config.mjs",
     "./tailwind.config": "./tailwind.config.ts",
     "./lib/*": "./lib/*.ts",
-    "./components/*": [
-      "./components/*.tsx",
-      "./components/*.ts"
-    ],
-    "./ui/*": [
-      "./ui/*.tsx",
-      "./ui/*.ts"
-    ]
+    "./*": "./ui/*.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

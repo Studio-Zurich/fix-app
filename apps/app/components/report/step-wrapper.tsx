@@ -1,4 +1,5 @@
 import { useReportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { ReactNode } from "react";
 
 interface StepWrapperProps {
@@ -69,22 +70,11 @@ export const StepWrapper = ({ steps }: StepWrapperProps) => {
         {/* Navigation buttons - hidden in confirm step */}
         {!isConfirmStep && (
           <div className="flex justify-between mt-8">
-            <button
-              onClick={handleBack}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-              disabled={currentStep === 0}
-            >
+            <Button onClick={handleBack} disabled={currentStep === 0}>
               Back
-            </button>
+            </Button>
 
-            {!isSummaryStep && (
-              <button
-                onClick={handleNext}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Next
-              </button>
-            )}
+            {!isSummaryStep && <Button onClick={handleNext}>Next</Button>}
           </div>
         )}
       </div>
