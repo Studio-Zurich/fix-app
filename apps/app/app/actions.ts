@@ -3,8 +3,13 @@
 import { reportSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { ReportData } from "@/lib/types";
+import { renderAsync } from "@react-email/render";
+import { ReportEmail } from "@repo/transactional/emails/my-email";
 import { revalidatePath } from "next/cache";
+import { Resend } from "resend";
 import { ZodError } from "zod";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function submitReport(data: ReportData) {
   const supabase = await createClient();
@@ -35,6 +40,28 @@ export async function submitReport(data: ReportData) {
       console.error("Error creating report record:", reportError);
       throw new Error(`Failed to create report: ${reportError.message}`);
     }
+
+    // Fetch incident type info for email
+    const { data: typeInfo } = await supabase
+      .from("incident_types")
+      .select("name")
+      .eq("id", validatedData.incidentTypeId)
+      .single();
+
+    let subtypeInfo;
+    if (validatedData.incidentSubtypeId) {
+      const { data: subtype } = await supabase
+        .from("incident_subtypes")
+        .select("name")
+        .eq("id", validatedData.incidentSubtypeId)
+        .single();
+      subtypeInfo = subtype;
+    }
+
+    const incidentTypeInfo = {
+      name: typeInfo?.name || "Unknown",
+      subtype: subtypeInfo?.name,
+    };
 
     // Process images: copy from temp to permanent location and create records
     for (const image of validatedData.images) {
@@ -99,6 +126,47 @@ export async function submitReport(data: ReportData) {
         });
         throw error;
       }
+    }
+
+    // Send email notifications
+    try {
+      const emailHtml = await renderAsync(
+        ReportEmail({
+          reportId: report.id,
+          reporterName: `${validatedData.reporterFirstName} ${validatedData.reporterLastName}`,
+          reporterEmail: validatedData.reporterEmail,
+          reporterPhone: validatedData.reporterPhone,
+          location: validatedData.location,
+          description: validatedData.description,
+          incidentType: {
+            name: incidentTypeInfo.name,
+            subtype: incidentTypeInfo.subtype,
+          },
+          imageCount: validatedData.images.length,
+        })
+      );
+
+      await resend.emails.send({
+        from: "Fix App <notifications@fix-app.ch>",
+        to: ["hello@studio-zurich.ch", validatedData.reporterEmail],
+        subject: `New Report Submitted (#${report.id})`,
+        html: emailHtml,
+      });
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+      // Create error report entry for email failure
+      await supabase.from("report_history").insert({
+        report_id: report.id,
+        action: "error",
+        details: {
+          error:
+            emailError instanceof Error
+              ? emailError.message
+              : "Email sending failed",
+          type: "email_error",
+        },
+      });
+      // Continue with the submission process even if email fails
     }
 
     // Create report history entry
