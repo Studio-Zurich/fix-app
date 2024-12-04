@@ -30,7 +30,7 @@ interface ReportEmailProps {
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fix-app.ch";
 
-const defaultProps: Partial<ReportEmailProps> = {
+const defaultProps = {
   reportId: "#000000",
   reporterName: "Unknown",
   reporterEmail: "no-email@provided.com",
@@ -42,9 +42,10 @@ const defaultProps: Partial<ReportEmailProps> = {
   description: "No description provided",
   incidentType: {
     name: "Unknown incident",
+    subtype: undefined,
   },
   imageCount: 0,
-};
+} as const;
 
 export const ReportEmail = ({
   reportId = defaultProps.reportId,
