@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
@@ -101,11 +100,11 @@ export const ReportEmail = ({
               )}
             </Section>
 
-            <Section style={buttonContainer}>
+            {/* <Section style={buttonContainer}>
               <Button href={`${baseUrl}/reports/${reportId}`} style={button}>
                 Meldung anzeigen
               </Button>
-            </Section>
+            </Section> */}
           </Section>
 
           <Text style={footer}>
