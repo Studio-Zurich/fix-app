@@ -156,7 +156,7 @@ export const ImageStep = () => {
               <img
                 src={image.previewUrl}
                 alt={`Upload ${index + 1}`}
-                className="w-full h-48 h-48 object-cover rounded-lg"
+                className="w-full h-48 object-cover rounded-lg"
               />
               <Button
                 variant="outline"

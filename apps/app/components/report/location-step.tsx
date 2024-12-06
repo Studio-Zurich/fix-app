@@ -76,11 +76,8 @@ export const LocationStep = () => {
   }, [updateReportData]);
 
   return (
-    <div className="space-y-4">
-      <div
-        ref={mapContainerRef}
-        className="w-full aspect-video rounded-lg border border-gray-200 shadow-sm"
-      />
+    <>
+      <div ref={mapContainerRef} className="w-full flex-1 h-full" />
 
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-medium text-gray-700 mb-2">
@@ -99,6 +96,6 @@ export const LocationStep = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

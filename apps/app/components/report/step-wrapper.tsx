@@ -17,23 +17,23 @@ const stepMetadata: StepMetadata[] = [
   {
     title: "Fotos hochladen",
     description:
-      "Laden Sie bis zu 5 Bilder (JPEG, PNG) des Vorfalls hoch. Maximale Dateigröße: 5MB",
+      "Laden Sie bis zu 5 Bilder (JPEG, PNG) des Vorfalls hoch. Maximale Dateigröße: 5MB.",
   },
   {
     title: "Beschreibung",
-    description: "Beschreiben Sie den Vorfall detailliert",
+    description: "Beschreiben Sie den Vorfall detailliert.",
   },
   {
     title: "Standort",
-    description: "Markieren Sie den genauen Standort auf der Karte",
+    description: "Markieren Sie den genauen Standort auf der Karte.",
   },
   {
     title: "Persönliche Daten",
-    description: "Geben Sie Ihre Kontaktinformationen ein",
+    description: "Geben Sie Ihre Kontaktinformationen ein.",
   },
   {
     title: "Zusammenfassung",
-    description: "Überprüfen Sie alle Informationen vor dem Absenden",
+    description: "Überprüfen Sie alle Informationen vor dem Absenden.",
     banner: (
       <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-md p-4">
         <p className="text-sm text-yellow-700">
@@ -92,25 +92,27 @@ export const StepWrapper = ({ steps }: StepWrapperProps) => {
   return (
     <>
       <section className="m-2 w-[calc(100vw-1rem)] rounded-xl h-full flex-1 flex flex-col justify-between bg-gray-100 p-5">
-        <div className="space-y-6">
+        <div className="space-y-6 flex-1 flex flex-col">
           <StepHeader />
           <div>
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold block">
               {stepMetadata[currentStep]?.title}
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground block">
               {stepMetadata[currentStep]?.description}
             </p>
             {stepMetadata[currentStep]?.banner && (
               <div className="mt-4">{stepMetadata[currentStep].banner}</div>
             )}
           </div>
-          <div className="">{steps[currentStep]}</div>
+          <div className="flex-1 flex flex-col h-full">
+            {steps[currentStep]}
+          </div>
         </div>
         <div>
           {!isConfirmStep && (
             <>
-              <div className="flex items-center justify-center gap-2 my-4">
+              <div className="flex items-center justify-center gap-2 my-8">
                 {stepMetadata.map((_, index) => (
                   <div
                     key={index}
@@ -122,7 +124,7 @@ export const StepWrapper = ({ steps }: StepWrapperProps) => {
                   />
                 ))}
               </div>
-              <div className="flex justify-between mt-8">
+              <div className="flex justify-between mt-4">
                 <Button
                   variant="ghost"
                   onClick={handleBack}
