@@ -1,127 +1,162 @@
+"use client";
+
 import { useReportStore } from "@/lib/store";
+import { Input } from "@repo/ui/input";
 import { useState } from "react";
+import { z } from "zod";
+
+interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+}
+
+const emailSchema = z
+  .string()
+  .email("Bitte geben Sie eine gültige E-Mail-Adresse ein");
 
 export const UserDataStep = () => {
   const { reportData, updateReportData } = useReportStore();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
-  const validateField = (name: string, value: string) => {
-    if (!value || value.trim() === "") {
-      return "Dieses Feld ist erforderlich";
+  const validateField = (
+    field: "firstName" | "lastName" | "email" | "phone",
+    value: string
+  ) => {
+    const newErrors = { ...errors };
+
+    switch (field) {
+      case "firstName":
+        if (!value.trim()) {
+          newErrors.firstName = "Bitte geben Sie Ihren Vornamen ein";
+        } else {
+          delete newErrors.firstName;
+        }
+        break;
+      case "lastName":
+        if (!value.trim()) {
+          newErrors.lastName = "Bitte geben Sie Ihren Nachnamen ein";
+        } else {
+          delete newErrors.lastName;
+        }
+        break;
+      case "email":
+        const emailResult = emailSchema.safeParse(value);
+        if (!emailResult.success) {
+          newErrors.email =
+            emailResult.error.errors[0]?.message || "Ungültige E-Mail-Adresse";
+        } else {
+          delete newErrors.email;
+        }
+        break;
+      case "phone":
+        // Phone is optional, but if provided should be valid
+        if (value.trim() && !/^[+\d\s-()]{5,}$/.test(value)) {
+          newErrors.phone = "Bitte geben Sie eine gültige Telefonnummer ein";
+        } else {
+          delete newErrors.phone;
+        }
+        break;
     }
-    if (name === "reporterEmail") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        return "Bitte geben Sie eine gültige E-Mail-Adresse ein";
-      }
-    }
-    return "";
+
+    setErrors(newErrors);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    updateReportData({ [name]: value });
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+  const handleChange = (
+    field: "firstName" | "lastName" | "email" | "phone",
+    value: string
+  ) => {
+    updateReportData({
+      [`reporter${field.charAt(0).toUpperCase() + field.slice(1)}`]: value,
+    });
+    if (errors[field]) {
+      validateField(field, value);
     }
   };
 
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const error = validateField(name, value);
-    setErrors((prev) => ({ ...prev, [name]: error }));
+  const handleBlur = (
+    field: "firstName" | "lastName" | "email" | "phone",
+    value: string
+  ) => {
+    validateField(field, value);
   };
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label
-            className={`block text-sm font-medium ${errors.reporterFirstName ? "text-red-600" : "text-gray-700"}`}
-          >
+      <div>
+        {errors.firstName ? (
+          <p className="block text-sm font-medium text-red-600 mb-2">
+            {errors.firstName}
+          </p>
+        ) : (
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Vorname *
           </label>
-          <input
-            type="text"
-            name="reporterFirstName"
-            value={reportData.reporterFirstName || ""}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            className={`mt-1 block w-full p-2 border ${
-              errors.reporterFirstName ? "border-red-500" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
-            placeholder="Ihr Vorname"
-            required
-          />
-          {errors.reporterFirstName && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.reporterFirstName}
-            </p>
-          )}
-        </div>
+        )}
+        <Input
+          type="text"
+          value={reportData.reporterFirstName || ""}
+          onChange={(e) => handleChange("firstName", e.target.value)}
+          onBlur={(e) => handleBlur("firstName", e.target.value)}
+          className={errors.firstName ? "border-red-500" : ""}
+        />
+      </div>
 
-        <div>
-          <label
-            className={`block text-sm font-medium ${errors.reporterLastName ? "text-red-600" : "text-gray-700"}`}
-          >
+      <div>
+        {errors.lastName ? (
+          <p className="block text-sm font-medium text-red-600 mb-2">
+            {errors.lastName}
+          </p>
+        ) : (
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Nachname *
           </label>
-          <input
-            type="text"
-            name="reporterLastName"
-            value={reportData.reporterLastName || ""}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            className={`mt-1 block w-full p-2 border ${
-              errors.reporterLastName ? "border-red-500" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
-            placeholder="Ihr Nachname"
-            required
-          />
-          {errors.reporterLastName && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.reporterLastName}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <label
-          className={`block text-sm font-medium ${errors.reporterEmail ? "text-red-600" : "text-gray-700"}`}
-        >
-          E-Mail Adresse *
-        </label>
-        <input
-          type="email"
-          name="reporterEmail"
-          value={reportData.reporterEmail || ""}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-          className={`mt-1 block w-full p-2 border ${
-            errors.reporterEmail ? "border-red-500" : "border-gray-300"
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
-          placeholder="ihre@email.com"
-          required
-        />
-        {errors.reporterEmail && (
-          <p className="mt-1 text-sm text-red-600">{errors.reporterEmail}</p>
         )}
+        <Input
+          type="text"
+          value={reportData.reporterLastName || ""}
+          onChange={(e) => handleChange("lastName", e.target.value)}
+          onBlur={(e) => handleBlur("lastName", e.target.value)}
+          className={errors.lastName ? "border-red-500" : ""}
+        />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Telefonnummer (optional)
-        </label>
-        <input
+        {errors.email ? (
+          <p className="block text-sm font-medium text-red-600 mb-2">
+            {errors.email}
+          </p>
+        ) : (
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            E-Mail *
+          </label>
+        )}
+        <Input
+          type="email"
+          value={reportData.reporterEmail || ""}
+          onChange={(e) => handleChange("email", e.target.value)}
+          onBlur={(e) => handleBlur("email", e.target.value)}
+          className={errors.email ? "border-red-500" : ""}
+        />
+      </div>
+
+      <div>
+        {errors.phone ? (
+          <p className="block text-sm font-medium text-red-600 mb-2">
+            {errors.phone}
+          </p>
+        ) : (
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Telefon (optional)
+          </label>
+        )}
+        <Input
           type="tel"
-          name="reporterPhone"
           value={reportData.reporterPhone || ""}
-          onChange={handleInputChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          placeholder="+41 XX XXX XX XX"
+          onChange={(e) => handleChange("phone", e.target.value)}
+          onBlur={(e) => handleBlur("phone", e.target.value)}
+          className={errors.phone ? "border-red-500" : ""}
         />
       </div>
     </div>

@@ -53,16 +53,22 @@ export const SummaryStep = () => {
         {/* Images */}
         <div>
           <h3 className="text-sm font-medium text-gray-700">Bilder</h3>
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            {reportData.images.map((image, index) => (
-              <img
-                key={index}
-                src={image.previewUrl}
-                alt={`Upload ${index + 1}`}
-                className="h-20 w-20 object-cover rounded-md"
-              />
-            ))}
-          </div>
+          {reportData.images.length > 0 ? (
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {reportData.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image.previewUrl}
+                  alt={`Upload ${index + 1}`}
+                  className="h-20 w-20 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-gray-500 italic">
+              Keine Bilder ausgewählt
+            </p>
+          )}
         </div>
 
         {/* Description */}
