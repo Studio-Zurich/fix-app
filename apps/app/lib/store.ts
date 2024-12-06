@@ -20,6 +20,8 @@ interface ReportData {
   reporterLastName?: string;
   reporterEmail?: string;
   reporterPhone?: string;
+  incidentTypeId?: string;
+  incidentSubtypeId?: string;
 }
 
 interface ReportState {

@@ -23,6 +23,13 @@ interface ReportEmailProps {
   imageCount: number;
 }
 
+// Use environment variables type-safely
+declare const process: {
+  env: {
+    NEXT_PUBLIC_APP_URL: string;
+  };
+};
+
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fix-app.ch";
 
 const defaultProps = {
