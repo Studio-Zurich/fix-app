@@ -1,5 +1,6 @@
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
+import { Alert, AlertDescription } from "@repo/ui/alert";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
@@ -119,33 +120,34 @@ export const ImageStep = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Upload Images</h2>
-      <p className="text-gray-600">
-        Upload up to 5 images (JPEG, PNG) of the incident. Maximum file size:
-        5MB
-      </p>
-
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <Input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileChange}
-          className="hidden"
-          id="image-upload"
-          disabled={uploading}
-        />
-        <Label
-          htmlFor="image-upload"
-          className={`px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 ${
-            uploading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          {uploading ? "Uploading..." : "Select Images"}
-        </Label>
+        <div className="grid w-full max-w-sm items-center gap-1.5 mx-auto">
+          <Label htmlFor="image-upload">Bilder hochladen</Label>
+          <Input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+            id="image-upload"
+            disabled={uploading}
+          />
+          <Label
+            htmlFor="image-upload"
+            className={`px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 ${
+              uploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {uploading ? "Wird hochgeladen..." : "Bilder auswählen"}
+          </Label>
+        </div>
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {reportData.images.length > 0 && (
         <div className="grid grid-cols-2 gap-4 mt-4">
@@ -154,12 +156,14 @@ export const ImageStep = () => {
               <img
                 src={image.previewUrl}
                 alt={`Upload ${index + 1}`}
-                className="w-full h-48 object-cover rounded-lg"
+                className="w-full h-48 h-48 object-cover rounded-lg"
               />
               <Button
+                variant="outline"
+                size="icon"
                 onClick={() => removeImage(index)}
                 className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
-                aria-label="Remove image"
+                aria-label="Bild entfernen"
               >
                 ✕
               </Button>

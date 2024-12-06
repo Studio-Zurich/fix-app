@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mapbox/search-js-react": "1.0.0-beta.22",
+    "@phosphor-icons/react": "^2.1.7",
     "@react-email/render": "0.0.15",
     "@repo/transactional": "workspace:*",
     "@repo/ui": "workspace:*",

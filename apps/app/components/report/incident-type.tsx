@@ -74,16 +74,11 @@ export const IncidentTypeStep = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Select Incident Type</h2>
-      <p className="text-gray-600">
-        Choose the type and subtype of the incident.
-      </p>
-
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Incident Type
+          Vorfall Typ
         </label>
         <select
           value={reportData.incidentTypeId || ""}
@@ -91,7 +86,7 @@ export const IncidentTypeStep = () => {
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
         >
           <option value="" disabled>
-            Select an incident type
+            Vorfall Typ auswählen
           </option>
           {incidentTypes.map((type) => (
             <option key={type.id} value={type.id}>
@@ -104,7 +99,7 @@ export const IncidentTypeStep = () => {
       {incidentSubtypes.length > 0 && (
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Incident Subtype
+            Vorfall Unterkategorie
           </label>
           <select
             value={reportData.incidentSubtypeId || ""}
@@ -112,7 +107,7 @@ export const IncidentTypeStep = () => {
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
           >
             <option value="" disabled>
-              Select an incident subtype
+              Unterkategorie auswählen
             </option>
             {incidentSubtypes.map((subtype) => (
               <option key={subtype.id} value={subtype.id}>
