@@ -138,18 +138,14 @@ export async function submitReport(data: ReportData) {
           reporterPhone: validatedData.reporterPhone,
           location: validatedData.location,
           description: validatedData.description,
-          incidentType: {
-            name: incidentTypeInfo.name,
-            subtype: incidentTypeInfo.subtype,
-          },
-          imageCount: validatedData.images.length,
+          imageCount: validatedData.images?.length ?? 0,
         })
       );
 
       await resend.emails.send({
         from: "Fix App <notifications@fix-app.ch>",
         to: ["hello@studio-zurich.ch", validatedData.reporterEmail],
-        subject: `New Report Submitted (#${report.id})`,
+        subject: "Ihre Meldung wurde bestätigt",
         html: emailHtml,
       });
     } catch (emailError) {

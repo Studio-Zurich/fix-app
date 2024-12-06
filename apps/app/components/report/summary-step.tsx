@@ -52,7 +52,7 @@ export const SummaryStep = () => {
       <div className="space-y-4">
         {/* Images */}
         <div>
-          <h3 className="text-sm font-medium text-gray-700">Bilder</h3>
+          <h3 className="text-base font-medium text-gray-700">Bilder</h3>
           {reportData.images.length > 0 ? (
             <div className="mt-2 grid grid-cols-4 gap-2">
               {reportData.images.map((image, index) => (
@@ -65,7 +65,7 @@ export const SummaryStep = () => {
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-gray-500 italic">
+            <p className="mt-2 text-base text-gray-500 italic">
               Keine Bilder ausgewählt
             </p>
           )}
@@ -74,8 +74,10 @@ export const SummaryStep = () => {
         {/* Description */}
         {reportData.description && (
           <div>
-            <h3 className="text-sm font-medium text-gray-700">Beschreibung</h3>
-            <p className="mt-1 text-sm text-gray-600">
+            <h3 className="text-base font-medium text-gray-700">
+              Beschreibung
+            </h3>
+            <p className="mt-1 text-base text-gray-600">
               {reportData.description}
             </p>
           </div>
@@ -84,8 +86,8 @@ export const SummaryStep = () => {
         {/* Location */}
         {reportData.location && (
           <div>
-            <h3 className="text-sm font-medium text-gray-700">Standort</h3>
-            <p className="mt-1 text-sm text-gray-600">
+            <h3 className="text-base font-medium text-gray-700">Standort</h3>
+            <p className="mt-1 text-base text-gray-600">
               {reportData.location.address}
             </p>
           </div>
@@ -93,10 +95,10 @@ export const SummaryStep = () => {
 
         {/* Reporter Information */}
         <div>
-          <h3 className="text-sm font-medium text-gray-700">
+          <h3 className="text-base font-medium text-gray-700">
             Kontaktinformationen
           </h3>
-          <div className="mt-1 text-sm text-gray-600">
+          <div className="mt-1 text-base text-gray-600">
             <p>{`${reportData.reporterFirstName} ${reportData.reporterLastName}`}</p>
             <p>{reportData.reporterEmail}</p>
             {reportData.reporterPhone && <p>{reportData.reporterPhone}</p>}

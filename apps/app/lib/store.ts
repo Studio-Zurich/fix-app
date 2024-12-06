@@ -1,25 +1,55 @@
 import { create } from "zustand";
-import { ReportData } from "./types";
 
-interface ReportStore {
-  currentStep: number;
-  reportData: ReportData;
-  setCurrentStep: (step: number) => void;
-  updateReportData: (data: Partial<ReportData>) => void;
-  reset: () => void;
+interface Image {
+  previewUrl: string;
+  storagePath: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
 }
 
-const initialState: ReportData = {
-  images: [],
+interface ReportData {
+  images: Image[];
+  description?: string;
+  location?: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  reporterFirstName?: string;
+  reporterLastName?: string;
+  reporterEmail?: string;
+  reporterPhone?: string;
+}
+
+interface ReportState {
+  currentStep: number;
+  reportData: ReportData;
+}
+
+interface ReportStore extends ReportState {
+  reset: () => void;
+  setCurrentStep: (step: number) => void;
+  updateReportData: (data: Partial<ReportData>) => void;
+}
+
+const initialState: ReportState = {
+  currentStep: 0,
+  reportData: {
+    images: [],
+  },
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
-  currentStep: 0,
-  reportData: initialState,
+  ...initialState,
+  reset: () => set(initialState),
   setCurrentStep: (step) => set({ currentStep: step }),
   updateReportData: (data) =>
     set((state) => ({
-      reportData: { ...state.reportData, ...data },
+      ...state,
+      reportData: {
+        ...state.reportData,
+        ...data,
+      },
     })),
-  reset: () => set({ currentStep: 0, reportData: initialState }),
 }));

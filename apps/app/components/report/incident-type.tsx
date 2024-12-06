@@ -74,16 +74,16 @@ export const IncidentTypeStep = () => {
 
   return (
     <div className="space-y-4">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-500 text-base">{error}</p>}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-base font-medium text-gray-700">
           Vorfall Typ
         </label>
         <select
           value={reportData.incidentTypeId || ""}
           onChange={(e) => handleTypeChange(e.target.value)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base rounded-md"
         >
           <option value="" disabled>
             Vorfall Typ auswählen
@@ -98,13 +98,13 @@ export const IncidentTypeStep = () => {
 
       {incidentSubtypes.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-base font-medium text-gray-700">
             Vorfall Unterkategorie
           </label>
           <select
             value={reportData.incidentSubtypeId || ""}
             onChange={(e) => handleSubtypeChange(e.target.value)}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base rounded-md"
           >
             <option value="" disabled>
               Unterkategorie auswählen

@@ -1,15 +1,17 @@
 "use client";
 
+import { useReportStore } from "@/lib/store";
 import { Check } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { useRouter } from "next/navigation";
 
 export const ConfirmStep = () => {
   const router = useRouter();
+  const reset = useReportStore((state) => state.reset);
 
   const handleNewReport = () => {
-    // Refresh the page to start a new report
-    router.refresh();
+    reset();
+    router.push("/");
   };
 
   return (
@@ -21,7 +23,7 @@ export const ConfirmStep = () => {
         <h3 className="text-xl font-semibold text-gray-900">
           Meldung erfolgreich übermittelt
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-base text-gray-500">
           Sie erhalten in Kürze eine Bestätigungs-E-Mail mit den Details Ihrer
           Meldung.
         </p>

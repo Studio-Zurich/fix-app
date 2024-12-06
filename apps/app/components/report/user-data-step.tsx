@@ -2,6 +2,7 @@
 
 import { useReportStore } from "@/lib/store";
 import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -83,18 +84,17 @@ export const UserDataStep = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div>
+    <div className="grid gap-6">
+      <div className="grid gap-1.5">
         {errors.firstName ? (
-          <p className="block text-sm font-medium text-red-600 mb-2">
+          <p className="block text-base font-medium text-red-600">
             {errors.firstName}
           </p>
         ) : (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Vorname *
-          </label>
+          <Label htmlFor="firstName">Vorname*</Label>
         )}
         <Input
+          id="firstName"
           type="text"
           value={reportData.reporterFirstName || ""}
           onChange={(e) => handleChange("firstName", e.target.value)}
@@ -103,17 +103,16 @@ export const UserDataStep = () => {
         />
       </div>
 
-      <div>
+      <div className="grid gap-1.5">
         {errors.lastName ? (
-          <p className="block text-sm font-medium text-red-600 mb-2">
+          <p className="block text-base font-medium text-red-600">
             {errors.lastName}
           </p>
         ) : (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Nachname *
-          </label>
+          <Label htmlFor="lastName">Nachname*</Label>
         )}
         <Input
+          id="lastName"
           type="text"
           value={reportData.reporterLastName || ""}
           onChange={(e) => handleChange("lastName", e.target.value)}
@@ -122,17 +121,16 @@ export const UserDataStep = () => {
         />
       </div>
 
-      <div>
+      <div className="grid gap-1.5">
         {errors.email ? (
-          <p className="block text-sm font-medium text-red-600 mb-2">
+          <p className="block text-base font-medium text-red-600">
             {errors.email}
           </p>
         ) : (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            E-Mail *
-          </label>
+          <Label htmlFor="email">E-Mail*</Label>
         )}
         <Input
+          id="email"
           type="email"
           value={reportData.reporterEmail || ""}
           onChange={(e) => handleChange("email", e.target.value)}
@@ -141,17 +139,16 @@ export const UserDataStep = () => {
         />
       </div>
 
-      <div>
+      <div className="grid gap-1.5">
         {errors.phone ? (
-          <p className="block text-sm font-medium text-red-600 mb-2">
+          <p className="block text-base font-medium text-red-600">
             {errors.phone}
           </p>
         ) : (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Telefon (optional)
-          </label>
+          <Label htmlFor="phone">Telefon (optional)</Label>
         )}
         <Input
+          id="phone"
           type="tel"
           value={reportData.reporterPhone || ""}
           onChange={(e) => handleChange("phone", e.target.value)}

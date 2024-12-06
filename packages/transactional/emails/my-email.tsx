@@ -21,10 +21,6 @@ interface ReportEmailProps {
     lng: number;
   } | null;
   description: string;
-  incidentType: {
-    name: string;
-    subtype?: string;
-  } | null;
   imageCount: number;
 }
 
@@ -40,10 +36,6 @@ const defaultProps = {
     lng: 0,
   },
   description: "No description provided",
-  incidentType: {
-    name: "Unknown incident",
-    subtype: undefined,
-  },
   imageCount: 0,
 } as const;
 
@@ -54,78 +46,64 @@ export const ReportEmail = ({
   reporterPhone,
   location = defaultProps.location,
   description = defaultProps.description,
-  incidentType = defaultProps.incidentType,
   imageCount = defaultProps.imageCount,
 }: ReportEmailProps) => {
-  const safeIncidentType = incidentType || defaultProps.incidentType;
   const safeLocation = location || defaultProps.location;
 
   return (
     <Html>
       <Head />
-      <Preview>New Report Submitted #{reportId}</Preview>
+      <Preview>Ihre Meldung wurde bestätigt</Preview>
       <Body style={main}>
         <Container>
           <Section style={content}>
-            <Heading style={header}>New Report Submitted #{reportId}</Heading>
+            <Heading style={header}>
+              Ihre Meldung wurde bestätigt #{reportId}
+            </Heading>
 
             <Section style={section}>
               <Heading as="h2" style={sectionHeader}>
-                Incident Details
+                Bilder
               </Heading>
               <Text style={text}>
-                <strong>Type:</strong> {safeIncidentType?.name || "Unknown"}
+                {imageCount} Bild(er) zur Meldung beigefügt
               </Text>
-              {safeIncidentType?.subtype && (
-                <Text style={text}>
-                  <strong>Subtype:</strong> {safeIncidentType.subtype}
-                </Text>
-              )}
             </Section>
 
             <Section style={section}>
               <Heading as="h2" style={sectionHeader}>
-                Location
-              </Heading>
-              <Text style={text}>{safeLocation.address}</Text>
-            </Section>
-
-            <Section style={section}>
-              <Heading as="h2" style={sectionHeader}>
-                Description
+                Beschreibung
               </Heading>
               <Text style={text}>{description}</Text>
             </Section>
 
             <Section style={section}>
               <Heading as="h2" style={sectionHeader}>
-                Reporter Information
+                Standort
+              </Heading>
+              <Text style={text}>{safeLocation.address}</Text>
+            </Section>
+
+            <Section style={section}>
+              <Heading as="h2" style={sectionHeader}>
+                Kontaktinformationen
               </Heading>
               <Text style={text}>
                 <strong>Name:</strong> {reporterName}
               </Text>
               <Text style={text}>
-                <strong>Email:</strong> {reporterEmail}
+                <strong>E-Mail:</strong> {reporterEmail}
               </Text>
               {reporterPhone && (
                 <Text style={text}>
-                  <strong>Phone:</strong> {reporterPhone}
+                  <strong>Telefon:</strong> {reporterPhone}
                 </Text>
               )}
             </Section>
 
-            <Section style={section}>
-              <Heading as="h2" style={sectionHeader}>
-                Images
-              </Heading>
-              <Text style={text}>
-                {imageCount} image(s) attached to the report
-              </Text>
-            </Section>
-
             <Section style={buttonContainer}>
               <Button href={`${baseUrl}/reports/${reportId}`} style={button}>
-                View Report
+                Meldung anzeigen
               </Button>
             </Section>
           </Section>
@@ -186,14 +164,18 @@ const buttonContainer = {
 
 const button = {
   backgroundColor: "#0070f3",
-  borderRadius: "5px",
+  borderRadius: "9999px",
   color: "#fff",
   fontSize: "16px",
-  fontWeight: "bold",
+  fontWeight: "500",
   textDecoration: "none",
   textAlign: "center" as const,
-  display: "inline-block",
-  padding: "12px 30px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "12px 24px",
+  transition: "background-color 150ms ease",
+  gap: "8px",
 };
 
 const footer = {

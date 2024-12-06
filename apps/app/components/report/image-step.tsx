@@ -1,5 +1,6 @@
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
+import { X } from "@phosphor-icons/react";
 import { Alert, AlertDescription } from "@repo/ui/alert";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
@@ -132,14 +133,13 @@ export const ImageStep = () => {
             id="image-upload"
             disabled={uploading}
           />
-          <Label
-            htmlFor="image-upload"
-            className={`px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer hover:bg-blue-700 ${
-              uploading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          <Button
+            className="w-full mt-2"
+            onClick={() => document.getElementById("image-upload")?.click()}
+            disabled={uploading}
           >
             {uploading ? "Wird hochgeladen..." : "Bilder auswählen"}
-          </Label>
+          </Button>
         </div>
       </div>
 
@@ -162,10 +162,10 @@ export const ImageStep = () => {
                 variant="outline"
                 size="icon"
                 onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-lg hover:bg-gray-100"
+                className="absolute top-2 right-2 bg-white hover:bg-gray-100/90"
                 aria-label="Bild entfernen"
               >
-                ✕
+                <X className="h-4 w-4" />
               </Button>
             </div>
           ))}

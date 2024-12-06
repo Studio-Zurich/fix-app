@@ -47,7 +47,7 @@ const steps: StepMetadata[] = [
     component: <SummaryStep />,
     banner: (
       <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-md p-4">
-        <p className="text-sm text-yellow-700">
+        <p className="text-base text-yellow-700">
           Bitte überprüfen Sie alle Angaben vor dem Absenden. Nach dem Absenden
           erhalten Sie eine Bestätigungs-E-Mail mit Ihren Meldungsdetails.
         </p>
@@ -173,7 +173,7 @@ export const StepWrapper = () => {
               <h2 className="text-lg font-semibold block">
                 {steps[currentStep]?.title}
               </h2>
-              <p className="text-sm text-muted-foreground block">
+              <p className="text-base text-muted-foreground block">
                 {steps[currentStep]?.description}
               </p>
               {steps[currentStep]?.banner && (
@@ -187,7 +187,7 @@ export const StepWrapper = () => {
 
           {submitError && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{submitError}</p>
+              <p className="text-base text-red-600">{submitError}</p>
             </div>
           )}
         </div>
