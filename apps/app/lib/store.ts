@@ -8,14 +8,16 @@ interface Image {
   fileSize: number;
 }
 
+interface Location {
+  lat: number;
+  lng: number;
+  address: string;
+}
+
 interface ReportData {
   images: Image[];
   description?: string;
-  location?: {
-    lat: number;
-    lng: number;
-    address: string;
-  };
+  location?: Location;
   reporterFirstName?: string;
   reporterLastName?: string;
   reporterEmail?: string;
@@ -27,12 +29,14 @@ interface ReportData {
 interface ReportState {
   currentStep: number;
   reportData: ReportData;
+  location: Location | null;
 }
 
 interface ReportStore extends ReportState {
   reset: () => void;
   setCurrentStep: (step: number) => void;
   updateReportData: (data: Partial<ReportData>) => void;
+  setLocation: (location: Location) => void;
 }
 
 const initialState: ReportState = {
@@ -40,6 +44,7 @@ const initialState: ReportState = {
   reportData: {
     images: [],
   },
+  location: null,
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -52,6 +57,15 @@ export const useReportStore = create<ReportStore>((set) => ({
       reportData: {
         ...state.reportData,
         ...data,
+      },
+    })),
+  setLocation: (location) =>
+    set((state) => ({
+      ...state,
+      location,
+      reportData: {
+        ...state.reportData,
+        location,
       },
     })),
 }));
