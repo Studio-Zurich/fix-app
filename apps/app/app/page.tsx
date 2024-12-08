@@ -1,7 +1,7 @@
 "use client";
 
-import { StepWrapper } from "@/components/report/step-wrapper";
+import StepContainer from "./components/step-container";
 
 export default function ReportPage() {
-  return <StepWrapper />;
+  return <StepContainer />;
 }

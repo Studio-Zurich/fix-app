@@ -1,6 +1,37 @@
+// General
+Do not do these things without consulting me first:
+
+- Add any new dependencies
+- Change or add styles
+- Change the file structure
+- Change the database schema
+- Remove parts of the code
+
+Do only add components or steps that are already existing
+
+More instructions are in project.md
+
+// Import Order
+Order imports based on the following:
+
+- React
+- Next.js
+- Other libraries
+- Components
+- Types
+- Utils
+
+// Imports
+Imports should be with base path or relative path but not ../ etc.
+
+// Map Integration
+use mapbox for map integration
+use mapbox for autocomplete
+
 // TypeScript and Data Validation
 typescript strict mode required
 use zod for data validation
+error handling with zod and only on click so we need client and server validation
 
 // State Management and Actions
 use zustand for state management
@@ -19,7 +50,7 @@ utilize route handlers for API routes
 follow turborepo structure
 apps/app/ contains wizard application
 apps/web/ for web application
-packages/ui/ for shared components
+packages/ui/ for shared components (@repo/ui/COMPONENT) NOT @repo/ui/ui/COMPONENT
 
 // File Naming
 files use lowercase with hyphens (example: location-step.tsx)
@@ -32,3 +63,12 @@ group related step components under components/report/
 keep configuration in lib/config.ts
 maintain types in lib/types.ts
 store state management in lib/store.ts
+
+// Animations
+use framer motion for animations
+
+// Icons
+use phosphor icons for icons
+
+// Drawer
+use vaul for drawers
