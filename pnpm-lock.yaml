@@ -41,6 +41,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.46.2
         version: 2.46.2
+      exifreader:
+        specifier: ^4.25.0
+        version: 4.25.0
       framer-motion:
         specifier: ^11.13.1
         version: 11.13.1(react-dom@18.3.1)(react@18.3.1)
@@ -62,9 +65,6 @@ importers:
       resend:
         specifier: ^4.0.1
         version: 4.0.1(react-dom@18.3.1)(react@18.3.1)
-      vaul:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/react-dom@18.3.0)(@types/react@18.3.6)(react-dom@18.3.1)(react@18.3.1)
       web-push:
         specifier: ^3.6.7
         version: 3.6.7
@@ -3784,6 +3784,13 @@ packages:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
 
+  /@xmldom/xmldom@0.9.6:
+    resolution: {integrity: sha512-Su4xcxR0CPGwlDHNmVP09fqET9YxbyDXHaSob6JlBH7L6reTYaeim6zbk9o08UarO0L5GTRo3uzl0D+9lSxmvw==}
+    engines: {node: '>=14.6'}
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@xtuc/ieee754@1.2.0:
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
 
@@ -5613,6 +5620,13 @@ packages:
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
     dev: true
+
+  /exifreader@4.25.0:
+    resolution: {integrity: sha512-lPyPXWTUuYgoKdKf3rw2EDoE9Zl7xHoy/ehPNeQ4gFVNLzfLyNMP4oEI+sP0/Czp5r/2i7cFhqg5MHsl4FYtyw==}
+    requiresBuild: true
+    optionalDependencies:
+      '@xmldom/xmldom': 0.9.6
+    dev: false
 
   /extend-shallow@2.0.1:
     resolution: {integrity: sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==}

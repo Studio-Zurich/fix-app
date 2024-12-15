@@ -30,6 +30,8 @@ interface ReportState {
   currentStep: number;
   reportData: ReportData;
   location: Location | null;
+  images: string[];
+  setImages: (images: string[]) => void;
 }
 
 interface ReportStore extends ReportState {
@@ -45,6 +47,8 @@ const initialState: ReportState = {
     images: [],
   },
   location: null,
+  images: [],
+  setImages: () => {},
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -68,4 +72,5 @@ export const useReportStore = create<ReportStore>((set) => ({
         location,
       },
     })),
+  setImages: (images) => set({ images }),
 }));
