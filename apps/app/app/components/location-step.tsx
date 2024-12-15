@@ -3,12 +3,21 @@
 import { useReportStore } from "@/lib/store";
 import { MagnifyingGlass, MapPin } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@repo/ui/drawer";
 import { Input } from "@repo/ui/input";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
 import Map, { Marker } from "react-map-gl";
-import { Drawer } from "vaul";
 
 interface Suggestion {
   id: string;
@@ -118,8 +127,8 @@ export default function LocationStep() {
 
   return (
     <div className="space-y-4">
-      <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Drawer.Trigger asChild>
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <DrawerTrigger asChild>
           <Button
             variant="outline"
             className="w-full justify-start text-muted-foreground h-10 px-3"
@@ -127,44 +136,52 @@ export default function LocationStep() {
             <MagnifyingGlass className="w-4 h-4 mr-2" />
             {location?.address || "Search address..."}
           </Button>
-        </Drawer.Trigger>
+        </DrawerTrigger>
+        <DrawerContent className="h-[90%]">
+          <DrawerHeader>
+            <DrawerTitle>Search address</DrawerTitle>
+            <DrawerDescription>
+              Search for an address or drag the marker on the map
+            </DrawerDescription>
+          </DrawerHeader>
 
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-          <Drawer.Content className="bg-white fixed bottom-0 left-0 right-0 rounded-t-xl">
-            <Drawer.Title>Search address</Drawer.Title>
-            <div className="p-4 space-y-4">
-              <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-4" />
+          <div className="p-4">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Search address..."
+                value={searchValue}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full"
+                autoFocus
+              />
 
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search address..."
-                  value={searchValue}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="w-full"
-                  autoFocus
-                />
-
-                {suggestions.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {suggestions.map((suggestion) => (
-                      <Button
-                        key={suggestion.id}
-                        variant="ghost"
-                        className="w-full justify-start text-left"
-                        onClick={() => handleLocationSelect(suggestion)}
-                      >
-                        {suggestion.place_name}
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {suggestions.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {suggestions.map((suggestion) => (
+                    <Button
+                      key={suggestion.id}
+                      variant="ghost"
+                      className="w-full justify-start text-left"
+                      onClick={() => handleLocationSelect(suggestion)}
+                    >
+                      {suggestion.place_name}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+          </div>
+
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="outline" className="w-full">
+                Close
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <Map
         ref={mapRef}

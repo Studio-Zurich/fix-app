@@ -3,10 +3,11 @@
 import { Button } from "@repo/ui/button";
 import { Progress } from "@repo/ui/progress";
 import { useState } from "react";
+import ImageStep from "./image-step";
 import LocationStep from "./location-step";
 
 const steps = [
-  { id: 0, component: <div>Image Step</div> },
+  { id: 0, component: <ImageStep /> },
   { id: 1, component: <LocationStep /> },
   { id: 2, component: <div>Incident Type Step</div> },
   { id: 3, component: <div>Incident Description Step</div> },
