@@ -2,9 +2,14 @@
 
 import { useReportStore } from "@/lib/store";
 import { Camera, MagnifyingGlass, MapPin } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import Vaul from "@repo/ui/vaul";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@repo/ui/sheet";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
@@ -154,51 +159,21 @@ export default function LocationStep() {
   return (
     <div className="relative">
       <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
-        <Vaul
-          open={isOpen}
-          onOpenChange={setIsOpen}
-          triggerContent={
-            <div className="flex items-center text-muted-foreground">
-              <MagnifyingGlass className="w-4 h-4 mr-2" />
-              Search address...
-            </div>
-          }
-        >
-          <div className="p-4 space-y-4">
-            <div>
-              <h2 className="font-semibold text-lg mb-1">Search address</h2>
-              <p className="text-sm text-muted-foreground">
-                Search for an address or drag the marker on the map
-              </p>
-            </div>
-
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search address..."
-                value={searchValue}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="w-full"
-                autoFocus
-              />
-
-              {suggestions.length > 0 && (
-                <div className="mt-2 space-y-1 overflow-hidden px-2 bg-muted">
-                  {suggestions.map((suggestion) => (
-                    <Button
-                      key={suggestion.id}
-                      variant="link"
-                      className="w-full justify-start text-left p-0 m-0 text-sm"
-                      onClick={() => handleLocationSelect(suggestion)}
-                    >
-                      {suggestion.place_name}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </Vaul>
+        <Sheet>
+          <SheetTrigger>
+            <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
+          </SheetTrigger>
+          <SheetContent side="bottom">
+            <SheetHeader>
+              <SheetTitle>Sheet</SheetTitle>
+            </SheetHeader>
+            <Input
+              placeholder="Search for a location"
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </SheetContent>
+        </Sheet>
       </div>
 
       <Map

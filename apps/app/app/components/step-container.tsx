@@ -20,7 +20,7 @@ export default function StepContainer() {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="min-h-screen flex flex-col p-4">
+    <div className="flex min-h-svh flex-col p-4">
       <header className="text-center mb-4">
         <h1 className="text-2xl font-bold">Fix App</h1>
       </header>
