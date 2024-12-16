@@ -27,24 +27,25 @@ export default function StepContainer() {
 
       <Progress value={progress} className="mb-6 w-full" />
 
-      <div className="flex-1">
+      <div className="flex-1 relative">
         {steps[currentStep]?.component || <div>Invalid step</div>}
       </div>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 space-y-4">
         <Button
+          className="w-full"
+          onClick={() => setCurrentStep(currentStep + 1)}
+          disabled={currentStep === steps.length - 1}
+        >
+          Next
+        </Button>
+        <Button
+          className="w-full"
           variant="outline"
           onClick={() => setCurrentStep(currentStep - 1)}
           disabled={currentStep === 0}
         >
           Back
-        </Button>
-
-        <Button
-          onClick={() => setCurrentStep(currentStep + 1)}
-          disabled={currentStep === steps.length - 1}
-        >
-          Next
         </Button>
       </div>
     </div>

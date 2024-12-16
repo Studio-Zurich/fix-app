@@ -1,279 +1,144 @@
 "use client";
 
+import type { ReportState } from "@/lib/store";
 import { useReportStore } from "@/lib/store";
-import { ImageSquare, Trash, UploadSimple } from "@phosphor-icons/react";
+import { Camera, ImageSquare } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
-import ExifReader from "exifreader";
-import { useState } from "react";
+import exifr from "exifr";
+import { useRef, useState } from "react";
 
-interface ImageMetadata {
-  name: string;
-  size: string;
-  type: string;
-  location?: {
-    lat?: number;
-    lng?: number;
-    address?: string;
-  };
-  dateTaken?: string;
-  camera?: {
-    make?: string;
-    model?: string;
-  };
-  settings?: {
-    exposureTime?: string;
-    fNumber?: number;
-    iso?: number;
-  };
+// Helper function to convert decimal degrees to DMS format
+function convertToDMS(decimal: number, isLatitude: boolean): string {
+  const direction = isLatitude
+    ? decimal >= 0
+      ? "N"
+      : "S"
+    : decimal >= 0
+      ? "E"
+      : "W";
+
+  const absolute = Math.abs(decimal);
+  const degrees = Math.floor(absolute);
+  const minutesDecimal = (absolute - degrees) * 60;
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = ((minutesDecimal - minutes) * 60).toFixed(3);
+
+  return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
 }
 
-// Helper function to convert GPS coordinates from EXIF format to decimal
-const convertGPSToDecimal = (
-  degrees: number,
-  minutes: number,
-  seconds: number,
-  direction: string
-) => {
-  let decimal = degrees + minutes / 60 + seconds / 3600;
-  if (direction === "S" || direction === "W") {
-    decimal = -decimal;
-  }
-  return decimal;
-};
-
-// New helper function to extract EXIF metadata
-const extractMetadata = async (file: File): Promise<Partial<ImageMetadata>> => {
-  try {
-    const tags = await ExifReader.load(file);
-    const metadata: Partial<ImageMetadata> = {};
-
-    // Extract date
-    if (tags.DateTimeOriginal) {
-      metadata.dateTaken = new Date(
-        tags.DateTimeOriginal.description
-      ).toLocaleString();
-    }
-
-    // Extract camera info
-    if (tags.Make || tags.Model) {
-      metadata.camera = {
-        make: tags.Make?.description,
-        model: tags.Model?.description,
-      };
-    }
-
-    // Extract camera settings
-    if (tags.ExposureTime || tags.FNumber || tags.ISOSpeedRatings) {
-      metadata.settings = {
-        exposureTime: tags.ExposureTime?.description,
-        fNumber: Number(tags.FNumber?.description),
-        iso: Number(tags.ISOSpeedRatings?.description),
-      };
-    }
-
-    // Extract GPS data
-    if (tags.GPSLatitude && tags.GPSLongitude) {
-      const lat = convertGPSToDecimal(
-        Number(tags.GPSLatitude.value[0]),
-        Number(tags.GPSLatitude.value[1]),
-        Number(tags.GPSLatitude.value[2]),
-        String(tags.GPSLatitudeRef?.value || "N")
-      );
-
-      const lng = convertGPSToDecimal(
-        Number(tags.GPSLongitude.value[0]),
-        Number(tags.GPSLongitude.value[1]),
-        Number(tags.GPSLongitude.value[2]),
-        String(tags.GPSLongitudeRef?.value || "E")
-      );
-
-      metadata.location = { lat, lng };
-    }
-
-    return metadata;
-  } catch (error) {
-    console.log("Error extracting metadata:", error);
-    return {};
-  }
-};
+// Helper function to format file size
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
 
 export default function ImageStep() {
-  const images = useReportStore((state) => state.images);
-  const setImages = useReportStore((state) => state.setImages);
-  const [metadata, setMetadata] = useState<ImageMetadata[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { setLocation, setImages, images, imageMetadata, setImageMetadata } =
+    useReportStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (
+  const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const files = event.target.files;
-    if (!files) return;
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    const newImages: string[] = [...images];
-    const newMetadata: ImageMetadata[] = [...metadata];
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    setImages([objectUrl]);
 
-    for (const file of Array.from(files)) {
-      // Extract all metadata
-      const extractedMetadata = await extractMetadata(file);
+    const newMetadata: ReportState["imageMetadata"] = {
+      fileInfo: {
+        size: file.size,
+        format: file.type.split("/")[1]?.toUpperCase() ?? "UNKNOWN",
+      },
+    };
 
-      // Fetch address if location exists
-      let address: string | undefined;
-      if (extractedMetadata.location) {
-        try {
-          const response = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${extractedMetadata.location.lng},${extractedMetadata.location.lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-          );
-          const data = await response.json();
-          address = data.features[0]?.place_name;
-        } catch (error) {
-          console.error("Error fetching address:", error);
-        }
+    try {
+      const output = await exifr.gps(file);
+      if (output?.latitude && output?.longitude) {
+        const coords = {
+          lat: output.latitude,
+          lng: output.longitude,
+        };
+        newMetadata.coordinates = coords;
+        setLocation({
+          lat: coords.lat,
+          lng: coords.lng,
+          address: "",
+        });
       }
-
-      // Read the file and create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (typeof e.target?.result === "string") {
-          newImages.push(e.target.result);
-          newMetadata.push({
-            name: file.name,
-            size: formatFileSize(file.size),
-            type: file.type,
-            ...extractedMetadata,
-            location: extractedMetadata.location
-              ? { ...extractedMetadata.location, address }
-              : undefined,
-          });
-
-          setImages(newImages);
-          setMetadata(newMetadata);
-
-          // Update report location if this is the first image with location data
-          if (extractedMetadata.location && newImages.length === 1) {
-            useReportStore.getState().setLocation({
-              lat: extractedMetadata.location.lat!,
-              lng: extractedMetadata.location.lng!,
-              address: address || "",
-            });
-          }
-        }
-      };
-      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error extracting GPS data:", error);
     }
+
+    setImageMetadata(newMetadata);
   };
 
-  const handleDelete = (index: number) => {
-    const newImages = images.filter((_, i) => i !== index);
-    const newMetadata = metadata.filter((_, i) => i !== index);
-    setImages(newImages);
-    setMetadata(newMetadata);
+  const handleClick = () => {
+    fileInputRef.current?.click();
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+  // Use the image from store if available, otherwise use local preview
+  const displayUrl = images[0] || previewUrl;
 
   return (
     <div className="space-y-4">
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold">Upload Images</h2>
-        <p className="text-sm text-muted-foreground">
-          Add photos of the incident (optional)
-        </p>
-      </div>
-
-      <div className="flex justify-center">
-        <Button
-          variant="outline"
-          className="w-full max-w-sm"
-          onClick={() => document.getElementById("image-upload")?.click()}
-        >
-          <UploadSimple className="w-5 h-5 mr-2" />
-          Upload Image
-        </Button>
+      <div className="border-2 border-dashed rounded-lg p-6 text-center">
         <input
           type="file"
-          id="image-upload"
-          className="hidden"
+          ref={fileInputRef}
+          onChange={handleFileChange}
           accept="image/*"
-          multiple
-          onChange={handleFileUpload}
+          className="hidden"
         />
+
+        {displayUrl ? (
+          <div className="space-y-4">
+            <img
+              src={displayUrl}
+              alt="Preview"
+              className="max-h-64 mx-auto rounded-lg"
+            />
+            <Button variant="outline" onClick={handleClick} className="mx-auto">
+              <ImageSquare className="w-4 h-4 mr-2" />
+              Change Image
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Camera className="w-8 h-8 mx-auto text-gray-400" />
+            <Button variant="outline" onClick={handleClick}>
+              Select an image
+            </Button>
+          </div>
+        )}
       </div>
 
-      {images.length > 0 && (
-        <div className="space-y-4">
-          {images.map((image, index) => (
-            <div
-              key={index}
-              className="border rounded-lg overflow-hidden bg-muted/50"
-            >
-              <img
-                src={image}
-                alt={`Uploaded ${index + 1}`}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 space-y-2">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <ImageSquare className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        {metadata[index]?.name}
-                      </span>
-                    </div>
-
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      <p>{metadata[index]?.size}</p>
-
-                      {metadata[index]?.dateTaken && (
-                        <p>📅 Taken: {metadata[index].dateTaken}</p>
-                      )}
-
-                      {metadata[index]?.camera && (
-                        <p>
-                          📸 Camera: {metadata[index].camera.make}{" "}
-                          {metadata[index].camera.model}
-                        </p>
-                      )}
-
-                      {metadata[index]?.settings && (
-                        <p>
-                          ⚙️ Settings:
-                          {metadata[index].settings.exposureTime &&
-                            ` ${metadata[index].settings.exposureTime}s`}
-                          {metadata[index].settings.fNumber &&
-                            ` f/${metadata[index].settings.fNumber}`}
-                          {metadata[index].settings.iso &&
-                            ` ISO ${metadata[index].settings.iso}`}
-                        </p>
-                      )}
-
-                      {metadata[index]?.location && (
-                        <p>
-                          📍{" "}
-                          {metadata[index].location.address ||
-                            `${metadata[index].location.lat?.toFixed(6)}, ${metadata[index].location.lng?.toFixed(6)}`}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive"
-                    onClick={() => handleDelete(index)}
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+      {(imageMetadata?.coordinates || imageMetadata?.fileInfo) && (
+        <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+          {imageMetadata.fileInfo && (
+            <>
+              <p className="text-sm text-gray-600">Image information:</p>
+              <p className="font-mono text-sm">
+                Format: {imageMetadata.fileInfo.format} | Size:{" "}
+                {formatFileSize(imageMetadata.fileInfo.size)}
+              </p>
+            </>
+          )}
+          {imageMetadata.coordinates && (
+            <>
+              <p className="text-sm text-gray-600">Location from image:</p>
+              <p className="font-mono text-sm">
+                {convertToDMS(imageMetadata.coordinates.lat, true)}{" "}
+                {convertToDMS(imageMetadata.coordinates.lng, false)}
+              </p>
+            </>
+          )}
         </div>
       )}
     </div>

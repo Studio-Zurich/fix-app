@@ -26,12 +26,19 @@ interface ReportData {
   incidentSubtypeId?: string;
 }
 
-interface ReportState {
+export interface ReportState {
   currentStep: number;
   reportData: ReportData;
   location: Location | null;
   images: string[];
-  setImages: (images: string[]) => void;
+  imageMetadata: {
+    coordinates?: { lat: number; lng: number };
+    fileInfo?: {
+      size: number;
+      format: string;
+    };
+  } | null;
+  setImageMetadata: (metadata: ReportState["imageMetadata"]) => void;
 }
 
 interface ReportStore extends ReportState {
@@ -39,6 +46,7 @@ interface ReportStore extends ReportState {
   setCurrentStep: (step: number) => void;
   updateReportData: (data: Partial<ReportData>) => void;
   setLocation: (location: Location) => void;
+  setImages: (images: string[]) => void;
 }
 
 const initialState: ReportState = {
@@ -48,7 +56,8 @@ const initialState: ReportState = {
   },
   location: null,
   images: [],
-  setImages: () => {},
+  imageMetadata: null,
+  setImageMetadata: () => {},
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -73,4 +82,5 @@ export const useReportStore = create<ReportStore>((set) => ({
       },
     })),
   setImages: (images) => set({ images }),
+  setImageMetadata: (metadata) => set({ imageMetadata: metadata }),
 }));
