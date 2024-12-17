@@ -29,9 +29,10 @@ export async function submitReport(data: ReportData) {
         location_lat: validatedData.location.lat,
         location_lng: validatedData.location.lng,
         location_address: validatedData.location.address,
-        reporter_name: `${validatedData.reporterFirstName} ${validatedData.reporterLastName}`,
-        reporter_email: validatedData.reporterEmail,
-        reporter_phone: validatedData.reporterPhone,
+        reporter_first_name: validatedData.reporterFirstName || null,
+        reporter_last_name: validatedData.reporterLastName || null,
+        reporter_email: validatedData.reporterEmail || null,
+        reporter_phone: validatedData.reporterPhone || null,
       })
       .select()
       .single();
@@ -63,42 +64,15 @@ export async function submitReport(data: ReportData) {
       subtype: subtypeInfo?.name,
     };
 
-    // Process images: copy from temp to permanent location and create records
+    // Process images: create records for uploaded images
     for (const image of validatedData.images) {
       try {
-        // Generate permanent path
-        const permanentPath = `reports/${report.id}/${image.fileName}`;
-
-        // Download the file from temp location
-        const { data: fileData, error: downloadError } = await supabase.storage
-          .from("report-images")
-          .download(image.storagePath);
-
-        if (downloadError) {
-          console.error("Error downloading temp file:", downloadError);
-          throw new Error(
-            `Failed to download temp file: ${downloadError.message}`
-          );
-        }
-
-        // Upload to permanent location
-        const { error: uploadError } = await supabase.storage
-          .from("report-images")
-          .upload(permanentPath, fileData);
-
-        if (uploadError) {
-          console.error("Error uploading to permanent location:", uploadError);
-          throw new Error(
-            `Failed to upload to permanent location: ${uploadError.message}`
-          );
-        }
-
         // Create report_images record
         const { error: imageRecordError } = await supabase
           .from("report_images")
           .insert({
             report_id: report.id,
-            storage_path: permanentPath,
+            storage_path: image.storagePath,
             file_name: image.fileName,
             file_type: image.fileType,
             file_size: image.fileSize,
@@ -133,9 +107,10 @@ export async function submitReport(data: ReportData) {
       const emailHtml = await renderAsync(
         ReportEmail({
           reportId: report.id,
-          reporterName: `${validatedData.reporterFirstName} ${validatedData.reporterLastName}`,
-          reporterEmail: validatedData.reporterEmail,
-          reporterPhone: validatedData.reporterPhone,
+          reporterName:
+            `${validatedData.reporterFirstName ?? ""} ${validatedData.reporterLastName ?? ""}`.trim(),
+          reporterEmail: validatedData.reporterEmail ?? "",
+          reporterPhone: validatedData.reporterPhone ?? "",
           location: validatedData.location,
           description: validatedData.description,
           imageCount: validatedData.images?.length ?? 0,
@@ -143,8 +118,10 @@ export async function submitReport(data: ReportData) {
       );
 
       await resend.emails.send({
-        from: "Fix App <notifications@fix-app.ch>",
-        to: ["hello@studio-zurich.ch", validatedData.reporterEmail],
+        from: "Fix App <notifications@fixapp.ch>",
+        to: ["hello@studio-zurich.ch"].concat(
+          validatedData.reporterEmail ? [validatedData.reporterEmail] : []
+        ),
         subject: "Ihre Meldung wurde bestätigt",
         html: emailHtml,
       });

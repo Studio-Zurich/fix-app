@@ -17,22 +17,20 @@ export const locationSchema = z.object({
 export const reportSchema = z.object({
   images: z.array(reportImageSchema).default([]),
   location: locationSchema,
-  incidentTypeId: z.string().uuid().optional(),
+  incidentTypeId: z.string().uuid(),
   incidentSubtypeId: z.string().uuid().optional(),
   description: z.string().min(1),
-  reporterFirstName: z.string().min(1, "Bitte geben Sie Ihren Vornamen ein"),
-  reporterLastName: z.string().min(1, "Bitte geben Sie Ihren Nachnamen ein"),
-  reporterEmail: z
-    .string()
-    .email("Bitte geben Sie eine gültige E-Mail-Adresse ein"),
+  reporterFirstName: z.string().optional(),
+  reporterLastName: z.string().optional(),
+  reporterEmail: z.string().email("Invalid email address").optional(),
   reporterPhone: z.string().optional(),
 });
 
 export const incidentDescriptionSchema = z.object({
   description: z
     .string()
-    .min(1, "Bitte geben Sie eine Beschreibung ein")
-    .max(1000, "Beschreibung darf maximal 1000 Zeichen lang sein"),
+    .min(1, "Please provide a description")
+    .max(1000, "Description must not exceed 1000 characters"),
 });
 
 export type IncidentDescriptionSchema = z.infer<

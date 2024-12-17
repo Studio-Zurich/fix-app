@@ -1,16 +1,19 @@
 "use client";
 
+import { submitReport } from "@/app/actions";
 import { useReportStore } from "@/lib/store";
 import {
   Camera,
   EnvelopeSimple,
   MapPin,
+  Phone,
   TextT,
   User,
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface IncidentTypeInfo {
@@ -31,6 +34,8 @@ export default function SummaryStep() {
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch incident type and subtype names
   useEffect(() => {
@@ -71,16 +76,60 @@ export default function SummaryStep() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Here you would implement the actual submission logic
-      // For example, sending to your API or Supabase
-      console.log("Submitting report:", reportData);
+      // Convert image URLs to Blobs and prepare image data
+      const imagePromises = images.map(async (imageUrl, index) => {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const fileName = `image-${index}.${blob.type.split("/")[1]}`;
+
+        return {
+          previewUrl: imageUrl,
+          storagePath: `reports/${Date.now()}-${fileName}`,
+          fileName,
+          fileType: blob.type,
+          fileSize: blob.size,
+          blob,
+        };
+      });
+
+      const imageData = await Promise.all(imagePromises);
+
+      // Upload images first
+      const uploadPromises = imageData.map(async (image) => {
+        const { error: uploadError } = await supabase.storage
+          .from("report-images")
+          .upload(image.storagePath, image.blob);
+
+        if (uploadError) throw uploadError;
+        return image;
+      });
+
+      const uploadedImages = await Promise.all(uploadPromises);
+
+      // Remove blob from image data before sending to server
+      const cleanedImages = uploadedImages.map(({ blob, ...rest }) => rest);
+
+      // Submit report with uploaded image data
+      const result = await submitReport({
+        ...reportData,
+        location: location!,
+        images: cleanedImages,
+      });
+
+      if (!result.success || !result.reportId) {
+        throw new Error(result.error || "Failed to get report ID");
+      }
 
       // Reset the store after successful submission
       useReportStore.getState().reset();
 
-      // Redirect to success page or show success message
+      // Use window.location for a full page navigation
+      window.location.href = `/confirm/${result.reportId}`;
     } catch (error) {
       console.error("Error submitting report:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to submit report"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -169,21 +218,27 @@ export default function SummaryStep() {
         {/* Contact Information Section */}
         {(reportData.reporterFirstName ||
           reportData.reporterLastName ||
-          reportData.reporterEmail) && (
+          reportData.reporterEmail ||
+          reportData.reporterPhone) && (
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-primary" weight="fill" />
               <h3 className="font-medium">Contact Information</h3>
             </div>
             <div className="pl-6 space-y-2">
-              {(reportData.reporterFirstName ||
-                reportData.reporterLastName) && (
+              {reportData.reporterFirstName && (
                 <div className="flex items-center space-x-2">
                   <User className="w-4 h-4 text-muted-foreground" />
                   <p className="text-sm">
-                    {[reportData.reporterFirstName, reportData.reporterLastName]
-                      .filter(Boolean)
-                      .join(" ")}
+                    First Name: {reportData.reporterFirstName}
+                  </p>
+                </div>
+              )}
+              {reportData.reporterLastName && (
+                <div className="flex items-center space-x-2">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <p className="text-sm">
+                    Last Name: {reportData.reporterLastName}
                   </p>
                 </div>
               )}
@@ -193,19 +248,34 @@ export default function SummaryStep() {
                     className="w-4 h-4 text-muted-foreground"
                     weight="fill"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    {reportData.reporterEmail}
-                  </p>
+                  <p className="text-sm">Email: {reportData.reporterEmail}</p>
+                </div>
+              )}
+              {reportData.reporterPhone && (
+                <div className="flex items-center space-x-2">
+                  <Phone
+                    className="w-4 h-4 text-muted-foreground"
+                    weight="fill"
+                  />
+                  <p className="text-sm">Phone: {reportData.reporterPhone}</p>
                 </div>
               )}
             </div>
           </div>
         )}
-      </div>
 
-      <Button className="w-full" onClick={handleSubmit} disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Submit Report"}
-      </Button>
+        {error && (
+          <div className="text-sm text-destructive">Error: {error}</div>
+        )}
+
+        <Button
+          className="w-full"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Report"}
+        </Button>
+      </div>
     </div>
   );
 }
