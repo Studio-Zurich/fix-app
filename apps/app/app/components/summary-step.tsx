@@ -2,6 +2,7 @@
 
 import { submitReport } from "@/app/actions";
 import { useReportStore } from "@/lib/store";
+import { createClient } from "@/lib/supabase/client";
 import {
   Camera,
   EnvelopeSimple,
@@ -12,7 +13,6 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
-import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,11 +20,6 @@ interface IncidentTypeInfo {
   name: string;
   subtype?: string;
 }
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function SummaryStep() {
   const reportData = useReportStore((state) => state.reportData);
@@ -41,6 +36,8 @@ export default function SummaryStep() {
   useEffect(() => {
     const fetchIncidentInfo = async () => {
       if (!reportData.incidentTypeId) return;
+
+      const supabase = createClient();
 
       try {
         // Fetch incident type
@@ -75,6 +72,8 @@ export default function SummaryStep() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    const supabase = createClient();
+
     try {
       // Convert image URLs to Blobs and prepare image data
       const imagePromises = images.map(async (imageUrl, index) => {
@@ -136,7 +135,7 @@ export default function SummaryStep() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div>
         <h2 className="text-lg font-semibold">Summary</h2>
         <p className="text-sm text-muted-foreground">
@@ -263,11 +262,11 @@ export default function SummaryStep() {
             </div>
           </div>
         )}
+      </div>
 
-        {error && (
-          <div className="text-sm text-destructive">Error: {error}</div>
-        )}
+      {error && <div className="text-sm text-destructive">Error: {error}</div>}
 
+      <div className="fixed bottom-4 left-4 right-4">
         <Button
           className="w-full"
           onClick={handleSubmit}
