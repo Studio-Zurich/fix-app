@@ -6,18 +6,21 @@ import { useState } from "react";
 import { z } from "zod";
 
 const userDataSchema = z.object({
-  firstName: z.string().min(2, "First name is too short").optional(),
-  lastName: z.string().min(2, "Last name is too short").optional(),
-  email: z.string().email("Invalid email address").optional(),
+  firstName: z.string().min(2, "First name is too short"),
+  lastName: z.string().min(2, "Last name is too short"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
 });
 
 type UserDataForm = z.infer<typeof userDataSchema>;
 
 export default function UserDataStep() {
+  const reportData = useReportStore((state) => state.reportData);
   const [formData, setFormData] = useState<UserDataForm>({
-    firstName: "",
-    lastName: "",
-    email: "",
+    firstName: reportData.reporterFirstName || "",
+    lastName: reportData.reporterLastName || "",
+    email: reportData.reporterEmail || "",
+    phone: reportData.reporterPhone || "",
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof UserDataForm, string>>
@@ -32,35 +35,52 @@ export default function UserDataStep() {
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
+
+      // Update store immediately
+      const storeUpdate: Partial<typeof reportData> = {};
+      switch (field) {
+        case "firstName":
+          storeUpdate.reporterFirstName = value;
+          break;
+        case "lastName":
+          storeUpdate.reporterLastName = value;
+          break;
+        case "email":
+          storeUpdate.reporterEmail = value;
+          break;
+        case "phone":
+          storeUpdate.reporterPhone = value;
+          break;
+      }
+      useReportStore.getState().updateReportData(storeUpdate);
     };
 
   const handleBlur = (field: keyof UserDataForm) => () => {
-    if (formData[field]) {
-      try {
-        userDataSchema.shape[field].parse(formData[field]);
-        setErrors((prev) => ({ ...prev, [field]: undefined }));
-      } catch (err) {
-        const error = err as z.ZodError;
-        setErrors((prev) => ({
-          ...prev,
-          [field]: error.errors?.[0]?.message || "Invalid input",
-        }));
-      }
+    try {
+      const fieldSchema = userDataSchema.shape[field];
+      fieldSchema.parse(formData[field]);
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    } catch (err) {
+      const error = err as z.ZodError;
+      setErrors((prev) => ({
+        ...prev,
+        [field]: error.errors[0]?.message || "Invalid input",
+      }));
     }
   };
 
   const handleSubmit = () => {
     try {
       const validatedData = userDataSchema.parse(formData);
+
       // Update store with validated data
-      useReportStore.setState((state) => ({
-        reportData: {
-          ...state.reportData,
-          reporterFirstName: validatedData.firstName,
-          reporterLastName: validatedData.lastName,
-          reporterEmail: validatedData.email,
-        },
-      }));
+      useReportStore.getState().updateReportData({
+        reporterFirstName: validatedData.firstName,
+        reporterLastName: validatedData.lastName,
+        reporterEmail: validatedData.email,
+        reporterPhone: validatedData.phone,
+      });
+
       // Move to next step
       useReportStore.getState().setCurrentStep(5);
     } catch (error) {
@@ -80,7 +100,7 @@ export default function UserDataStep() {
       <div>
         <h2 className="text-lg font-semibold">Contact Information</h2>
         <p className="text-sm text-muted-foreground">
-          Optionally provide your contact details
+          Please provide your contact details
         </p>
       </div>
 
@@ -120,6 +140,15 @@ export default function UserDataStep() {
           {errors.email && (
             <p className="text-sm text-destructive">{errors.email}</p>
           )}
+        </div>
+
+        <div className="space-y-2">
+          <Input
+            type="tel"
+            placeholder="Phone number (optional)"
+            value={formData.phone}
+            onChange={handleChange("phone")}
+          />
         </div>
       </div>
 
