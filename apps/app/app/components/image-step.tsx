@@ -102,7 +102,7 @@ export default function ImageStep() {
             <img
               src={displayUrl}
               alt="Preview"
-              className="max-h-64 mx-auto rounded-lg"
+              className="mx-auto rounded-lg max-h-24"
             />
             <Button variant="outline" onClick={handleClick} className="mx-auto">
               <ImageSquare className="w-4 h-4 mr-2" />

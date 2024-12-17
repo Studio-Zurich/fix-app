@@ -32,6 +32,7 @@ export default function LocationStep() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isLocationFromImage, setIsLocationFromImage] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
   const location = useReportStore((state) => state.location);
@@ -53,6 +54,7 @@ export default function LocationStep() {
             lng: imageMetadata.coordinates.lng,
             address,
           });
+          setIsLocationFromImage(true);
 
           mapRef.current?.flyTo({
             center: [
@@ -77,6 +79,7 @@ export default function LocationStep() {
         lng: ZUG_CENTER.longitude,
         address: ZUG_CENTER.address,
       });
+      setIsLocationFromImage(false);
     };
 
     initializeLocation();
@@ -113,6 +116,8 @@ export default function LocationStep() {
   const handleLocationSelect = useCallback(
     async (suggestion: Suggestion) => {
       const [lng, lat] = suggestion.center;
+      setIsLocationFromImage(false);
+
       setLocation({
         lat,
         lng,
@@ -122,7 +127,6 @@ export default function LocationStep() {
       setSuggestions([]);
       setIsOpen(false);
 
-      // Fly to the selected location
       mapRef.current?.flyTo({
         center: [lng, lat],
         zoom: 15,
@@ -135,9 +139,9 @@ export default function LocationStep() {
   const handleMarkerDrag = useCallback(
     async (event: { lngLat: { lng: number; lat: number } }) => {
       const { lng, lat } = event.lngLat;
+      setIsLocationFromImage(false);
 
       try {
-        // Reverse geocoding to get address
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
         );
@@ -159,19 +163,40 @@ export default function LocationStep() {
   return (
     <div className="relative">
       <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
-        <Sheet>
-          <SheetTrigger>
-            <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger onClick={() => setIsOpen(true)}>
+            <div className="flex items-center space-x-2 p-2">
+              <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm font-medium text-muted-foreground">
+                Search for a location
+              </p>
+            </div>
           </SheetTrigger>
           <SheetContent side="bottom">
             <SheetHeader>
-              <SheetTitle>Sheet</SheetTitle>
+              <SheetTitle>Choose a location</SheetTitle>
             </SheetHeader>
-            <Input
-              placeholder="Search for a location"
-              value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+            <div className="py-4 space-y-4">
+              <Input
+                placeholder="Search for a location"
+                value={searchValue}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              {suggestions.length > 0 && (
+                <div className="space-y-2">
+                  {suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion.id}
+                      className="flex items-center space-x-2 w-full p-2 hover:bg-gray-100 rounded-lg text-left"
+                      onClick={() => handleLocationSelect(suggestion)}
+                    >
+                      <MapPin className="w-4 h-4 text-primary" weight="fill" />
+                      <span className="text-sm">{suggestion.place_name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </SheetContent>
         </Sheet>
       </div>
@@ -210,10 +235,12 @@ export default function LocationStep() {
       </Map>
 
       <div className="absolute bottom-12 p-4 bg-white shadow-md rounded-lg space-y-2 left-0 w-[calc(100%-32px)] ml-[16px]">
-        <div className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4 text-primary" weight="fill" />
-          <p className="text-sm font-medium">Current Location</p>
-          {imageMetadata?.coordinates && (
+        <div className="flex items-center space-x-2 justify-between">
+          <div className="flex items-center space-x-2">
+            <MapPin className="w-4 h-4 text-primary" weight="fill" />
+            <p className="text-sm font-medium">Current Location</p>
+          </div>
+          {isLocationFromImage && (
             <div className="flex items-center ml-auto">
               <Camera className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground ml-1">
