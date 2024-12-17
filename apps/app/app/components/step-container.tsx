@@ -4,14 +4,19 @@ import { Button } from "@repo/ui/button";
 import { Progress } from "@repo/ui/progress";
 import { useState } from "react";
 import ImageStep from "./image-step";
+import IncidentDescriptionStep from "./incident-description-step";
+import IncidentTypeStep from "./incident-type-step";
 import LocationStep from "./location-step";
+import SummaryStep from "./summary-step";
+import UserDataStep from "./user-data-step";
 
 const steps = [
   { id: 0, component: <ImageStep /> },
   { id: 1, component: <LocationStep /> },
-  { id: 2, component: <div>Incident Type Step</div> },
-  { id: 3, component: <div>Incident Description Step</div> },
-  { id: 4, component: <div>Summary Step</div> },
+  { id: 2, component: <IncidentTypeStep /> },
+  { id: 3, component: <IncidentDescriptionStep /> },
+  { id: 4, component: <UserDataStep /> },
+  { id: 5, component: <SummaryStep /> },
 ];
 
 export default function StepContainer() {
@@ -20,7 +25,7 @@ export default function StepContainer() {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="flex min-h-svh flex-col p-4">
+    <div className="flex min-h-svh max-h-svh flex-col p-4 overflow-hidden">
       <header className="text-center mb-4">
         <h1 className="text-2xl font-bold">Fix App</h1>
       </header>
