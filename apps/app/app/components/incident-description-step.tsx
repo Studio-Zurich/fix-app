@@ -1,14 +1,17 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
 import { useState } from "react";
 
 const MAX_CHARS = 500;
 
 export default function IncidentDescriptionStep() {
-  const [description, setDescription] = useState("");
-  const { setCurrentStep } = useReportStore();
+  const [description, setDescription] = useState(
+    useReportStore.getState().reportData.description || ""
+  );
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
 
   const handleDescriptionChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -26,8 +29,17 @@ export default function IncidentDescriptionStep() {
     }
   };
 
-  const handleContinue = () => {
-    setCurrentStep(4); // Move to summary step
+  const handleNext = () => {
+    if (description.trim()) {
+      // If there's a description, make sure it's saved to the store
+      useReportStore.setState((state) => ({
+        reportData: {
+          ...state.reportData,
+          description: description.trim(),
+        },
+      }));
+    }
+    setCurrentStep(4);
   };
 
   const charactersLeft = MAX_CHARS - description.length;
@@ -62,6 +74,18 @@ export default function IncidentDescriptionStep() {
           <li>Keep it respectful</li>
           <li>No swear words or offensive language</li>
         </ul>
+      </div>
+
+      <div className="fixed bottom-4 left-4 right-4">
+        {description.trim() ? (
+          <Button className="w-full" onClick={handleNext}>
+            Confirm Description
+          </Button>
+        ) : (
+          <Button variant="secondary" className="w-full" onClick={handleNext}>
+            Skip Description
+          </Button>
+        )}
       </div>
     </div>
   );

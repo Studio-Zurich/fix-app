@@ -40,6 +40,7 @@ export default function ImageStep() {
   const { setLocation, setImages, images, imageMetadata, setImageMetadata } =
     useReportStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -87,7 +88,7 @@ export default function ImageStep() {
   const displayUrl = images[0] || previewUrl;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="border-2 border-dashed rounded-lg p-6 text-center">
         <input
           type="file"
@@ -141,6 +142,22 @@ export default function ImageStep() {
           )}
         </div>
       )}
+
+      <div className="fixed bottom-4 left-4 right-4">
+        {images.length > 0 ? (
+          <Button className="w-full" onClick={() => setCurrentStep(1)}>
+            Confirm Image
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => setCurrentStep(1)}
+          >
+            Skip Image Upload
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

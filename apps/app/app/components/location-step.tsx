@@ -2,6 +2,7 @@
 
 import { useReportStore } from "@/lib/store";
 import { Camera, MagnifyingGlass, MapPin } from "@phosphor-icons/react";
+import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import {
   Sheet,
@@ -33,11 +34,13 @@ export default function LocationStep() {
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLocationFromImage, setIsLocationFromImage] = useState(false);
+  const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
   const location = useReportStore((state) => state.location);
   const setLocation = useReportStore((state) => state.setLocation);
   const imageMetadata = useReportStore((state) => state.imageMetadata);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -55,6 +58,7 @@ export default function LocationStep() {
             address,
           });
           setIsLocationFromImage(true);
+          setIsLocationConfirmed(true);
 
           mapRef.current?.flyTo({
             center: [
@@ -80,6 +84,7 @@ export default function LocationStep() {
         address: ZUG_CENTER.address,
       });
       setIsLocationFromImage(false);
+      setIsLocationConfirmed(false);
     };
 
     initializeLocation();
@@ -117,6 +122,7 @@ export default function LocationStep() {
     async (suggestion: Suggestion) => {
       const [lng, lat] = suggestion.center;
       setIsLocationFromImage(false);
+      setIsLocationConfirmed(true);
 
       setLocation({
         lat,
@@ -140,6 +146,7 @@ export default function LocationStep() {
     async (event: { lngLat: { lng: number; lat: number } }) => {
       const { lng, lat } = event.lngLat;
       setIsLocationFromImage(false);
+      setIsLocationConfirmed(true);
 
       try {
         const response = await fetch(
@@ -224,7 +231,7 @@ export default function LocationStep() {
           latitude={location?.lat || ZUG_CENTER.latitude}
           longitude={location?.lng || ZUG_CENTER.longitude}
           anchor="bottom"
-          draggable
+          draggable={!isLocationFromImage}
           onDragEnd={handleMarkerDrag}
         >
           <MapPin
@@ -234,7 +241,7 @@ export default function LocationStep() {
         </Marker>
       </Map>
 
-      <div className="absolute bottom-12 p-4 bg-white shadow-md rounded-lg space-y-2 left-0 w-[calc(100%-32px)] ml-[16px]">
+      <div className="absolute bottom-24 p-4 bg-white shadow-md rounded-lg space-y-2 left-0 w-[calc(100%-32px)] ml-[16px]">
         <div className="flex items-center space-x-2 justify-between">
           <div className="flex items-center space-x-2">
             <MapPin className="w-4 h-4 text-primary" weight="fill" />
@@ -254,6 +261,22 @@ export default function LocationStep() {
             {location?.address || ZUG_CENTER.address}
           </p>
         </div>
+      </div>
+
+      <div className="fixed bottom-4 left-4 right-4">
+        {isLocationFromImage ? (
+          <Button className="w-full" onClick={() => setCurrentStep(2)}>
+            Confirm Location from Image
+          </Button>
+        ) : (
+          <Button
+            className="w-full"
+            onClick={() => setCurrentStep(2)}
+            disabled={!isLocationConfirmed}
+          >
+            {isLocationConfirmed ? "Confirm Location" : "Select Location"}
+          </Button>
+        )}
       </div>
     </div>
   );

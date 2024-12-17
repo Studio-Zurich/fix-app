@@ -1,6 +1,7 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { useState } from "react";
 import { z } from "zod";
@@ -16,6 +17,8 @@ type UserDataForm = z.infer<typeof userDataSchema>;
 
 export default function UserDataStep() {
   const reportData = useReportStore((state) => state.reportData);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+
   const [formData, setFormData] = useState<UserDataForm>({
     firstName: reportData.reporterFirstName || "",
     lastName: reportData.reporterLastName || "",
@@ -69,6 +72,15 @@ export default function UserDataStep() {
     }
   };
 
+  const isFormValid = () => {
+    try {
+      userDataSchema.parse(formData);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const handleSubmit = () => {
     try {
       const validatedData = userDataSchema.parse(formData);
@@ -82,7 +94,7 @@ export default function UserDataStep() {
       });
 
       // Move to next step
-      useReportStore.getState().setCurrentStep(5);
+      setCurrentStep(5);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Partial<Record<keyof UserDataForm, string>> = {};
@@ -107,7 +119,7 @@ export default function UserDataStep() {
       <div className="space-y-4">
         <div className="space-y-2">
           <Input
-            placeholder="First name"
+            placeholder="First name *"
             value={formData.firstName}
             onChange={handleChange("firstName")}
             onBlur={handleBlur("firstName")}
@@ -119,7 +131,7 @@ export default function UserDataStep() {
 
         <div className="space-y-2">
           <Input
-            placeholder="Last name"
+            placeholder="Last name *"
             value={formData.lastName}
             onChange={handleChange("lastName")}
             onBlur={handleBlur("lastName")}
@@ -132,7 +144,7 @@ export default function UserDataStep() {
         <div className="space-y-2">
           <Input
             type="email"
-            placeholder="Email address"
+            placeholder="Email address *"
             value={formData.email}
             onChange={handleChange("email")}
             onBlur={handleBlur("email")}
@@ -159,6 +171,17 @@ export default function UserDataStep() {
           <li>Allow follow-up questions if needed</li>
           <li>Receive confirmation when resolved</li>
         </ul>
+        <p className="text-xs mt-2">* Required fields</p>
+      </div>
+
+      <div className="fixed bottom-4 left-4 right-4">
+        <Button
+          className="w-full"
+          onClick={handleSubmit}
+          disabled={!isFormValid()}
+        >
+          Confirm Contact Details
+        </Button>
       </div>
     </div>
   );
