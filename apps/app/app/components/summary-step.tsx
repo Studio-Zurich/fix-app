@@ -113,6 +113,12 @@ export default function SummaryStep() {
         ...reportData,
         location: location!,
         images: cleanedImages,
+        incidentTypeId: reportData.incidentTypeId!,
+        incidentSubtypeId: reportData.incidentSubtypeId!,
+        reporterFirstName: reportData.reporterFirstName || "",
+        reporterLastName: reportData.reporterLastName || "",
+        reporterEmail: reportData.reporterEmail || "",
+        reporterPhone: reportData.reporterPhone || "",
       });
 
       if (!result.success || !result.reportId) {

@@ -112,7 +112,7 @@ export async function submitReport(data: ReportData) {
           reporterEmail: validatedData.reporterEmail ?? "",
           reporterPhone: validatedData.reporterPhone ?? "",
           location: validatedData.location,
-          description: validatedData.description,
+          description: validatedData.description ?? "",
           imageCount: validatedData.images?.length ?? 0,
         })
       );
