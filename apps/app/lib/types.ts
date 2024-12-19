@@ -13,14 +13,14 @@ export type ReportLocation = {
 };
 
 export type ReportData = {
-  images: ReportImage[];
-  location?: ReportLocation;
-  incidentTypeId?: string;
+  images?: ReportImage[];
+  location: ReportLocation;
+  incidentTypeId: string;
   incidentSubtypeId?: string;
   description?: string;
-  reporterFirstName?: string;
-  reporterLastName?: string;
-  reporterEmail?: string;
+  reporterFirstName: string;
+  reporterLastName: string;
+  reporterEmail: string;
   reporterPhone?: string;
 };
 

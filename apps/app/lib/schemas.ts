@@ -15,22 +15,33 @@ export const locationSchema = z.object({
 });
 
 export const reportSchema = z.object({
-  images: z.array(reportImageSchema).default([]),
+  images: z.array(reportImageSchema).optional().default([]),
   location: locationSchema,
-  incidentTypeId: z.string().uuid(),
+  incidentTypeId: z.string().uuid({
+    message: "Please select an incident type",
+  }),
   incidentSubtypeId: z.string().uuid().optional(),
-  description: z.string().min(1),
-  reporterFirstName: z.string().optional(),
-  reporterLastName: z.string().optional(),
-  reporterEmail: z.string().email("Invalid email address").optional(),
+  description: z.string().optional(),
+  reporterFirstName: z
+    .string({
+      required_error: "First name is required",
+    })
+    .min(1, "First name is required"),
+  reporterLastName: z
+    .string({
+      required_error: "Last name is required",
+    })
+    .min(1, "Last name is required"),
+  reporterEmail: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email("Invalid email address"),
   reporterPhone: z.string().optional(),
 });
 
 export const incidentDescriptionSchema = z.object({
-  description: z
-    .string()
-    .min(1, "Please provide a description")
-    .max(1000, "Description must not exceed 1000 characters"),
+  description: z.string().optional(),
 });
 
 export type IncidentDescriptionSchema = z.infer<
