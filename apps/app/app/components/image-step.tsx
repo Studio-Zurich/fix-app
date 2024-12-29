@@ -41,6 +41,9 @@ export default function ImageStep() {
     useReportStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+  const [captureMode, setCaptureMode] = useState<"upload" | "capture" | null>(
+    null
+  );
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -59,12 +62,22 @@ export default function ImageStep() {
       },
     };
 
-    try {
-      const output = await exifr.gps(file);
-      if (output?.latitude && output?.longitude) {
+    // If this was a capture and we don't get GPS from EXIF, try to get current location
+    if (captureMode === "capture") {
+      try {
+        const position = await new Promise<GeolocationPosition>(
+          (resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
+            });
+          }
+        );
+
         const coords = {
-          lat: output.latitude,
-          lng: output.longitude,
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
         };
         newMetadata.coordinates = coords;
         setLocation({
@@ -72,16 +85,48 @@ export default function ImageStep() {
           lng: coords.lng,
           address: "",
         });
+      } catch (error) {
+        console.error("Error getting current location:", error);
       }
-    } catch (error) {
-      console.error("Error extracting GPS data:", error);
+    } else {
+      // Try to get EXIF data for uploaded images
+      try {
+        const output = await exifr.gps(file);
+        if (output?.latitude && output?.longitude) {
+          const coords = {
+            lat: output.latitude,
+            lng: output.longitude,
+          };
+          newMetadata.coordinates = coords;
+          setLocation({
+            lat: coords.lat,
+            lng: coords.lng,
+            address: "",
+          });
+        }
+      } catch (error) {
+        console.error("Error extracting GPS data:", error);
+      }
     }
 
     setImageMetadata(newMetadata);
+    setCaptureMode(null);
   };
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
+  const handleCapture = () => {
+    setCaptureMode("capture");
+    if (fileInputRef.current) {
+      fileInputRef.current.setAttribute("capture", "environment");
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleUpload = () => {
+    setCaptureMode("upload");
+    if (fileInputRef.current) {
+      fileInputRef.current.removeAttribute("capture");
+      fileInputRef.current.click();
+    }
   };
 
   // Use the image from store if available, otherwise use local preview
@@ -105,17 +150,28 @@ export default function ImageStep() {
               alt="Preview"
               className="mx-auto rounded-lg max-h-24"
             />
-            <Button variant="outline" onClick={handleClick} className="mx-auto">
-              <ImageSquare className="w-4 h-4 mr-2" />
-              Change Image
-            </Button>
+            <div className="space-x-2">
+              <Button variant="outline" onClick={handleCapture}>
+                <Camera className="w-4 h-4 mr-2" />
+                Take Photo
+              </Button>
+              <Button variant="outline" onClick={handleUpload}>
+                <ImageSquare className="w-4 h-4 mr-2" />
+                Upload Image
+              </Button>
+            </div>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Camera className="w-8 h-8 mx-auto text-gray-400" />
-            <Button variant="outline" onClick={handleClick}>
-              Select an image
-            </Button>
+            <div className="space-x-2">
+              <Button variant="outline" onClick={handleCapture}>
+                Take Photo
+              </Button>
+              <Button variant="outline" onClick={handleUpload}>
+                Upload Image
+              </Button>
+            </div>
           </div>
         )}
       </div>

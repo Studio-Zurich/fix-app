@@ -1,6 +1,7 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
+import { CaretLeft } from "@phosphor-icons/react";
 import ImageStep from "./image-step";
 import IncidentDescriptionStep from "./incident-description-step";
 import IncidentTypeStep from "./incident-type-step";
@@ -32,19 +33,20 @@ export default function StepContainer() {
 
   return (
     <div className="flex min-h-svh max-h-svh flex-col overflow-hidden">
-      {/* <header className="flex items-center mb-4">
+      <header className="grid grid-cols-3 items-center px-5 py-4">
         {showBackButton && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mr-2"
-            onClick={handleBack}
-          >
-            <CaretLeft className="w-6 h-6" />
-          </Button>
+          <button className="col-span-1" onClick={handleBack}>
+            <CaretLeft />
+          </button>
         )}
-        <h1 className="text-2xl font-bold flex-1 text-center">Fix App</h1>
-      </header> */}
+        <h1
+          className={`text-2xl font-bold flex-1 text-center ${
+            showBackButton ? "col-span-1" : "col-span-3"
+          }`}
+        >
+          Fix App
+        </h1>
+      </header>
 
       {/* <Progress value={progress} className="mb-6 w-full" /> */}
 
