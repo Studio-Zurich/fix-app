@@ -240,8 +240,8 @@ export default function LocationStep() {
     <div className="relative">
       <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger onClick={() => setIsOpen(true)}>
-            <div className="flex items-center justify-between p-2">
+          <SheetTrigger onClick={() => setIsOpen(true)} className="w-full">
+            <div className="flex items-center justify-between p-2 w-full">
               <div className="flex items-center space-x-2">
                 <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
                 <p className="text-sm font-medium text-muted-foreground">
@@ -256,7 +256,7 @@ export default function LocationStep() {
                   requestLocationPermission();
                 }}
                 disabled={isGettingLocation}
-                className="flex items-center space-x-1"
+                className="flex items-center space-x-1 text-muted-foreground"
               >
                 <Crosshair className="w-4 h-4" />
                 <span className="text-xs">
@@ -307,7 +307,7 @@ export default function LocationStep() {
         }
         style={{
           width: "100%",
-          height: "calc(100svh - 224px)",
+          height: "100svh",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
@@ -327,29 +327,28 @@ export default function LocationStep() {
         </Marker>
       </Map>
 
-      <div className="absolute bottom-[16px] p-4 bg-white shadow-md rounded-lg space-y-2 left-0 w-[calc(100%-32px)] ml-[16px] z-10">
-        <div className="flex items-center space-x-2 justify-between">
-          <div className="flex items-center space-x-2">
-            <MapPin className="w-4 h-4 text-primary" weight="fill" />
-            <p className="text-sm font-medium">Current Location</p>
-          </div>
-          {isLocationFromImage && (
-            <div className="flex items-center ml-auto">
-              <Camera className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground ml-1">
-                From image
-              </span>
+      <div className="absolute bottom-12 p-4 bg-white shadow-md rounded-lg space-y-4 left-0 w-[calc(100%-32px)] ml-[16px] z-10">
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2 justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4 text-primary" weight="fill" />
+              <p className="text-sm font-medium">Current Location</p>
             </div>
-          )}
+            {isLocationFromImage && (
+              <div className="flex items-center ml-auto">
+                <Camera className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground ml-1">
+                  From image
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="pl-6">
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {location?.address || ZUG_CENTER.address}
+            </p>
+          </div>
         </div>
-        <div className="pl-6">
-          <p className="text-sm text-muted-foreground whitespace-pre-line">
-            {location?.address || ZUG_CENTER.address}
-          </p>
-        </div>
-      </div>
-
-      <div className="fixed bottom-4 left-4 right-4">
         {isLocationFromImage ? (
           <Button className="w-full" onClick={() => setCurrentStep(2)}>
             Confirm Location from Image
