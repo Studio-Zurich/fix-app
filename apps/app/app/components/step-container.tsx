@@ -32,8 +32,8 @@ export default function StepContainer() {
   };
 
   return (
-    <div className="flex min-h-svh max-h-svh flex-col overflow-hidden">
-      <header className="grid grid-cols-3 items-center px-5 py-4">
+    <div className="flex flex-col h-svh">
+      <header className="grid grid-cols-3 items-center px-5 h-16">
         {showBackButton && (
           <button className="col-span-1" onClick={handleBack}>
             <CaretLeft />
@@ -50,7 +50,7 @@ export default function StepContainer() {
 
       {/* <Progress value={progress} className="mb-6 w-full" /> */}
 
-      <div className="flex-1 relative overflow-y-auto">
+      <div className="flex-1">
         {steps[currentStep]?.component || <div>Invalid step</div>}
       </div>
     </div>

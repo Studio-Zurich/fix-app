@@ -151,11 +151,19 @@ export default function ImageStep() {
               className="mx-auto rounded-lg max-h-24"
             />
             <div className="space-x-2">
-              <Button variant="outline" onClick={handleCapture}>
+              <Button
+                variant="outline"
+                onClick={handleCapture}
+                className="md:hidden"
+              >
                 <Camera className="w-4 h-4 mr-2" />
                 Take Photo
               </Button>
-              <Button variant="outline" onClick={handleUpload}>
+              <Button
+                variant="outline"
+                onClick={handleUpload}
+                className="hidden md:block"
+              >
                 <ImageSquare className="w-4 h-4 mr-2" />
                 Upload Image
               </Button>
@@ -165,10 +173,18 @@ export default function ImageStep() {
           <div className="space-y-4">
             <Camera className="w-8 h-8 mx-auto text-gray-400" />
             <div className="space-x-2">
-              <Button variant="outline" onClick={handleCapture}>
+              <Button
+                variant="outline"
+                onClick={handleCapture}
+                className="md:hidden"
+              >
                 Take Photo
               </Button>
-              <Button variant="outline" onClick={handleUpload}>
+              <Button
+                variant="outline"
+                onClick={handleUpload}
+                className="hidden md:block"
+              >
                 Upload Image
               </Button>
             </div>
