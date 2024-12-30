@@ -1,6 +1,6 @@
 "use client";
 
-import { submitReport } from "@/app/actions";
+import { submitReport } from "@/app/[locale]/actions";
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
 import {
