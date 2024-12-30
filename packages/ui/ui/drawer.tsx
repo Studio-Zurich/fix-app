@@ -1,118 +1,163 @@
 "use client";
 
-import * as React from "react";
-import { Drawer as DrawerPrimitive } from "vaul";
+import { Drawer } from "vaul";
 
-import { cn } from "@repo/ui/lib/utils";
-
-const Drawer = ({
-  shouldScaleBackground = true,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
-  <DrawerPrimitive.Root
-    shouldScaleBackground={shouldScaleBackground}
-    {...props}
-  />
-);
-Drawer.displayName = "Drawer";
-
-const DrawerTrigger = DrawerPrimitive.Trigger;
-
-const DrawerPortal = DrawerPrimitive.Portal;
-
-const DrawerClose = DrawerPrimitive.Close;
-
-const DrawerOverlay = React.forwardRef<
-  React.ElementRef<typeof DrawerPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DrawerPrimitive.Overlay
-    ref={ref}
-    className={cn("fixed inset-0 z-50 bg-black/80", className)}
-    {...props}
-  />
-));
-DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
-
-const DrawerContent = React.forwardRef<
-  React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DrawerPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
-        className
-      )}
-      {...props}
-    >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-      {children}
-    </DrawerPrimitive.Content>
-  </DrawerPortal>
-));
-DrawerContent.displayName = "DrawerContent";
-
-const DrawerHeader = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
-    {...props}
-  />
-);
-DrawerHeader.displayName = "DrawerHeader";
-
-const DrawerFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
-    {...props}
-  />
-);
-DrawerFooter.displayName = "DrawerFooter";
-
-const DrawerTitle = React.forwardRef<
-  React.ElementRef<typeof DrawerPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DrawerPrimitive.Title
-    ref={ref}
-    className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
-      className
-    )}
-    {...props}
-  />
-));
-DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
-
-const DrawerDescription = React.forwardRef<
-  React.ElementRef<typeof DrawerPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DrawerPrimitive.Description
-    ref={ref}
-    className={cn("text-base text-muted-foreground", className)}
-    {...props}
-  />
-));
-DrawerDescription.displayName = DrawerPrimitive.Description.displayName;
-
-export {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerPortal,
-  DrawerTitle,
-  DrawerTrigger,
-};
+export default function VaulDrawer() {
+  return (
+    <Drawer.Root>
+      <Drawer.Trigger className="relative flex h-10 flex-shrink-0 items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-4 text-sm font-medium shadow-sm transition-all hover:bg-[#FAFAFA] dark:bg-[#161615] dark:hover:bg-[#1A1A19] dark:text-white">
+        Open Drawer
+      </Drawer.Trigger>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+        <Drawer.Content className="bg-gray-100 flex flex-col rounded-t-[10px] h-full mt-24 lg:h-fit max-h-[96%] fixed bottom-0 left-0 right-0">
+          <div className="p-4 bg-white rounded-t-[10px] flex-1">
+            <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 mb-8" />
+            <div className="max-w-md mx-auto">
+              <Drawer.Title className="font-medium mb-4 text-gray-900">
+                Nested Drawers.
+              </Drawer.Title>
+              <p className="text-gray-600 mb-2">
+                Nesting drawers creates a{" "}
+                <a
+                  href="https://sonner.emilkowal.ski/"
+                  target="_blank"
+                  className="underline"
+                >
+                  Sonner-like
+                </a>{" "}
+                stacking effect .
+              </p>
+              <p className="text-gray-600 mb-2">
+                You can nest as many drawers as you want. All you need to do is
+                add a `Drawer.NestedRoot` component instead of `Drawer.Root`.
+              </p>
+              <Drawer.NestedRoot>
+                <Drawer.Trigger className="rounded-md mt-4 w-full bg-gray-900 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">
+                  Open Second Drawer
+                </Drawer.Trigger>
+                <Drawer.Portal>
+                  <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+                  <Drawer.Content className="bg-gray-100 flex flex-col rounded-t-[10px] lg:h-[327px] h-full mt-24 max-h-[94%] fixed bottom-0 left-0 right-0">
+                    <div className="p-4 bg-white rounded-t-[10px] flex-1">
+                      <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-300 mb-8" />
+                      <div className="max-w-md mx-auto">
+                        <Drawer.Title className="font-medium mb-4 text-gray-900">
+                          This drawer is nested.
+                        </Drawer.Title>
+                        <p className="text-gray-600 mb-2">
+                          If you pull this drawer down a bit, it&apos;ll scale
+                          the drawer underneath it as well.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-gray-100 border-t border-gray-200 mt-auto">
+                      <div className="flex gap-6 justify-end max-w-md mx-auto">
+                        <a
+                          className="text-xs text-gray-600 flex items-center gap-0.25"
+                          href="https://github.com/emilkowalski/vaul"
+                          target="_blank"
+                        >
+                          GitHub
+                          <svg
+                            fill="none"
+                            height="16"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            aria-hidden="true"
+                            className="w-3 h-3 ml-1"
+                          >
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14L21 3"></path>
+                          </svg>
+                        </a>
+                        <a
+                          className="text-xs text-gray-600 flex items-center gap-0.25"
+                          href="https://twitter.com/emilkowalski_"
+                          target="_blank"
+                        >
+                          Twitter
+                          <svg
+                            fill="none"
+                            height="16"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            aria-hidden="true"
+                            className="w-3 h-3 ml-1"
+                          >
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14L21 3"></path>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </Drawer.Content>
+                </Drawer.Portal>
+              </Drawer.NestedRoot>
+            </div>
+          </div>
+          <div className="p-4 bg-gray-100 border-t border-gray-200 mt-auto">
+            <div className="flex gap-6 justify-end max-w-md mx-auto">
+              <a
+                className="text-xs text-gray-600 flex items-center gap-0.25"
+                href="https://github.com/emilkowalski/vaul"
+                target="_blank"
+              >
+                GitHub
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  aria-hidden="true"
+                  className="w-3 h-3 ml-1"
+                >
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                  <path d="M15 3h6v6"></path>
+                  <path d="M10 14L21 3"></path>
+                </svg>
+              </a>
+              <a
+                className="text-xs text-gray-600 flex items-center gap-0.25"
+                href="https://twitter.com/emilkowalski_"
+                target="_blank"
+              >
+                Twitter
+                <svg
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  aria-hidden="true"
+                  className="w-3 h-3 ml-1"
+                >
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                  <path d="M15 3h6v6"></path>
+                  <path d="M10 14L21 3"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
+  );
+}
