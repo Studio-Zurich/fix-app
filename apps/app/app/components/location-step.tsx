@@ -16,10 +16,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@repo/ui/sheet";
+import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
-import Map, { Marker } from "react-map-gl";
+import Map from "react-map-gl";
 
 interface Suggestion {
   id: string;
@@ -34,6 +35,22 @@ const ZUG_CENTER = {
   address: "Postplatz, 6300 Zug, Switzerland",
 } as const;
 
+const ZUG_BOUNDS = {
+  north: 47.2273,
+  south: 47.0698,
+  east: 8.6549,
+  west: 8.3989,
+} as const;
+
+const isLocationInZug = (lat: number, lng: number) => {
+  return (
+    lat >= ZUG_BOUNDS.south &&
+    lat <= ZUG_BOUNDS.north &&
+    lng >= ZUG_BOUNDS.west &&
+    lng <= ZUG_BOUNDS.east
+  );
+};
+
 export default function LocationStep() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -42,6 +59,8 @@ export default function LocationStep() {
   const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isDefaultLocation, setIsDefaultLocation] = useState(true);
+  const [isMoving, setIsMoving] = useState(false);
+  const [isOutsideZug, setIsOutsideZug] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
   const location = useReportStore((state) => state.location);
@@ -143,6 +162,10 @@ export default function LocationStep() {
   const handleLocationSelect = useCallback(
     async (suggestion: Suggestion) => {
       const [lng, lat] = suggestion.center;
+
+      const withinZug = isLocationInZug(lat, lng);
+      setIsOutsideZug(!withinZug);
+
       setIsLocationFromImage(false);
       setIsLocationConfirmed(true);
       setIsDefaultLocation(false);
@@ -165,31 +188,36 @@ export default function LocationStep() {
     [setLocation]
   );
 
-  const handleMarkerDrag = useCallback(
-    async (event: { lngLat: { lng: number; lat: number } }) => {
-      const { lng, lat } = event.lngLat;
-      setIsLocationFromImage(false);
-      setIsLocationConfirmed(true);
-      setIsDefaultLocation(false);
+  const handleMapMove = useCallback(async () => {
+    if (!mapRef.current) return;
 
-      try {
-        const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-        );
-        const data = await response.json();
-        const address = data.features[0]?.place_name || "Unknown location";
+    const center = mapRef.current.getCenter();
+    const lng = center.lng;
+    const lat = center.lat;
 
-        setLocation({
-          lat,
-          lng,
-          address,
-        });
-      } catch (error) {
-        console.error("Error fetching address:", error);
-      }
-    },
-    [setLocation]
-  );
+    setIsLocationFromImage(false);
+    setIsLocationConfirmed(true);
+    setIsDefaultLocation(false);
+
+    const withinZug = isLocationInZug(lat, lng);
+    setIsOutsideZug(!withinZug);
+
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+      );
+      const data = await response.json();
+      const address = data.features[0]?.place_name || "Unknown location";
+
+      setLocation({
+        lat,
+        lng,
+        address,
+      });
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  }, [setLocation]);
 
   const requestLocationPermission = useCallback(async () => {
     setIsGettingLocation(true);
@@ -258,31 +286,31 @@ export default function LocationStep() {
     <div className="relative">
       <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger onClick={() => setIsOpen(true)}>
-            <div className="flex items-center justify-between p-2">
+          <div className="flex items-center justify-between p-2 w-full">
+            <SheetTrigger onClick={() => setIsOpen(true)}>
               <div className="flex items-center space-x-2">
                 <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
                 <p className="text-sm font-medium text-muted-foreground">
                   Search for a location
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestLocationPermission();
-                }}
-                disabled={isGettingLocation}
-                className="flex items-center space-x-1"
-              >
-                <Crosshair className="w-4 h-4" />
-                <span className="text-xs">
-                  {isGettingLocation ? "Getting location..." : "Get location"}
-                </span>
-              </Button>
-            </div>
-          </SheetTrigger>
+            </SheetTrigger>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                requestLocationPermission();
+              }}
+              disabled={isGettingLocation}
+              className="flex items-center space-x-1"
+            >
+              <Crosshair className="w-4 h-4" />
+              <span className="text-xs">
+                {isGettingLocation ? "Getting location..." : "Get location"}
+              </span>
+            </Button>
+          </div>
           <SheetContent side="bottom">
             <SheetHeader>
               <SheetTitle>Choose a location</SheetTitle>
@@ -325,58 +353,78 @@ export default function LocationStep() {
         }
         style={{
           width: "100%",
-          height: "calc(100svh - 224px)",
+          height: "calc(100svh)",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         reuseMaps
+        onMoveStart={() => setIsMoving(true)}
+        onMoveEnd={(e) => {
+          setIsMoving(false);
+          handleMapMove();
+        }}
       >
-        <Marker
-          latitude={location?.lat || ZUG_CENTER.latitude}
-          longitude={location?.lng || ZUG_CENTER.longitude}
-          anchor="bottom"
-          draggable={true}
-          onDragEnd={handleMarkerDrag}
-        >
-          <MapPin
-            className="w-8 h-8 text-primary -translate-y-2 cursor-grab active:cursor-grabbing"
-            weight="fill"
-          />
-        </Marker>
-      </Map>
-
-      <div className="absolute bottom-[16px] p-4 bg-white shadow-md rounded-lg space-y-2 left-0 w-[calc(100%-32px)] ml-[16px] z-10">
-        <div className="flex items-center space-x-2 justify-between">
-          <div className="flex items-center space-x-2">
-            <MapPin className="w-4 h-4 text-primary" weight="fill" />
-            <p className="text-sm font-medium">Current Location</p>
-          </div>
-          {isLocationFromImage && (
-            <div className="flex items-center ml-auto">
-              <Camera className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground ml-1">
-                From image
-              </span>
-            </div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none">
+          <motion.div
+            animate={{
+              y: isMoving ? -8 : 0,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
+          >
+            <MapPin className="w-8 h-8 text-primary" weight="fill" />
+          </motion.div>
+          {isMoving && (
+            <div className="w-3 h-3 rounded-full bg-black/20 mx-auto mt-1" />
           )}
         </div>
-        <div className="pl-6">
-          <p className="text-sm text-muted-foreground whitespace-pre-line">
-            {location?.address || ZUG_CENTER.address}
-          </p>
-        </div>
-      </div>
+      </Map>
 
-      <div className="fixed bottom-4 left-4 right-4">
+      <div className="absolute bottom-[16px] p-4 bg-white shadow-md rounded-lg space-y-4 left-0 w-[calc(100%-32px)] ml-[16px] z-10">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2 justify-between">
+            <div className="flex items-center space-x-2">
+              <MapPin className="w-4 h-4 text-primary" weight="fill" />
+              <p className="text-sm font-medium">Current Location</p>
+            </div>
+            {isLocationFromImage && (
+              <div className="flex items-center ml-auto">
+                <Camera className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground ml-1">
+                  From image
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="pl-6 space-y-2">
+            {isOutsideZug && (
+              <div className="flex items-center ml-auto">
+                <span className="text-xs text-destructive">
+                  Currently only supporting Kanton Zug
+                </span>
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {location?.address || ZUG_CENTER.address}
+            </p>
+          </div>
+        </div>
         {isLocationFromImage ? (
-          <Button className="w-full" onClick={() => setCurrentStep(2)}>
+          <Button
+            className="w-full"
+            onClick={() => setCurrentStep(2)}
+            disabled={isOutsideZug}
+          >
             Confirm Location from Image
           </Button>
         ) : (
           <Button
             className="w-full"
             onClick={() => setCurrentStep(2)}
-            disabled={!isLocationConfirmed}
+            disabled={!isLocationConfirmed || isOutsideZug}
           >
             {isLocationConfirmed ? "Confirm Location" : "Select Location"}
           </Button>
