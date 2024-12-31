@@ -1,8 +1,9 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import { CaretRight } from "@phosphor-icons/react";
+import { CaretRight, MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
 import { createClient } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
 
@@ -26,8 +27,10 @@ const supabase = createClient(
 
 export default function IncidentTypeStep() {
   const [types, setTypes] = useState<IncidentType[]>([]);
+  const [filteredTypes, setFilteredTypes] = useState<IncidentType[]>([]);
   const [subtypes, setSubtypes] = useState<IncidentSubtype[]>([]);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +47,7 @@ export default function IncidentTypeStep() {
 
         if (error) throw error;
         setTypes(data);
+        setFilteredTypes(data);
       } catch (err) {
         setError("Failed to load incident types");
         console.error(err);
@@ -54,6 +58,17 @@ export default function IncidentTypeStep() {
 
     fetchTypes();
   }, []);
+
+  // Handle search
+  useEffect(() => {
+    const query = searchQuery.toLowerCase();
+    const filtered = types.filter(
+      (type) =>
+        type.name.toLowerCase().includes(query) ||
+        type.description?.toLowerCase().includes(query)
+    );
+    setFilteredTypes(filtered);
+  }, [searchQuery, types]);
 
   // Fetch subtypes when a type is selected
   const fetchSubtypes = useCallback(async (typeId: string) => {
@@ -72,17 +87,17 @@ export default function IncidentTypeStep() {
     }
   }, []);
 
-  const handleTypeSelect = async (typeId: string) => {
-    setSelectedType(typeId);
+  const handleTypeSelect = async (type: IncidentType) => {
+    setSelectedType(type);
     setSubtypes([]);
-    await fetchSubtypes(typeId);
+    await fetchSubtypes(type.id);
   };
 
   const handleSubtypeSelect = (subtypeId: string) => {
     useReportStore.setState((state) => ({
       reportData: {
         ...state.reportData,
-        incidentTypeId: selectedType || undefined,
+        incidentTypeId: selectedType?.id,
         incidentSubtypeId: subtypeId,
       },
     }));
@@ -111,24 +126,43 @@ export default function IncidentTypeStep() {
   return (
     <div className="space-y-4">
       {!selectedType ? (
-        // Show main incident types
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold mb-4">Select incident type</h2>
-          {types.map((type) => (
-            <Button
-              key={type.id}
-              variant="outline"
-              className="w-full justify-between"
-              onClick={() => handleTypeSelect(type.id)}
-            >
-              <span>{type.name}</span>
-              <CaretRight className="w-4 h-4" />
-            </Button>
-          ))}
+        // Show main incident types with search
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Select incident type</h2>
+
+          <div className="relative">
+            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search incident types..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
+          <div className="space-y-2">
+            {filteredTypes.map((type) => (
+              <button
+                key={type.id}
+                className="w-full justify-between flex p-2 border border-1"
+                onClick={() => handleTypeSelect(type)}
+              >
+                <div className="text-left">
+                  <div>{type.name}</div>
+                  {/* {type.description && (
+                    <div className="text-sm text-muted-foreground">
+                      {type.description}
+                    </div>
+                  )} */}
+                </div>
+                <CaretRight className="w-4 h-4 flex-shrink-0" />
+              </button>
+            ))}
+          </div>
         </div>
       ) : (
-        // Show subtypes if available
-        <div className="space-y-2">
+        // Show subtypes with parent type info
+        <div className="space-y-4">
           <Button
             variant="ghost"
             className="mb-4"
@@ -136,28 +170,50 @@ export default function IncidentTypeStep() {
           >
             ← Back to types
           </Button>
-          <h2 className="text-lg font-semibold mb-4">Select subtype</h2>
-          {subtypes.length > 0 ? (
-            subtypes.map((subtype) => (
+
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <h3 className="font-medium text-sm text-muted-foreground">
+              Selected Type
+            </h3>
+            <p className="font-medium">{selectedType.name}</p>
+            {selectedType.description && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {selectedType.description}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Select subtype</h2>
+            {subtypes.length > 0 ? (
+              subtypes.map((subtype) => (
+                <Button
+                  key={subtype.id}
+                  variant="outline"
+                  className="w-full justify-between"
+                  onClick={() => handleSubtypeSelect(subtype.id)}
+                >
+                  <div className="text-left">
+                    <div>{subtype.name}</div>
+                    {subtype.description && (
+                      <div className="text-sm text-muted-foreground">
+                        {subtype.description}
+                      </div>
+                    )}
+                  </div>
+                  <CaretRight className="w-4 h-4 flex-shrink-0" />
+                </Button>
+              ))
+            ) : (
               <Button
-                key={subtype.id}
-                variant="outline"
                 className="w-full justify-between"
-                onClick={() => handleSubtypeSelect(subtype.id)}
+                onClick={() => handleTypeOnlySelect(selectedType.id)}
               >
-                <span>{subtype.name}</span>
+                Continue without subtype
                 <CaretRight className="w-4 h-4" />
               </Button>
-            ))
-          ) : (
-            <Button
-              className="w-full justify-between"
-              onClick={() => handleTypeOnlySelect(selectedType)}
-            >
-              Continue without subtype
-              <CaretRight className="w-4 h-4" />
-            </Button>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>

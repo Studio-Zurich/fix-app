@@ -1,6 +1,24 @@
 {
     "DashboardPage": {
         "title": "Hello world!",
-        "about": "Go to the about page"
+        "about": "Go to the about page",
+        "newReport": "Start New Report",
+        "overview": "Overview",
+        "quickReports": "Quick Reports"
+    },
+    "quickReports": {
+        "parking": "Illegal Parking",
+        "littering": "Littering",
+        "vegetation": "Vegetation Issue",
+        "other": "Other Issue"
+    },
+    "ConfirmPage": {
+        "title": "Report Submitted",
+        "subtitle": "Thank you for your report",
+        "reportNumber": "Report Number",
+        "nextSteps": "Next Steps",
+        "nextStepsDescription": "We will review your report and take appropriate action. You will receive an email confirmation shortly.",
+        "backToDashboard": "Back to Dashboard",
+        "newReport": "Submit Another Report"
     }
 }

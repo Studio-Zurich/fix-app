@@ -1,6 +1,7 @@
 "use client";
 
 import { submitReport } from "@/app/[locale]/actions";
+import { useRouter } from "@/i18n/routing";
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -13,7 +14,6 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface IncidentTypeInfo {
@@ -128,8 +128,8 @@ export default function SummaryStep() {
       // Reset the store after successful submission
       useReportStore.getState().reset();
 
-      // Use window.location for a full page navigation
-      window.location.href = `/confirm/${result.reportId}`;
+      // Use the localized router instead of window.location
+      router.push(`/confirm/${result.reportId}`);
     } catch (error) {
       console.error("Error submitting report:", error);
       setError(

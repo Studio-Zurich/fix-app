@@ -1,6 +1,24 @@
 {
     "DashboardPage": {
         "title": "Hallo Welt!",
-        "about": "Zum Dashboard"
+        "about": "Zum Dashboard",
+        "newReport": "Neue Meldung",
+        "overview": "Übersicht",
+        "quickReports": "Schnellmeldungen"
+    },
+    "quickReports": {
+        "parking": "Illegales Parken",
+        "littering": "Abfall",
+        "vegetation": "Vegetation Problem",
+        "other": "Anderes Problem"
+    },
+    "ConfirmPage": {
+        "title": "Meldung Eingereicht",
+        "subtitle": "Vielen Dank für Ihre Meldung",
+        "reportNumber": "Meldungsnummer",
+        "nextSteps": "Nächste Schritte",
+        "nextStepsDescription": "Wir werden Ihre Meldung prüfen und entsprechende Maßnahmen ergreifen. Sie erhalten in Kürze eine E-Mail-Bestätigung.",
+        "backToDashboard": "Zurück zur Übersicht",
+        "newReport": "Weitere Meldung Erstellen"
     }
 }

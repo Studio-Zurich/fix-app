@@ -1,63 +1,59 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import { MapPin } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect, useRef } from "react";
-import type { MapRef } from "react-map-gl";
-import Map, { Marker } from "react-map-gl";
+import { CaretLeft } from "@phosphor-icons/react";
+import { Button } from "@repo/ui/button";
+import { Progress } from "@repo/ui/progress";
+import ImageStep from "./image-step";
+import IncidentDescriptionStep from "./incident-description-step";
+import IncidentTypeStep from "./incident-type-step";
+import LocationStep from "./location-step";
+import SummaryStep from "./summary-step";
+import UserDataStep from "./user-data-step";
 
-const StepContainer = () => {
-  const location = useReportStore((state) => state.location);
-  const mapRef = useRef<MapRef>(null);
+const steps = [
+  { id: 0, component: <ImageStep /> },
+  { id: 1, component: <LocationStep /> },
+  { id: 2, component: <IncidentTypeStep /> },
+  { id: 3, component: <IncidentDescriptionStep /> },
+  { id: 4, component: <UserDataStep /> },
+  { id: 5, component: <SummaryStep /> },
+];
 
-  useEffect(() => {
-    if (location && mapRef.current) {
-      mapRef.current.flyTo({
-        center: [location.lng, location.lat],
-        zoom: 15,
-        duration: 2000,
-      });
+export default function StepContainer() {
+  const currentStep = useReportStore((state) => state.currentStep);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+
+  const progress = ((currentStep + 1) / steps.length) * 100;
+  const showBackButton = currentStep > 0;
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
-  }, [location]);
-
-  if (!location) return null;
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="h-[100svh]"
-    >
-      <Map
-        ref={mapRef}
-        initialViewState={{
-          latitude: location.lat,
-          longitude: location.lng,
-          zoom: 15,
-        }}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-      >
-        <Marker
-          latitude={location.lat}
-          longitude={location.lng}
-          anchor="bottom"
-        >
-          <MapPin
-            className="w-8 h-8 text-primary -translate-y-2"
-            weight="fill"
-          />
-        </Marker>
-      </Map>
-    </motion.div>
-  );
-};
+    <div className="flex min-h-svh max-h-svh flex-col p-4 overflow-hidden">
+      <header className="flex items-center mb-4">
+        {showBackButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-2"
+            onClick={handleBack}
+          >
+            <CaretLeft className="w-6 h-6" />
+          </Button>
+        )}
+        <h1 className="text-2xl font-bold flex-1 text-center">Fix App</h1>
+      </header>
 
-export default StepContainer;
+      <Progress value={progress} className="mb-6 w-full" />
+
+      <div className="flex-1 relative overflow-y-auto">
+        {steps[currentStep]?.component || <div>Invalid step</div>}
+      </div>
+    </div>
+  );
+}
