@@ -18,7 +18,7 @@ interface ReportLocation {
   location_lng: number;
   incident_type: {
     name: string;
-  };
+  } | null;
   status: string;
   created_at: string;
 }
@@ -52,7 +52,12 @@ const MapOverview = () => {
         return;
       }
 
-      setReports(data);
+      setReports(
+        data.map((report) => ({
+          ...report,
+          incident_type: report.incident_type?.[0] || null,
+        })) as ReportLocation[]
+      );
     };
 
     fetchReports();
