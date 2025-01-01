@@ -47,3 +47,20 @@ export const incidentDescriptionSchema = z.object({
 export type IncidentDescriptionSchema = z.infer<
   typeof incidentDescriptionSchema
 >;
+
+export const imageMetadataSchema = z.object({
+  coordinates: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+    })
+    .optional(),
+  fileInfo: z
+    .object({
+      size: z.number(),
+      format: z.string(),
+    })
+    .optional(),
+});
+
+export const imagesMetadataSchema = z.record(imageMetadataSchema);

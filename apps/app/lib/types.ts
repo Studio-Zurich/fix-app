@@ -25,3 +25,15 @@ export type ReportData = {
 };
 
 export type StepStatus = "pending" | "current" | "completed";
+
+export type ImageMetadata = {
+  coordinates?: { lat: number; lng: number };
+  fileInfo?: {
+    size: number;
+    format: string;
+  };
+};
+
+export type ImagesMetadata = {
+  [url: string]: ImageMetadata;
+};

@@ -1,8 +1,7 @@
 "use client";
 
-import type { ReportState } from "@/lib/store";
 import { useReportStore } from "@/lib/store";
-import { Camera, ImageSquare } from "@phosphor-icons/react";
+import { Camera, ImageSquare, X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import exifr from "exifr";
 import { useRef, useState } from "react";
@@ -35,11 +34,21 @@ function formatFileSize(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 }
 
+type ImageMetadata = {
+  fileInfo: {
+    size: number;
+    format: string;
+  };
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+};
+
 export default function ImageStep() {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { setLocation, setImages, images, imageMetadata, setImageMetadata } =
-    useReportStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { images, setImages, setLocation, setImageMetadata, imagesMetadata } =
+    useReportStore();
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
   const [captureMode, setCaptureMode] = useState<"upload" | "capture" | null>(
     null
@@ -48,54 +57,38 @@ export default function ImageStep() {
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files) return;
 
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
-    setImages([objectUrl]);
+    const newImages = [...images];
 
-    const newMetadata: ReportState["imageMetadata"] = {
-      fileInfo: {
-        size: file.size,
-        format: file.type.split("/")[1]?.toUpperCase() ?? "UNKNOWN",
-      },
-    };
+    for (const file of files) {
+      const objectUrl = URL.createObjectURL(file);
+      newImages.push(objectUrl);
 
-    // If this was a capture and we don't get GPS from EXIF, try to get current location
-    if (captureMode === "capture") {
-      try {
-        const position = await new Promise<GeolocationPosition>(
-          (resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0,
-            });
-          }
-        );
+      const newMetadata = {
+        fileInfo: {
+          size: file.size,
+          format: file.type.split("/")[1]?.toUpperCase() ?? "UNKNOWN",
+        },
+      } as ImageMetadata;
 
-        const coords = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        newMetadata.coordinates = coords;
-        setLocation({
-          lat: coords.lat,
-          lng: coords.lng,
-          address: "",
-        });
-      } catch (error) {
-        console.error("Error getting current location:", error);
-      }
-    } else {
-      // Try to get EXIF data for uploaded images
-      try {
-        const output = await exifr.gps(file);
-        if (output?.latitude && output?.longitude) {
+      // If this was a capture and we don't get GPS from EXIF, try to get current location
+      if (captureMode === "capture") {
+        try {
+          const position = await new Promise<GeolocationPosition>(
+            (resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0,
+              });
+            }
+          );
+
           const coords = {
-            lat: output.latitude,
-            lng: output.longitude,
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
           };
           newMetadata.coordinates = coords;
           setLocation({
@@ -103,14 +96,42 @@ export default function ImageStep() {
             lng: coords.lng,
             address: "",
           });
+        } catch (error) {
+          console.error("Error getting current location:", error);
         }
-      } catch (error) {
-        console.error("Error extracting GPS data:", error);
+      } else {
+        // Try to get EXIF data for uploaded images
+        try {
+          const output = await exifr.gps(file);
+          if (output?.latitude && output?.longitude) {
+            const coords = {
+              lat: output.latitude,
+              lng: output.longitude,
+            };
+            newMetadata.coordinates = coords;
+            setLocation({
+              lat: coords.lat,
+              lng: coords.lng,
+              address: "",
+            });
+          }
+        } catch (error) {
+          console.error("Error extracting GPS data:", error);
+        }
       }
+
+      setImageMetadata(objectUrl, newMetadata);
     }
 
-    setImageMetadata(newMetadata);
+    setImages(newImages);
     setCaptureMode(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveImage = (urlToRemove: string) => {
+    setImages(images.filter((url) => url !== urlToRemove));
   };
 
   const handleCapture = () => {
@@ -129,9 +150,6 @@ export default function ImageStep() {
     }
   };
 
-  // Use the image from store if available, otherwise use local preview
-  const displayUrl = images[0] || previewUrl;
-
   return (
     <div className="space-y-6">
       <div className="border-2 border-dashed rounded-lg p-6 text-center">
@@ -141,72 +159,75 @@ export default function ImageStep() {
           onChange={handleFileChange}
           accept="image/*"
           className="hidden"
+          multiple
         />
 
-        {displayUrl ? (
-          <div className="space-y-4">
-            <img
-              src={displayUrl}
-              alt="Preview"
-              className="mx-auto rounded-lg max-h-24"
-            />
-            <div className="space-x-2">
-              <Button onClick={handleCapture} className="md:hidden">
-                <Camera className="w-4 h-4 mr-2" />
-                Take Photo
-              </Button>
-              <Button
-                onClick={handleUpload}
-                className="hidden md:block"
-                variant="outline"
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {images.map((url, index) => (
+            <div key={index} className="relative">
+              <button
+                onClick={() => handleRemoveImage(url)}
+                className="absolute -top-2 -right-2 z-10 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
               >
-                <ImageSquare className="w-4 h-4 mr-2" />
-                Upload Image
-              </Button>
+                <X className="w-4 h-4" />
+              </button>
+              <img
+                src={url}
+                alt={`Preview ${index + 1}`}
+                className="w-full aspect-square object-cover rounded-lg"
+              />
+              {imagesMetadata[url] && (
+                <div className="p-4 bg-gray-50 rounded-lg space-y-2 mt-2">
+                  {imagesMetadata[url].fileInfo && (
+                    <>
+                      <p className="text-sm text-gray-600">
+                        Image information:
+                      </p>
+                      <p className="font-mono text-sm">
+                        Format: {imagesMetadata[url].fileInfo.format} | Size:{" "}
+                        {formatFileSize(imagesMetadata[url].fileInfo.size)}
+                      </p>
+                    </>
+                  )}
+                  {imagesMetadata[url].coordinates && (
+                    <>
+                      <p className="text-sm text-gray-600">
+                        Location from image:
+                      </p>
+                      <p className="font-mono text-sm">
+                        {convertToDMS(
+                          imagesMetadata[url].coordinates.lat,
+                          true
+                        )}{" "}
+                        {convertToDMS(
+                          imagesMetadata[url].coordinates.lng,
+                          false
+                        )}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <Camera className="w-8 h-8 mx-auto text-gray-400" />
-            <div className="space-x-2">
-              <Button onClick={handleCapture} className="md:hidden">
-                Take Photo
-              </Button>
-              <Button variant="outline" onClick={handleUpload}>
-                Upload Image
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {(imageMetadata?.coordinates || imageMetadata?.fileInfo) && (
-        <div className="p-4 bg-gray-50 rounded-lg space-y-2">
-          {imageMetadata.fileInfo && (
-            <>
-              <p className="text-sm text-gray-600">Image information:</p>
-              <p className="font-mono text-sm">
-                Format: {imageMetadata.fileInfo.format} | Size:{" "}
-                {formatFileSize(imageMetadata.fileInfo.size)}
-              </p>
-            </>
-          )}
-          {imageMetadata.coordinates && (
-            <>
-              <p className="text-sm text-gray-600">Location from image:</p>
-              <p className="font-mono text-sm">
-                {convertToDMS(imageMetadata.coordinates.lat, true)}{" "}
-                {convertToDMS(imageMetadata.coordinates.lng, false)}
-              </p>
-            </>
-          )}
+          ))}
         </div>
-      )}
+
+        <div className="space-x-2">
+          <Button onClick={handleCapture} className="md:hidden">
+            <Camera className="w-4 h-4 mr-2" />
+            Take Photo
+          </Button>
+          <Button onClick={handleUpload} variant="outline">
+            <ImageSquare className="w-4 h-4 mr-2" />
+            Upload Image
+          </Button>
+        </div>
+      </div>
 
       <div className="fixed bottom-4 left-4 right-4">
         {images.length > 0 ? (
           <Button className="w-full" onClick={() => setCurrentStep(1)}>
-            Confirm Image
+            Confirm Images ({images.length})
           </Button>
         ) : (
           <Button

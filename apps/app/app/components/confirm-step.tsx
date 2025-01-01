@@ -5,37 +5,48 @@ import { CheckCircle } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
-interface ConfirmStepProps {
-  reportId: string;
-}
-
-export default function ConfirmStep({ reportId }: ConfirmStepProps) {
+export default function ConfirmStep() {
   const t = useTranslations("ConfirmPage");
   const reset = useReportStore((state) => state.reset);
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
 
+  // Cleanup object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      // Get the images from store
+      const images = useReportStore.getState().images;
+      // Revoke all object URLs
+      images.forEach((url) => {
+        if (url.startsWith("blob:")) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []);
+
   const handleNewReport = () => {
+    // Get the images before reset
+    const images = useReportStore.getState().images;
+    // Revoke all object URLs
+    images.forEach((url) => {
+      if (url.startsWith("blob:")) {
+        URL.revokeObjectURL(url);
+      }
+    });
+
     reset();
     setCurrentStep(0);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col items-center space-y-2 text-center">
         <CheckCircle className="w-16 h-16 text-primary" weight="fill" />
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
-
-      <div className="w-full space-y-2">
-        <p className="text-sm text-center text-muted-foreground">
-          {t("reportNumber")}
-        </p>
-        <p className="text-lg font-mono text-center">{reportId}</p>
-      </div>
-
-      <Separator />
 
       <div className="w-full space-y-2">
         <h2 className="font-semibold">{t("nextSteps")}</h2>
@@ -44,7 +55,9 @@ export default function ConfirmStep({ reportId }: ConfirmStepProps) {
         </p>
       </div>
 
-      <div className="fixed bottom-4 left-4 right-4 space-y-2">
+      <Separator />
+
+      <div className="fixed bottom-4 left-4 right-4">
         <Button className="w-full" onClick={handleNewReport}>
           {t("newReport")}
         </Button>

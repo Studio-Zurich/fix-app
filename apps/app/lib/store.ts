@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { ImageMetadata, ImagesMetadata } from "./types";
 
 interface Image {
   previewUrl: string;
@@ -31,14 +32,7 @@ export interface ReportState {
   reportData: ReportData;
   location: Location | null;
   images: string[];
-  imageMetadata: {
-    coordinates?: { lat: number; lng: number };
-    fileInfo?: {
-      size: number;
-      format: string;
-    };
-  } | null;
-  setImageMetadata: (metadata: ReportState["imageMetadata"]) => void;
+  imagesMetadata: ImagesMetadata;
 }
 
 interface ReportStore extends ReportState {
@@ -47,6 +41,8 @@ interface ReportStore extends ReportState {
   updateReportData: (data: Partial<ReportData>) => void;
   setLocation: (location: Location) => void;
   setImages: (images: string[]) => void;
+  removeImage: (url: string) => void;
+  setImageMetadata: (url: string, metadata: ImageMetadata) => void;
 }
 
 const initialState: ReportState = {
@@ -56,8 +52,7 @@ const initialState: ReportState = {
   },
   location: null,
   images: [],
-  imageMetadata: null,
-  setImageMetadata: () => {},
+  imagesMetadata: {},
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -66,7 +61,6 @@ export const useReportStore = create<ReportStore>((set) => ({
   setCurrentStep: (step) => set({ currentStep: step }),
   updateReportData: (data) =>
     set((state) => ({
-      ...state,
       reportData: {
         ...state.reportData,
         ...data,
@@ -74,7 +68,6 @@ export const useReportStore = create<ReportStore>((set) => ({
     })),
   setLocation: (location) =>
     set((state) => ({
-      ...state,
       location,
       reportData: {
         ...state.reportData,
@@ -82,5 +75,19 @@ export const useReportStore = create<ReportStore>((set) => ({
       },
     })),
   setImages: (images) => set({ images }),
-  setImageMetadata: (metadata) => set({ imageMetadata: metadata }),
+  removeImage: (url: string) =>
+    set((state) => {
+      const { [url]: removed, ...rest } = state.imagesMetadata;
+      return {
+        images: state.images.filter((img) => img !== url),
+        imagesMetadata: rest,
+      };
+    }),
+  setImageMetadata: (url: string, metadata: ImageMetadata) =>
+    set((state) => ({
+      imagesMetadata: {
+        ...state.imagesMetadata,
+        [url]: metadata,
+      },
+    })),
 }));

@@ -11,6 +11,46 @@ import { ZodError } from "zod";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+export async function uploadImages(reportId: string, images: string[]) {
+  const supabase = await createClient();
+
+  const uploads = images.map(async (imageUrl) => {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const timestamp = new Date().getTime();
+    const fileName = `${timestamp}.jpg`;
+    const storagePath = `${reportId}/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from("report-images")
+      .upload(storagePath, blob, {
+        contentType: "image/jpeg",
+        upsert: false,
+      });
+
+    if (error) throw error;
+
+    const { error: recordError } = await supabase.from("report_images").insert({
+      report_id: reportId,
+      storage_path: storagePath,
+      file_name: fileName,
+      file_type: "image/jpeg",
+      file_size: blob.size,
+    });
+
+    if (recordError) throw recordError;
+
+    return data;
+  });
+
+  try {
+    await Promise.all(uploads);
+  } catch (error) {
+    console.error("Error in batch upload:", error);
+    throw error;
+  }
+}
+
 export async function submitReport(data: ReportData) {
   const supabase = await createClient();
 
@@ -18,7 +58,7 @@ export async function submitReport(data: ReportData) {
     // Validate the input data
     const validatedData = reportSchema.parse(data);
 
-    // Start a Supabase transaction
+    // Create the report first to get the ID
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
@@ -42,6 +82,46 @@ export async function submitReport(data: ReportData) {
       throw new Error(`Failed to create report: ${reportError.message}`);
     }
 
+    // Handle image uploads if there are any
+    if (validatedData.images && validatedData.images.length > 0) {
+      const reportFolder = `reports/${report.id}`; // Create a folder for this report
+
+      for (const image of validatedData.images) {
+        try {
+          // Create filename with timestamp to ensure uniqueness
+          const timestamp = Date.now();
+          const fileName = `image_${timestamp}.${image.fileType.split("/")[1]}`;
+          const storagePath = `${reportFolder}/${fileName}`;
+
+          // Upload to the report's folder
+          const { error: uploadError } = await supabase.storage
+            .from("report-images")
+            .upload(storagePath, image.previewUrl, {
+              contentType: image.fileType,
+              upsert: false,
+            });
+
+          if (uploadError) throw uploadError;
+
+          // Create image record
+          const { error: imageRecordError } = await supabase
+            .from("report_images")
+            .insert({
+              report_id: report.id,
+              storage_path: storagePath,
+              file_name: fileName,
+              file_type: image.fileType,
+              file_size: image.fileSize,
+            });
+
+          if (imageRecordError) throw imageRecordError;
+        } catch (error) {
+          console.error("Error processing image:", error);
+          throw error;
+        }
+      }
+    }
+
     // Fetch incident type info for email
     const { data: typeInfo } = await supabase
       .from("incident_types")
@@ -63,44 +143,6 @@ export async function submitReport(data: ReportData) {
       name: typeInfo?.name || "Unknown",
       subtype: subtypeInfo?.name,
     };
-
-    // Process images: create records for uploaded images
-    for (const image of validatedData.images) {
-      try {
-        // Create report_images record
-        const { error: imageRecordError } = await supabase
-          .from("report_images")
-          .insert({
-            report_id: report.id,
-            storage_path: image.storagePath,
-            file_name: image.fileName,
-            file_type: image.fileType,
-            file_size: image.fileSize,
-          });
-
-        if (imageRecordError) {
-          console.error("Error creating image record:", imageRecordError);
-          throw new Error(
-            `Failed to create image record: ${imageRecordError.message}`
-          );
-        }
-      } catch (error) {
-        console.error("Error processing image:", error);
-        // Create error report entry
-        await supabase.from("report_history").insert({
-          report_id: report.id,
-          action: "error",
-          details: {
-            error:
-              error instanceof Error
-                ? error.message
-                : "Unknown error during image processing",
-            image: image.fileName,
-          },
-        });
-        throw error;
-      }
-    }
 
     // Send email notifications
     try {

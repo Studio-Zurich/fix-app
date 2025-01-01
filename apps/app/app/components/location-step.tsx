@@ -65,7 +65,7 @@ export default function LocationStep() {
 
   const location = useReportStore((state) => state.location);
   const setLocation = useReportStore((state) => state.setLocation);
-  const imageMetadata = useReportStore((state) => state.imageMetadata);
+  const imagesMetadata = useReportStore((state) => state.imagesMetadata);
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
 
   useEffect(() => {
@@ -76,17 +76,21 @@ export default function LocationStep() {
 
   useEffect(() => {
     const initializeLocation = async () => {
-      if (imageMetadata?.coordinates) {
+      const firstImageWithCoords = Object.values(imagesMetadata).find(
+        (metadata) => metadata?.coordinates
+      );
+
+      if (firstImageWithCoords?.coordinates) {
         try {
           const response = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${imageMetadata.coordinates.lng},${imageMetadata.coordinates.lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${firstImageWithCoords.coordinates.lng},${firstImageWithCoords.coordinates.lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
           );
           const data = await response.json();
           const address = data.features[0]?.place_name || "Unknown location";
 
           setLocation({
-            lat: imageMetadata.coordinates.lat,
-            lng: imageMetadata.coordinates.lng,
+            lat: firstImageWithCoords.coordinates.lat,
+            lng: firstImageWithCoords.coordinates.lng,
             address,
           });
           setIsLocationFromImage(true);
@@ -95,8 +99,8 @@ export default function LocationStep() {
 
           mapRef.current?.flyTo({
             center: [
-              imageMetadata.coordinates.lng,
-              imageMetadata.coordinates.lat,
+              firstImageWithCoords.coordinates.lng,
+              firstImageWithCoords.coordinates.lat,
             ],
             zoom: 15,
             duration: 2000,
@@ -129,7 +133,7 @@ export default function LocationStep() {
     };
 
     initializeLocation();
-  }, [imageMetadata?.coordinates, setLocation, location]);
+  }, [imagesMetadata, setLocation, location]);
 
   const handleSearch = useCallback(async (value: string) => {
     setSearchValue(value);

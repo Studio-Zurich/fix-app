@@ -25,12 +25,14 @@ export default function SummaryStep() {
   const reportData = useReportStore((state) => state.reportData);
   const location = useReportStore((state) => state.location);
   const images = useReportStore((state) => state.images);
+  const imagesMetadata = useReportStore((state) => state.imagesMetadata);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
   const [incidentInfo, setIncidentInfo] = useState<IncidentTypeInfo | null>(
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Fetch incident type and subtype names
   useEffect(() => {
@@ -72,47 +74,42 @@ export default function SummaryStep() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    const supabase = createClient();
 
     try {
-      // Convert image URLs to Blobs and prepare image data
-      const imagePromises = images.map(async (imageUrl, index) => {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const fileName = `image-${index}.${blob.type.split("/")[1]}`;
+      // Convert blob URLs to actual blobs first
+      const imageData = await Promise.all(
+        images.map(async (imageUrl, index) => {
+          const metadata = imagesMetadata[imageUrl];
+          if (!metadata?.fileInfo) {
+            throw new Error(`Missing metadata for image ${index + 1}`);
+          }
 
-        return {
-          previewUrl: imageUrl,
-          storagePath: `reports/${Date.now()}-${fileName}`,
-          fileName,
-          fileType: blob.type,
-          fileSize: blob.size,
-          blob,
-        };
-      });
+          // Get the actual blob from the blob URL
+          const response = await fetch(imageUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image ${index + 1}`);
+          }
+          const blob = await response.blob();
 
-      const imageData = await Promise.all(imagePromises);
+          return {
+            previewUrl: imageUrl,
+            storagePath: `reports/${Date.now()}-${index}`,
+            fileName: `image-${index + 1}.${metadata.fileInfo.format.toLowerCase()}`,
+            fileType:
+              metadata.fileInfo.format.toLowerCase() === "png"
+                ? "image/png"
+                : "image/jpeg",
+            fileSize: blob.size,
+            blob, // Pass the blob to the server action
+          };
+        })
+      );
 
-      // Upload images first
-      const uploadPromises = imageData.map(async (image) => {
-        const { error: uploadError } = await supabase.storage
-          .from("report-images")
-          .upload(image.storagePath, image.blob);
-
-        if (uploadError) throw uploadError;
-        return image;
-      });
-
-      const uploadedImages = await Promise.all(uploadPromises);
-
-      // Remove blob from image data before sending to server
-      const cleanedImages = uploadedImages.map(({ blob, ...rest }) => rest);
-
-      // Submit report with uploaded image data
+      // Submit report with image data
       const result = await submitReport({
         ...reportData,
         location: location!,
-        images: cleanedImages,
+        images: imageData.map(({ blob, ...rest }) => rest), // Remove blob before sending to server
         incidentTypeId: reportData.incidentTypeId!,
         incidentSubtypeId: reportData.incidentSubtypeId!,
         reporterFirstName: reportData.reporterFirstName || "",
@@ -125,11 +122,8 @@ export default function SummaryStep() {
         throw new Error(result.error || "Failed to get report ID");
       }
 
-      // Reset the store after successful submission
-      useReportStore.getState().reset();
-
-      // Use the localized router instead of window.location
-      router.push(`/confirm/${result.reportId}`);
+      // Move to confirm step
+      setCurrentStep(6);
     } catch (error) {
       console.error("Error submitting report:", error);
       setError(
