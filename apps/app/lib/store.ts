@@ -1,48 +1,36 @@
 import { create } from "zustand";
-import { ImageMetadata, ImagesMetadata } from "./types";
+import {
+  ImageMetadata,
+  ImagesMetadata,
+  ReportData,
+  ReportLocation,
+} from "./types";
 
-interface Image {
-  previewUrl: string;
-  storagePath: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-}
-
-interface Location {
-  lat: number;
-  lng: number;
-  address: string;
-}
-
-interface ReportData {
-  images: Image[];
-  description?: string;
-  location?: Location;
-  reporterFirstName?: string;
-  reporterLastName?: string;
-  reporterEmail?: string;
-  reporterPhone?: string;
-  incidentTypeId?: string;
-  incidentSubtypeId?: string;
-}
-
-export interface ReportState {
+interface ReportState {
   currentStep: number;
-  reportData: ReportData;
-  location: Location | null;
+  reportData: Partial<ReportData>;
+  location: ReportLocation | null;
   images: string[];
   imagesMetadata: ImagesMetadata;
+  stepValidation: {
+    location?: boolean;
+    incidentType?: boolean;
+    userData?: boolean;
+  };
 }
 
 interface ReportStore extends ReportState {
   reset: () => void;
   setCurrentStep: (step: number) => void;
   updateReportData: (data: Partial<ReportData>) => void;
-  setLocation: (location: Location) => void;
+  setLocation: (location: ReportLocation) => void;
   setImages: (images: string[]) => void;
   removeImage: (url: string) => void;
   setImageMetadata: (url: string, metadata: ImageMetadata) => void;
+  setStepValidation: (
+    step: keyof ReportState["stepValidation"],
+    isValid: boolean
+  ) => void;
 }
 
 const initialState: ReportState = {
@@ -53,6 +41,7 @@ const initialState: ReportState = {
   location: null,
   images: [],
   imagesMetadata: {},
+  stepValidation: {},
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -88,6 +77,13 @@ export const useReportStore = create<ReportStore>((set) => ({
       imagesMetadata: {
         ...state.imagesMetadata,
         [url]: metadata,
+      },
+    })),
+  setStepValidation: (step, isValid) =>
+    set((state) => ({
+      stepValidation: {
+        ...state.stepValidation,
+        [step]: isValid,
       },
     })),
 }));

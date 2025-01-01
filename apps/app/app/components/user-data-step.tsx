@@ -1,9 +1,8 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 const userDataSchema = z.object({
@@ -17,7 +16,7 @@ type UserDataForm = z.infer<typeof userDataSchema>;
 
 export default function UserDataStep() {
   const reportData = useReportStore((state) => state.reportData);
-  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+  const setStepValidation = useReportStore((state) => state.setStepValidation);
 
   const [formData, setFormData] = useState<UserDataForm>({
     firstName: reportData.reporterFirstName || "",
@@ -29,6 +28,30 @@ export default function UserDataStep() {
     Partial<Record<keyof UserDataForm, string>>
   >({});
 
+  // Validate form and update step validation whenever form data changes
+  useEffect(() => {
+    try {
+      // Only validate required fields (excluding phone)
+      const { firstName, lastName, email } = formData;
+      const isValid =
+        firstName.length >= 2 &&
+        lastName.length >= 2 &&
+        z.string().email().safeParse(email).success;
+
+      setStepValidation("userData", isValid);
+
+      // Update store with current values
+      useReportStore.getState().updateReportData({
+        reporterFirstName: formData.firstName,
+        reporterLastName: formData.lastName,
+        reporterEmail: formData.email,
+        reporterPhone: formData.phone,
+      });
+    } catch (error) {
+      setStepValidation("userData", false);
+    }
+  }, [formData, setStepValidation]);
+
   const handleChange =
     (field: keyof UserDataForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -38,28 +61,13 @@ export default function UserDataStep() {
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
-
-      // Update store immediately
-      const storeUpdate: Partial<typeof reportData> = {};
-      switch (field) {
-        case "firstName":
-          storeUpdate.reporterFirstName = value;
-          break;
-        case "lastName":
-          storeUpdate.reporterLastName = value;
-          break;
-        case "email":
-          storeUpdate.reporterEmail = value;
-          break;
-        case "phone":
-          storeUpdate.reporterPhone = value;
-          break;
-      }
-      useReportStore.getState().updateReportData(storeUpdate);
     };
 
   const handleBlur = (field: keyof UserDataForm) => () => {
     try {
+      // Skip validation for optional phone field
+      if (field === "phone") return;
+
       const fieldSchema = userDataSchema.shape[field];
       fieldSchema.parse(formData[field]);
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -69,41 +77,6 @@ export default function UserDataStep() {
         ...prev,
         [field]: error.errors[0]?.message || "Invalid input",
       }));
-    }
-  };
-
-  const isFormValid = () => {
-    try {
-      userDataSchema.parse(formData);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const handleSubmit = () => {
-    try {
-      const validatedData = userDataSchema.parse(formData);
-
-      // Update store with validated data
-      useReportStore.getState().updateReportData({
-        reporterFirstName: validatedData.firstName,
-        reporterLastName: validatedData.lastName,
-        reporterEmail: validatedData.email,
-        reporterPhone: validatedData.phone,
-      });
-
-      // Move to next step
-      setCurrentStep(5);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: Partial<Record<keyof UserDataForm, string>> = {};
-        error.errors.forEach((err) => {
-          const path = err.path[0] as keyof UserDataForm;
-          newErrors[path] = err.message;
-        });
-        setErrors(newErrors);
-      }
     }
   };
 
@@ -172,16 +145,6 @@ export default function UserDataStep() {
           <li>Receive confirmation when resolved</li>
         </ul>
         <p className="text-xs mt-2">* Required fields</p>
-      </div>
-
-      <div className="fixed bottom-4 left-4 right-4">
-        <Button
-          className="w-full"
-          onClick={handleSubmit}
-          disabled={!isFormValid()}
-        >
-          Confirm Contact Details
-        </Button>
       </div>
     </div>
   );

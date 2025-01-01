@@ -1,8 +1,12 @@
 "use client";
 
+import { submitReport } from "@/app/[locale]/actions";
 import { useReportStore } from "@/lib/store";
+import { ReportData } from "@/lib/types";
 import { X } from "@phosphor-icons/react";
+import { Button } from "@repo/ui/button";
 import { Vaul } from "@repo/ui/drawer";
+import { useState } from "react";
 import ConfirmStep from "./confirm-step";
 import ImageStep from "./image-step";
 import IncidentDescriptionStep from "./incident-description-step";
@@ -30,14 +34,67 @@ export default function ReportDrawer({
   open,
   onOpenChange,
 }: ReportDrawerProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const currentStep = useReportStore((state) => state.currentStep);
+  const stepValidation = useReportStore((state) => state.stepValidation);
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+  const reportData = useReportStore((state) => state.reportData);
+  const location = useReportStore((state) => state.location);
+
+  const isNextEnabled = () => {
+    switch (currentStep) {
+      case 0: // Image step - always enabled since images are optional
+        return true;
+      case 1: // Location step
+        return stepValidation.location === true;
+      case 2: // Incident type step
+        return stepValidation.incidentType === true;
+      case 3: // Description step - always enabled since description is optional
+        return true;
+      case 4: // User data step
+        return stepValidation.userData === true;
+      case 5: // Summary step
+        return !isSubmitting;
+      default:
+        return false;
+    }
+  };
+
+  const handleNext = async () => {
+    if (currentStep === 5) {
+      // Validate required fields before submission
+      if (!location || !reportData.incidentTypeId) {
+        console.error("Missing required fields");
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        const result = await submitReport({
+          ...reportData,
+          location,
+          images: reportData.images || [],
+          incidentTypeId: reportData.incidentTypeId,
+        } as ReportData); // Type assertion here is safe because we validated required fields
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to submit report");
+        }
+
+        setCurrentStep(6);
+      } catch (error) {
+        console.error("Error submitting report:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
 
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-    } else {
-      onOpenChange(false);
     }
   };
 
@@ -50,6 +107,9 @@ export default function ReportDrawer({
     onOpenChange(open);
   };
 
+  const isLastStep = currentStep === steps.length - 1;
+  const isConfirmStep = currentStep === 6;
+
   return (
     <Vaul.Root open={open} onOpenChange={handleOpenChange} dismissible={false}>
       <Vaul.Portal>
@@ -57,7 +117,7 @@ export default function ReportDrawer({
         <Vaul.Content className="fixed bottom-0 left-0 right-0 mt-24 h-[90%] rounded-t-[10px] bg-background z-50">
           <div className="flex flex-col px-5 pt-16 pb-8 relative">
             <button
-              onClick={handleBack}
+              onClick={() => handleOpenChange(false)}
               className="absolute z-10 right-5 top-4 bg-background rounded"
             >
               <X className="text-muted-foreground" size={24} />
@@ -66,9 +126,33 @@ export default function ReportDrawer({
             <div className="flex-1 relative overflow-y-auto">
               {steps[currentStep]?.component || <div>Invalid step</div>}
             </div>
-            <div className="fixed bottom-0 left-0 right-0 bg-background">
-              Button bottom
-            </div>
+
+            {!isConfirmStep && (
+              <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
+                <div className="flex gap-2 max-w-md mx-auto">
+                  {currentStep > 0 && (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleBack}
+                    >
+                      Back
+                    </Button>
+                  )}
+                  <Button
+                    className="flex-1"
+                    onClick={handleNext}
+                    disabled={!isNextEnabled()}
+                  >
+                    {currentStep === 5
+                      ? isSubmitting
+                        ? "Submitting..."
+                        : "Submit"
+                      : "Next"}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </Vaul.Content>
       </Vaul.Portal>

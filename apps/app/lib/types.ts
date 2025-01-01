@@ -13,18 +13,16 @@ export type ReportLocation = {
 };
 
 export type ReportData = {
-  images?: ReportImage[];
+  images: ReportImage[];
   location: ReportLocation;
+  description?: string;
+  reporterFirstName?: string;
+  reporterLastName?: string;
+  reporterEmail?: string;
+  reporterPhone?: string;
   incidentTypeId: string;
   incidentSubtypeId?: string;
-  description?: string;
-  reporterFirstName: string;
-  reporterLastName: string;
-  reporterEmail: string;
-  reporterPhone?: string;
 };
-
-export type StepStatus = "pending" | "current" | "completed";
 
 export type ImageMetadata = {
   coordinates?: { lat: number; lng: number };

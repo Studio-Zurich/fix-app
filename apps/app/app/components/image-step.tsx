@@ -162,7 +162,7 @@ export default function ImageStep() {
           multiple
         />
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid gap-4 mb-4">
           {images.map((url, index) => (
             <div key={index} className="relative">
               <button
