@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "@/i18n/routing";
+import { useReportStore } from "@/lib/store";
 import { CheckCircle } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
@@ -11,8 +11,14 @@ interface ConfirmStepProps {
 }
 
 export default function ConfirmStep({ reportId }: ConfirmStepProps) {
-  const router = useRouter();
   const t = useTranslations("ConfirmPage");
+  const reset = useReportStore((state) => state.reset);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+
+  const handleNewReport = () => {
+    reset();
+    setCurrentStep(0);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] p-4 space-y-6">
@@ -39,15 +45,8 @@ export default function ConfirmStep({ reportId }: ConfirmStepProps) {
       </div>
 
       <div className="fixed bottom-4 left-4 right-4 space-y-2">
-        <Button className="w-full" onClick={() => router.push("/report")}>
+        <Button className="w-full" onClick={handleNewReport}>
           {t("newReport")}
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => router.push("/")}
-        >
-          {t("backToDashboard")}
         </Button>
       </div>
     </div>

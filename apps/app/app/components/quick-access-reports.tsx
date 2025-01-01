@@ -1,44 +1,57 @@
 "use client";
 
-import { useRouter } from "@/i18n/routing";
+import { useReportStore } from "@/lib/store";
 import { Car, TrashSimple, Tree, Warning } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { useTranslations } from "next-intl";
 
+interface QuickAccessReportsProps {
+  onStartReport: () => void;
+}
+
 const quickReports = [
   {
-    id: "parking",
+    id: "vehicles_illegal_parking",
+    type: "vehicles",
     icon: Car,
-    translationKey: "quickReports.parking",
-    incidentTypeId: "some-uuid-1",
+    incidentTypeId: "vehicles",
   },
   {
-    id: "littering",
+    id: "waste_general",
+    type: "waste",
     icon: TrashSimple,
-    translationKey: "quickReports.littering",
-    incidentTypeId: "some-uuid-2",
+    incidentTypeId: "waste",
   },
   {
-    id: "vegetation",
+    id: "vegetation_general",
+    type: "vegetation",
     icon: Tree,
-    translationKey: "quickReports.vegetation",
-    incidentTypeId: "some-uuid-3",
+    incidentTypeId: "vegetation",
   },
   {
-    id: "other",
+    id: "feedback_general",
+    type: "feedback",
     icon: Warning,
-    translationKey: "quickReports.other",
-    incidentTypeId: "some-uuid-4",
+    incidentTypeId: "feedback",
   },
 ];
 
-const QuickAccessReports = () => {
-  const router = useRouter();
-  const t = useTranslations();
+const QuickAccessReports = ({ onStartReport }: QuickAccessReportsProps) => {
+  const t = useTranslations("incidentTypes");
 
-  const handleQuickReport = (incidentTypeId: string) => {
-    // Here you would typically set the incident type in your store
-    router.push(`/report`);
+  const handleQuickReport = (incidentTypeId: string, subtypeId: string) => {
+    // Set the incident type and subtype in store
+    useReportStore.setState((state) => ({
+      reportData: {
+        ...state.reportData,
+        incidentTypeId,
+        incidentSubtypeId: subtypeId,
+      },
+    }));
+    // Skip to location step since we have the type
+    useReportStore.setState({ currentStep: 1 });
+    // Open the drawer
+    onStartReport();
   };
 
   return (
@@ -48,11 +61,11 @@ const QuickAccessReports = () => {
           key={report.id}
           variant="outline"
           className="flex-shrink-0 flex flex-col items-center gap-1 h-auto py-3 px-4"
-          onClick={() => handleQuickReport(report.incidentTypeId)}
+          onClick={() => handleQuickReport(report.incidentTypeId, report.id)}
         >
           <report.icon className="w-5 h-5" />
           <span className="text-xs whitespace-nowrap">
-            {t(report.translationKey)}
+            {t(`${report.type}.subtypes.${report.id}.name`)}
           </span>
         </Button>
       ))}

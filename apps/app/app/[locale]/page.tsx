@@ -1,7 +1,5 @@
-"use client";
-
 import Dashboard from "../components/dashboard";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   return <Dashboard />;
 }
