@@ -17,6 +17,7 @@ interface ReportState {
     incidentType?: boolean;
     userData?: boolean;
   };
+  skipIncidentType: boolean;
 }
 
 interface ReportStore extends ReportState {
@@ -42,12 +43,20 @@ const initialState: ReportState = {
   images: [],
   imagesMetadata: {},
   stepValidation: {},
+  skipIncidentType: false,
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
   ...initialState,
   reset: () => set(initialState),
-  setCurrentStep: (step) => set({ currentStep: step }),
+  setCurrentStep: (step) => {
+    set((state) => {
+      if (state.skipIncidentType && step === 2) {
+        return { currentStep: 3 };
+      }
+      return { currentStep: step };
+    });
+  },
   updateReportData: (data) =>
     set((state) => ({
       reportData: {

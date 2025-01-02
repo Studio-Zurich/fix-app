@@ -23,38 +23,77 @@ export default function IncidentDescriptionStep() {
     typeName: string;
     subtypeName?: string;
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const reportData = useReportStore((state) => state.reportData);
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
-  const t = useTranslations("incidentTypes");
+  const t = useTranslations("reportDrawer");
+  const tIncident = useTranslations("incidentTypes");
 
   useEffect(() => {
     const fetchTypeInfo = async () => {
-      if (!reportData.incidentTypeId) return;
+      console.log("Current reportData:", reportData); // Debug log
+
+      if (!reportData.incidentTypeId) {
+        console.log("No incident type ID found"); // Debug log
+        setIsLoading(false);
+        return;
+      }
 
       try {
-        const { data: typeData } = await supabase
+        console.log("Fetching type info for ID:", reportData.incidentTypeId); // Debug log
+
+        // First fetch the incident type
+        const { data: typeData, error: typeError } = await supabase
           .from("incident_types")
           .select("name")
           .eq("id", reportData.incidentTypeId)
           .single();
 
-        let subtypeName;
+        console.log("Type Data Response:", typeData, "Error:", typeError); // Debug log
+
+        if (typeError) throw typeError;
+
+        // Then fetch the subtype if it exists
+        let subtypeData = null;
         if (reportData.incidentSubtypeId) {
-          const { data: subtypeData } = await supabase
+          console.log(
+            "Fetching subtype info for ID:",
+            reportData.incidentSubtypeId
+          ); // Debug log
+
+          const { data: subtype, error: subtypeError } = await supabase
             .from("incident_subtypes")
             .select("name")
             .eq("id", reportData.incidentSubtypeId)
             .single();
-          subtypeName = subtypeData?.name;
+
+          console.log(
+            "Subtype Data Response:",
+            subtype,
+            "Error:",
+            subtypeError
+          ); // Debug log
+
+          if (subtypeError) throw subtypeError;
+          subtypeData = subtype;
         }
 
-        setTypeInfo({
-          typeName: typeData?.name || "",
-          subtypeName,
-        });
+        if (typeData) {
+          console.log("Setting type info:", {
+            typeName: typeData.name,
+            subtypeName: subtypeData?.name,
+          });
+
+          setTypeInfo({
+            typeName: typeData.name,
+            subtypeName: subtypeData?.name,
+          });
+        }
       } catch (error) {
         console.error("Error fetching type info:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -77,17 +116,23 @@ export default function IncidentDescriptionStep() {
   };
 
   const handleEditType = () => {
-    setCurrentStep(2); // Go back to incident type step
+    setCurrentStep(2);
   };
 
   const charactersLeft = MAX_CHARS - description.length;
+
+  if (isLoading) {
+    return <div className="p-5">Loading...</div>;
+  }
 
   return (
     <div className="space-y-4 px-5">
       {typeInfo && (
         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium">{t(`${typeInfo.typeName}.name`)}</h3>
+            <h3 className="font-medium">
+              {tIncident(`${typeInfo.typeName}.name`)}
+            </h3>
             <Button
               variant="ghost"
               size="sm"
@@ -99,40 +144,43 @@ export default function IncidentDescriptionStep() {
           </div>
           {typeInfo.subtypeName && (
             <p className="text-sm text-muted-foreground">
-              {t(`${typeInfo.typeName}.subtypes.${typeInfo.subtypeName}.name`)}
+              {tIncident(
+                `${typeInfo.typeName}.subtypes.${typeInfo.subtypeName}.name`
+              )}
             </p>
           )}
         </div>
       )}
 
       <div>
-        <h2 className="text-lg font-semibold mb-2">Additional Details</h2>
+        <h2 className="text-lg font-semibold mb-2">
+          {t("steps.description.title")}
+        </h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Please provide more information about the{" "}
-          {typeInfo?.typeName.toLowerCase()}
+          {t("steps.description.description")}
         </p>
       </div>
 
       <div className="space-y-2">
         <Textarea
-          placeholder="Describe the incident in more detail..."
+          placeholder={t("steps.description.placeholder")}
           value={description}
           onChange={handleDescriptionChange}
           rows={6}
           className="resize-none"
         />
         <p className="text-sm text-muted-foreground text-right">
-          {charactersLeft} characters remaining
+          {charactersLeft} {t("steps.description.charactersLeft")}
         </p>
       </div>
 
       <div className="text-sm text-muted-foreground space-y-1">
-        <p>Guidelines:</p>
+        <p>{t("steps.description.guidelines.title")}:</p>
         <ul className="list-disc list-inside pl-2">
-          <li>Be specific and clear</li>
-          <li>Avoid personal information</li>
-          <li>Keep it respectful</li>
-          <li>No swear words or offensive language</li>
+          <li>{t("steps.description.guidelines.specific")}</li>
+          <li>{t("steps.description.guidelines.noPersonalInfo")}</li>
+          <li>{t("steps.description.guidelines.respectful")}</li>
+          <li>{t("steps.description.guidelines.noOffensive")}</li>
         </ul>
       </div>
     </div>

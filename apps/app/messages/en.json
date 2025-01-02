@@ -269,7 +269,16 @@
             },
             "description": {
                 "title": "Description",
-                "description": "Provide additional details about the incident"
+                "description": "Provide additional details about the incident",
+                "placeholder": "Describe the incident in more detail...",
+                "charactersLeft": "characters remaining",
+                "guidelines": {
+                    "title": "Guidelines",
+                    "specific": "Be specific and clear",
+                    "noPersonalInfo": "Avoid personal information",
+                    "respectful": "Keep it respectful",
+                    "noOffensive": "No swear words or offensive language"
+                }
             },
             "userData": {
                 "title": "Your Information",

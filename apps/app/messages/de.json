@@ -269,7 +269,16 @@
             },
             "description": {
                 "title": "Beschreibung",
-                "description": "Gib weitere Details zum Vorfall an"
+                "description": "Geben Sie weitere Details zum Vorfall an",
+                "placeholder": "Beschreiben Sie den Vorfall genauer...",
+                "charactersLeft": "Zeichen übrig",
+                "guidelines": {
+                    "title": "Richtlinien",
+                    "specific": "Seien Sie konkret und klar",
+                    "noPersonalInfo": "Vermeiden Sie persönliche Informationen",
+                    "respectful": "Bleiben Sie respektvoll",
+                    "noOffensive": "Keine Schimpfwörter oder beleidigende Sprache"
+                }
             },
             "userData": {
                 "title": "Deine Informationen",
