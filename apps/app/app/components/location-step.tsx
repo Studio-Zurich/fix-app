@@ -6,11 +6,10 @@ import {
   Crosshair,
   MagnifyingGlass,
   MapPin,
-  X,
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
-import { Vaul } from "@repo/ui/drawer";
 import { Input } from "@repo/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@repo/ui/sheet";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -365,8 +364,8 @@ export default function LocationStep() {
   return (
     <div className="relative">
       <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
-        <Vaul.Root open={isOpen} onOpenChange={setIsOpen}>
-          <Vaul.Trigger asChild>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
             <div className="flex items-center justify-between p-2 w-full">
               <div className="flex items-center space-x-2">
                 <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
@@ -390,47 +389,39 @@ export default function LocationStep() {
                 </span>
               </Button>
             </div>
-          </Vaul.Trigger>
-          <Vaul.Portal>
-            <Vaul.Overlay className="fixed inset-0 bg-black/40 z-50" />
-            <Vaul.Content className="fixed bottom-0 left-0 right-0 mt-24 h-[50%] rounded-t-[10px] bg-background z-50">
-              <div className="flex flex-col p-4 h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">Choose a location</h2>
-                  <button onClick={() => setIsOpen(false)}>
-                    <X className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Search for a location"
-                    value={searchValue}
-                    onChange={(e) => handleSearch(e.target.value)}
-                  />
-                  {suggestions.length > 0 && (
-                    <div className="space-y-2 overflow-auto">
-                      {suggestions.map((suggestion) => (
-                        <button
-                          key={suggestion.id}
-                          className="flex items-center space-x-2 w-full p-2 hover:bg-gray-100 rounded-lg text-left"
-                          onClick={() => handleLocationSelect(suggestion)}
-                        >
-                          <MapPin
-                            className="w-4 h-4 text-primary"
-                            weight="fill"
-                          />
-                          <span className="text-sm">
-                            {suggestion.place_name}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[50%]">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Choose a location</h2>
               </div>
-            </Vaul.Content>
-          </Vaul.Portal>
-        </Vaul.Root>
+              <div className="space-y-4">
+                <Input
+                  placeholder="Search for a location"
+                  value={searchValue}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+                {suggestions.length > 0 && (
+                  <div className="space-y-2 overflow-auto">
+                    {suggestions.map((suggestion) => (
+                      <button
+                        key={suggestion.id}
+                        className="flex items-center space-x-2 w-full p-2 hover:bg-gray-100 rounded-lg text-left"
+                        onClick={() => handleLocationSelect(suggestion)}
+                      >
+                        <MapPin
+                          className="w-4 h-4 text-primary"
+                          weight="fill"
+                        />
+                        <span className="text-sm">{suggestion.place_name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <Map

@@ -3,9 +3,8 @@
 import { submitReport } from "@/app/[locale]/actions";
 import { useReportStore } from "@/lib/store";
 import { ReportData } from "@/lib/types";
-import { X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
-import { Vaul } from "@repo/ui/drawer";
+import { Sheet, SheetContent } from "@repo/ui/sheet";
 import { useState } from "react";
 import ConfirmStep from "./confirm-step";
 import ImageStep from "./image-step";
@@ -111,56 +110,48 @@ export default function ReportDrawer({
   const isConfirmStep = currentStep === 6;
 
   return (
-    <Vaul.Root
-      open={open}
-      onOpenChange={handleOpenChange}
-      dismissible={false}
-      repositionInputs={false}
-    >
-      <Vaul.Portal>
-        <Vaul.Overlay className="fixed inset-0 bg-black/40 z-40" />
-        <Vaul.Content className="fixed bottom-0 left-0 right-0 mt-24 h-[90%] rounded-t-[10px] bg-background z-50">
-          <div className="flex flex-col px-5 pt-16 pb-8 relative">
-            <button
-              onClick={() => handleOpenChange(false)}
-              className="absolute z-10 right-5 top-4 bg-background rounded"
-            >
-              <X className="text-muted-foreground" size={24} />
-            </button>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent side="bottom" className="h-[90%] p-0 pt-16 pb-8">
+        <div className="relative px-5">
+          {/* <button
+            onClick={() => handleOpenChange(false)}
+            className="absolute z-10 right-5 top-4 bg-background rounded"
+          >
+            <X className="text-muted-foreground" size={24} />
+          </button> */}
 
-            <div className="flex-1 relative overflow-y-auto">
-              {steps[currentStep]?.component || <div>Invalid step</div>}
-            </div>
-
-            {!isConfirmStep && (
-              <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
-                <div className="flex gap-2 max-w-md mx-auto">
-                  {currentStep > 0 && (
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={handleBack}
-                    >
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    className="flex-1"
-                    onClick={handleNext}
-                    disabled={!isNextEnabled()}
-                  >
-                    {currentStep === 5
-                      ? isSubmitting
-                        ? "Submitting..."
-                        : "Submit"
-                      : "Next"}
-                  </Button>
-                </div>
-              </div>
-            )}
+          <div className="flex-1 relative overflow-y-auto">
+            {steps[currentStep]?.component || <div>Invalid step</div>}
           </div>
-        </Vaul.Content>
-      </Vaul.Portal>
-    </Vaul.Root>
+
+          {!isConfirmStep && (
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
+              <div className="flex gap-2 max-w-md mx-auto">
+                {currentStep > 0 && (
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleBack}
+                  >
+                    Back
+                  </Button>
+                )}
+                <Button
+                  className="flex-1"
+                  onClick={handleNext}
+                  disabled={!isNextEnabled()}
+                >
+                  {currentStep === 5
+                    ? isSubmitting
+                      ? "Submitting..."
+                      : "Submit"
+                    : "Next"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
