@@ -1,15 +1,12 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import {
-  Camera,
-  Crosshair,
-  MagnifyingGlass,
-  MapPin,
-} from "@phosphor-icons/react";
+import { Crosshair, MagnifyingGlass, MapPin } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
+import { TypographyH3 } from "@repo/ui/headline";
 import { Input } from "@repo/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@repo/ui/sheet";
+import { TypographyParagraph, TypographySpan } from "@repo/ui/text";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -59,32 +56,52 @@ const MapLocationDialog = ({
   if (!open) return null;
 
   return (
-    <div className="absolute top-20 left-4 right-4 z-20">
-      <div className="bg-white/95 backdrop-blur-sm shadow-lg rounded-lg p-4 mx-auto max-w-sm border animate-in fade-in-0 zoom-in-95 slide-in-from-top-2">
-        <div className="space-y-3">
-          <div>
-            <h3 className="font-medium">Use Image Location?</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              We found a location in your image
-            </p>
-            <p className="text-sm font-medium mt-2">{address}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              size="sm"
-              onClick={onReject}
-            >
-              Use own location
-            </Button>
-            <Button className="flex-1" size="sm" onClick={onAccept}>
-              Use image location
-            </Button>
-          </div>
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-4/5">
+      <div className="bg-white/95 backdrop-blur-sm shadow-lg rounded-lg p-4 mx-auto max-w-lg  border animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 space-y-4">
+        <div className="w-full">
+          <TypographyH3>Use Image Location?</TypographyH3>
+          <TypographyParagraph className="text-sm text-muted-foreground mt-1">
+            We found a location in your image
+          </TypographyParagraph>
+          <TypographySpan className="text-sm font-medium mt-2">
+            {address}
+          </TypographySpan>
+        </div>
+        <div className="grid gap-1">
+          <Button className="flex-1" size="sm" onClick={onAccept}>
+            Use image location
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex-1"
+            size="sm"
+            onClick={onReject}
+          >
+            Use own location
+          </Button>
         </div>
       </div>
     </div>
+  );
+};
+
+const LocationPopup = ({ address }: { address: string }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className="absolute -top-[5.75rem] left-4 pointer-events-none z-10"
+    >
+      <div className="bg-background p-3 w-44 mx-auto rounded-lg shadow-lg">
+        <TypographyH3 size="text-base" weight="medium" className="text-primary">
+          Location
+        </TypographyH3>
+        <TypographySpan size="text-[12px]" className="block">
+          {address}
+        </TypographySpan>
+      </div>
+    </motion.div>
   );
 };
 
@@ -363,32 +380,33 @@ export default function LocationStep() {
 
   return (
     <div className="relative">
-      <div className="absolute top-6 bg-white shadow-md left-0 w-[calc(100%-32px)] ml-[16px] z-10 rounded-full">
+      <Map
+        ref={mapRef}
+        initialViewState={
+          location
+            ? {
+                latitude: location.lat,
+                longitude: location.lng,
+                zoom: 15,
+              }
+            : ZUG_CENTER
+        }
+        style={{
+          width: "100%",
+          height: "calc(95svh - 208px)",
+        }}
+        mapStyle="mapbox://styles/mapbox/streets-v11"
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+        reuseMaps
+        onMoveStart={() => setIsMoving(true)}
+        onMoveEnd={(e) => {
+          setIsMoving(false);
+          handleMapMove();
+        }}
+      >
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <div className="flex items-center justify-between p-2 w-full">
-              <div className="flex items-center space-x-2">
-                <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
-                <p className="text-sm font-medium text-muted-foreground">
-                  Search for a location
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestLocationPermission();
-                }}
-                disabled={isGettingLocation}
-                className="flex items-center space-x-1"
-              >
-                <Crosshair className="w-4 h-4" />
-                <span className="text-xs">
-                  {isGettingLocation ? "Getting location..." : "Get location"}
-                </span>
-              </Button>
-            </div>
+          <SheetTrigger className="absolute top-5 left-5 bg-background w-10 h-10 rounded-full flex items-center justify-center">
+            <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[50%]">
             <div className="flex flex-col h-full">
@@ -422,34 +440,21 @@ export default function LocationStep() {
             </div>
           </SheetContent>
         </Sheet>
-      </div>
-
-      <Map
-        ref={mapRef}
-        initialViewState={
-          location
-            ? {
-                latitude: location.lat,
-                longitude: location.lng,
-                zoom: 15,
-              }
-            : ZUG_CENTER
-        }
-        style={{
-          width: "100%",
-          height: "calc(60svh)",
-        }}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        reuseMaps
-        onMoveStart={() => setIsMoving(true)}
-        onMoveEnd={(e) => {
-          setIsMoving(false);
-          handleMapMove();
-        }}
-      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            requestLocationPermission();
+          }}
+          disabled={isGettingLocation}
+          className="absolute top-5 right-5 bg-background w-10 h-10 rounded-full flex items-center justify-center"
+        >
+          <Crosshair className="w-4 h-4" />
+        </Button>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none">
           <motion.div
+            className="relative"
             animate={{
               y: isMoving ? -8 : 0,
             }}
@@ -460,42 +465,18 @@ export default function LocationStep() {
             }}
           >
             <MapPin className="w-8 h-8 text-primary" weight="fill" />
+            {!isMoving && location && (
+              <LocationPopup address={location.address} />
+            )}
           </motion.div>
           {isMoving && (
             <div className="w-3 h-3 rounded-full bg-black/20 mx-auto mt-1" />
           )}
         </div>
       </Map>
-
-      <div className="absolute bottom-[16px] p-4 bg-white shadow-md rounded-lg space-y-4 left-0 w-[calc(100%-32px)] ml-[16px] z-10">
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <MapPin className="w-4 h-4 text-primary" weight="fill" />
-            <p className="text-sm font-medium">Current Location</p>
-            {isLocationFromImage && (
-              <div className="flex items-center ml-auto">
-                <Camera className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground ml-1">
-                  From image
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="pl-6 space-y-2">
-            {isOutsideZug && (
-              <div className="flex items-center ml-auto">
-                <span className="text-xs text-destructive">
-                  Currently only supporting Kanton Zug
-                </span>
-              </div>
-            )}
-            <p className="text-sm text-muted-foreground whitespace-pre-line">
-              {location?.address || ZUG_CENTER.address}
-            </p>
-          </div>
-        </div>
-      </div>
-
+      {showLocationDialog && (
+        <div className="absolute bottom-0 left-0 w-full h-full z-10 bg-black/50" />
+      )}
       <MapLocationDialog
         open={showLocationDialog}
         onAccept={handleAcceptImageLocation}

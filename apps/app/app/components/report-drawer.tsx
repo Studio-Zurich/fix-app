@@ -3,14 +3,17 @@
 import { submitReport } from "@/app/[locale]/actions";
 import { useReportStore } from "@/lib/store";
 import { ReportData } from "@/lib/types";
+import { ArrowCircleRight } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Sheet, SheetContent } from "@repo/ui/sheet";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import ConfirmStep from "./confirm-step";
 import ImageStep from "./image-step";
 import IncidentDescriptionStep from "./incident-description-step";
 import IncidentTypeStep from "./incident-type-step";
 import LocationStep from "./location-step";
+import StepHeader from "./step-header";
 import SummaryStep from "./summary-step";
 import UserDataStep from "./user-data-step";
 
@@ -33,6 +36,7 @@ export default function ReportDrawer({
   open,
   onOpenChange,
 }: ReportDrawerProps) {
+  const t = useTranslations("reportDrawer");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const currentStep = useReportStore((state) => state.currentStep);
   const stepValidation = useReportStore((state) => state.stepValidation);
@@ -109,48 +113,81 @@ export default function ReportDrawer({
   const isLastStep = currentStep === steps.length - 1;
   const isConfirmStep = currentStep === 6;
 
+  // Get step title and description based on current step
+  const getStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return {
+          title: t("steps.images.title"),
+          description: t("steps.images.description"),
+        };
+      case 1:
+        return {
+          title: t("steps.location.title"),
+          description: t("steps.location.description"),
+        };
+      case 2:
+        return {
+          title: t("steps.incidentType.title"),
+          description: t("steps.incidentType.description"),
+        };
+      case 3:
+        return {
+          title: t("steps.description.title"),
+          description: t("steps.description.description"),
+        };
+      case 4:
+        return {
+          title: t("steps.userData.title"),
+          description: t("steps.userData.description"),
+        };
+      case 5:
+        return {
+          title: t("steps.summary.title"),
+          description: t("steps.summary.description"),
+        };
+      default:
+        return { title: "", description: "" };
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side="bottom" className="h-[90%] p-0 pt-16 pb-8">
-        <div className="flex flex-col h-full relative px-5">
-          {/* <button
-            onClick={() => handleOpenChange(false)}
-            className="absolute z-10 right-5 top-4 bg-background rounded"
-          >
-            <X className="text-muted-foreground" size={24} />
-          </button> */}
-
-          <div className="flex-1 relative overflow-y-auto ">
-            {steps[currentStep]?.component || <div>Invalid step</div>}
-          </div>
-
-          {!isConfirmStep && (
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
-              <div className="grid gap-2 max-w-md mx-auto">
-                <Button
-                  className="flex-1"
-                  onClick={handleNext}
-                  disabled={!isNextEnabled()}
-                >
-                  {currentStep === 5
-                    ? isSubmitting
-                      ? "Submitting..."
-                      : "Submit"
-                    : "Next"}
-                </Button>
-
-                <Button
-                  disabled={currentStep === 0}
-                  variant="outline"
-                  className="flex-1"
-                  onClick={handleBack}
-                >
-                  Back
-                </Button>
-              </div>
-            </div>
-          )}
+      <SheetContent side="bottom">
+        <StepHeader
+          title={getStepContent().title}
+          description={getStepContent().description}
+        />
+        <div className="flex-1 overflow-y-auto">
+          {steps[currentStep]?.component || <div>Invalid step</div>}
         </div>
+
+        {!isConfirmStep && (
+          <div className="px-5 py-4 flex justify-between items-center space-x-6">
+            <Button
+              disabled={currentStep === 0}
+              variant="link"
+              className="flex-1"
+              onClick={handleBack}
+            >
+              {t("buttons.back")}
+            </Button>
+            <Button
+              variant={currentStep === 5 ? "default" : "icon"}
+              size={currentStep === 5 ? "default" : "icon"}
+              className={`w-[65%] ${currentStep === 5 ? "bg-primary" : ""}`}
+              onClick={handleNext}
+              disabled={!isNextEnabled()}
+            >
+              {currentStep === 5
+                ? isSubmitting
+                  ? t("buttons.submitting")
+                  : t("buttons.submit")
+                : t("buttons.next")}{" "}
+              <ArrowCircleRight className="flex-shrink-0 w-20" />
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );

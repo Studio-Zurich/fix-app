@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Header from "../components/header";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
+          <Header />
           <main className="min-h-svh max-h-svh w-full flex flex-col">
             {children}
           </main>

@@ -72,3 +72,8 @@ use phosphor icons for icons
 
 // Drawer
 use vaul for drawers
+
+// Translations
+use next-intl for translations
+when using the messages folder please have a consistent naming convention for the files
+e.g. components are like "quickReportsComponent": {...} and pages are like "quickReportsPage": {...}

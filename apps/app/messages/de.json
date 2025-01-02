@@ -246,5 +246,68 @@
                 }
             }
         }
+    },
+    "reportDrawer": {
+        "steps": {
+            "images": {
+                "title": "Bilder hochladen",
+                "description": "Lade Bilder vom Vorfall hoch. Wenn Du keine hast, kannst Du ein Foto mit Deiner Kamera aufnehmen."
+            },
+            "location": {
+                "title": "Standort",
+                "description": "Wähle den Ort des Vorfalls",
+                "search": "Nach Ort suchen",
+                "useCurrentLocation": "Aktuellen Standort verwenden",
+                "useImageLocation": "Bildstandort verwenden",
+                "useOwnLocation": "Eigenen Standort wählen",
+                "locationFromImage": "Wir haben einen Standort in Ihrem Bild gefunden",
+                "outsideZug": "Der gewählte Standort liegt außerhalb von Zug"
+            },
+            "incidentType": {
+                "title": "Vorfallsart",
+                "description": "Wähle die Art des Vorfalls, den Du melden möchtest"
+            },
+            "description": {
+                "title": "Beschreibung",
+                "description": "Gib weitere Details zum Vorfall an"
+            },
+            "userData": {
+                "title": "Deine Informationen",
+                "description": "Bitte gib Deine Kontaktinformationen an"
+            },
+            "summary": {
+                "title": "Zusammenfassung",
+                "description": "Überprüfe Deine Meldung vor dem Absenden"
+            }
+        },
+        "buttons": {
+            "back": "Zurück",
+            "next": "Weiter",
+            "submit": "Absenden",
+            "submitting": "Wird gesendet..."
+        }
+    },
+    "locationStepComponent": {
+        "dialog": {
+            "title": "Bildstandort verwenden?",
+            "description": "Wir haben einen Standort in Ihrem Bild gefunden",
+            "useImageLocation": "Bildstandort verwenden",
+            "useOwnLocation": "Eigenen Standort wählen"
+        },
+        "search": {
+            "title": "Standort wählen",
+            "placeholder": "Nach Ort suchen",
+            "useCurrentLocation": "Aktuellen Standort verwenden"
+        },
+        "map": {
+            "defaultAddress": "Postplatz, 6300 Zug, Schweiz",
+            "unknownLocation": "Unbekannter Standort"
+        },
+        "errors": {
+            "outsideZug": "Der gewählte Standort liegt außerhalb von Zug",
+            "locationAccess": "Bitte aktivieren Sie den Standortzugriff in Ihren Geräteeinstellungen",
+            "locationError": "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut",
+            "geocodingError": "Fehler beim Abrufen der Adresse"
+        }
     }
 }

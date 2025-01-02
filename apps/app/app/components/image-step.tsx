@@ -3,6 +3,7 @@
 import { useReportStore } from "@/lib/store";
 import { Camera, ImageSquare, X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
+import { TypographyParagraph } from "@repo/ui/text";
 import exifr from "exifr";
 import { useRef, useState } from "react";
 
@@ -151,20 +152,30 @@ export default function ImageStep() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="border-2 border-dashed rounded-lg p-6 text-center">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept="image/*"
-          className="hidden"
-          multiple
-        />
+    <>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+        multiple
+      />
 
-        <div className="grid gap-4 mb-4">
+      <div className="px-5 space-y-8">
+        <div className="grid border border-dashed border-foreground/20 rounded-md p-4 gap-4">
+          <Button onClick={handleCapture} className="md:hidden">
+            <Camera />
+            Take Photo
+          </Button>
+          <Button onClick={handleUpload} variant="outline">
+            <ImageSquare />
+            Upload Image
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           {images.map((url, index) => (
-            <div key={index} className="relative">
+            <div key={index} className="relative h-32">
               <button
                 onClick={() => handleRemoveImage(url)}
                 className="absolute -top-2 -right-2 z-10 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
@@ -174,71 +185,20 @@ export default function ImageStep() {
               <img
                 src={url}
                 alt={`Preview ${index + 1}`}
-                className="w-full aspect-square object-cover rounded-lg"
+                className="w-full h-full object-cover"
               />
-              {imagesMetadata[url] && (
-                <div className="p-4 bg-gray-50 rounded-lg space-y-2 mt-2">
-                  {imagesMetadata[url].fileInfo && (
-                    <>
-                      <p className="text-sm text-gray-600">
-                        Image information:
-                      </p>
-                      <p className="font-mono text-sm">
-                        Format: {imagesMetadata[url].fileInfo.format} | Size:{" "}
-                        {formatFileSize(imagesMetadata[url].fileInfo.size)}
-                      </p>
-                    </>
-                  )}
-                  {imagesMetadata[url].coordinates && (
-                    <>
-                      <p className="text-sm text-gray-600">
-                        Location from image:
-                      </p>
-                      <p className="font-mono text-sm">
-                        {convertToDMS(
-                          imagesMetadata[url].coordinates.lat,
-                          true
-                        )}{" "}
-                        {convertToDMS(
-                          imagesMetadata[url].coordinates.lng,
-                          false
-                        )}
-                      </p>
-                    </>
-                  )}
+              {imagesMetadata[url]?.coordinates && (
+                <div className="absolute bottom-0 left-0 w-full bg-white p-2">
+                  <TypographyParagraph>
+                    {convertToDMS(imagesMetadata[url].coordinates.lat, true)}{" "}
+                    {convertToDMS(imagesMetadata[url].coordinates.lng, false)}
+                  </TypographyParagraph>
                 </div>
               )}
             </div>
           ))}
         </div>
-
-        <div className="space-x-2">
-          <Button onClick={handleCapture} className="md:hidden">
-            <Camera className="w-4 h-4 mr-2" />
-            Take Photo
-          </Button>
-          <Button onClick={handleUpload} variant="outline">
-            <ImageSquare className="w-4 h-4 mr-2" />
-            Upload Image
-          </Button>
-        </div>
       </div>
-
-      <div className="fixed bottom-4 left-4 right-4">
-        {images.length > 0 ? (
-          <Button className="w-full" onClick={() => setCurrentStep(1)}>
-            Confirm Images ({images.length})
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            className="w-full"
-            onClick={() => setCurrentStep(1)}
-          >
-            Skip Image Upload
-          </Button>
-        )}
-      </div>
-    </div>
+    </>
   );
 }

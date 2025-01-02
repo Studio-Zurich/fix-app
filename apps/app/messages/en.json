@@ -246,5 +246,68 @@
                 }
             }
         }
+    },
+    "reportDrawer": {
+        "steps": {
+            "images": {
+                "title": "Upload Images",
+                "description": "Upload images of the incident scene. If you don't have any, you can take a photo with your camera."
+            },
+            "location": {
+                "title": "Location",
+                "description": "Select the location of the incident",
+                "search": "Search for location",
+                "useCurrentLocation": "Use current location",
+                "useImageLocation": "Use image location",
+                "useOwnLocation": "Choose own location",
+                "locationFromImage": "We found a location in your image",
+                "outsideZug": "The selected location is outside of Zug"
+            },
+            "incidentType": {
+                "title": "Incident Type",
+                "description": "Select the type of incident you want to report"
+            },
+            "description": {
+                "title": "Description",
+                "description": "Provide additional details about the incident"
+            },
+            "userData": {
+                "title": "Your Information",
+                "description": "Please provide your contact information"
+            },
+            "summary": {
+                "title": "Summary",
+                "description": "Review your report before submitting"
+            }
+        },
+        "buttons": {
+            "back": "Back",
+            "next": "Next",
+            "submit": "Submit",
+            "submitting": "Submitting..."
+        }
+    },
+    "locationStepComponent": {
+        "dialog": {
+            "title": "Use Image Location?",
+            "description": "We found a location in your image",
+            "useImageLocation": "Use image location",
+            "useOwnLocation": "Choose own location"
+        },
+        "search": {
+            "title": "Choose Location",
+            "placeholder": "Search for location",
+            "useCurrentLocation": "Use current location"
+        },
+        "map": {
+            "defaultAddress": "Postplatz, 6300 Zug, Switzerland",
+            "unknownLocation": "Unknown location"
+        },
+        "errors": {
+            "outsideZug": "The selected location is outside of Zug",
+            "locationAccess": "Please enable location access in your device settings",
+            "locationError": "Unable to get your location. Please try again",
+            "geocodingError": "Error fetching address"
+        }
     }
 }
