@@ -111,7 +111,12 @@ export default function ReportDrawer({
   const isConfirmStep = currentStep === 6;
 
   return (
-    <Vaul.Root open={open} onOpenChange={handleOpenChange} dismissible={false}>
+    <Vaul.Root
+      open={open}
+      onOpenChange={handleOpenChange}
+      dismissible={false}
+      repositionInputs={false}
+    >
       <Vaul.Portal>
         <Vaul.Overlay className="fixed inset-0 bg-black/40 z-40" />
         <Vaul.Content className="fixed bottom-0 left-0 right-0 mt-24 h-[90%] rounded-t-[10px] bg-background z-50">
