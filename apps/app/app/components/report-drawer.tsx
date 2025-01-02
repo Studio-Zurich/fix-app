@@ -112,7 +112,7 @@ export default function ReportDrawer({
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="bottom" className="h-[90%] p-0 pt-16 pb-8">
-        <div className="relative px-5">
+        <div className="flex flex-col h-full relative px-5">
           {/* <button
             onClick={() => handleOpenChange(false)}
             className="absolute z-10 right-5 top-4 bg-background rounded"
@@ -120,22 +120,13 @@ export default function ReportDrawer({
             <X className="text-muted-foreground" size={24} />
           </button> */}
 
-          <div className="flex-1 relative overflow-y-auto">
+          <div className="flex-1 relative overflow-y-auto ">
             {steps[currentStep]?.component || <div>Invalid step</div>}
           </div>
 
           {!isConfirmStep && (
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
-              <div className="flex gap-2 max-w-md mx-auto">
-                {currentStep > 0 && (
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={handleBack}
-                  >
-                    Back
-                  </Button>
-                )}
+              <div className="grid gap-2 max-w-md mx-auto">
                 <Button
                   className="flex-1"
                   onClick={handleNext}
@@ -146,6 +137,15 @@ export default function ReportDrawer({
                       ? "Submitting..."
                       : "Submit"
                     : "Next"}
+                </Button>
+
+                <Button
+                  disabled={currentStep === 0}
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleBack}
+                >
+                  Back
                 </Button>
               </div>
             </div>

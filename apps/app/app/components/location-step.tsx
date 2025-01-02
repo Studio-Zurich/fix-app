@@ -76,7 +76,7 @@ const MapLocationDialog = ({
               size="sm"
               onClick={onReject}
             >
-              Use default
+              Use own location
             </Button>
             <Button className="flex-1" size="sm" onClick={onAccept}>
               Use image location
