@@ -139,11 +139,6 @@ export async function submitReport(data: ReportData) {
       subtypeInfo = subtype;
     }
 
-    const incidentTypeInfo = {
-      name: typeInfo?.name || "Unknown",
-      subtype: subtypeInfo?.name,
-    };
-
     // Send email notifications
     try {
       const emailHtml = await renderAsync(
@@ -156,6 +151,10 @@ export async function submitReport(data: ReportData) {
           location: validatedData.location,
           description: validatedData.description ?? "",
           imageCount: validatedData.images?.length ?? 0,
+          incidentType: {
+            name: typeInfo?.name || "Unknown",
+            subtype: subtypeInfo?.name,
+          },
         })
       );
 

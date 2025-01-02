@@ -92,6 +92,30 @@ details JSONB,
 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE TABLE incident_mapping (
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+canton TEXT NOT NULL,
+department_id UUID REFERENCES government_departments(id),
+incident_type_id UUID REFERENCES incident_types(id),
+incident_subtype_id UUID REFERENCES incident_subtypes(id),
+is_default BOOLEAN DEFAULT false, -- For cases where no specific subtype mapping exists
+active BOOLEAN DEFAULT true,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE government_departments (
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+canton TEXT NOT NULL,
+department_name TEXT NOT NULL,
+email TEXT NOT NULL,
+phone TEXT,
+description TEXT,
+active BOOLEAN DEFAULT true,
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create a public bucket for report images
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('report-images', 'report-images', true);

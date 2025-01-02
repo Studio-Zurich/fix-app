@@ -21,6 +21,10 @@ interface ReportEmailProps {
   } | null;
   description: string;
   imageCount: number;
+  incidentType: {
+    name: string;
+    subtype?: string;
+  };
 }
 
 // Use environment variables type-safely
@@ -43,6 +47,9 @@ const defaultProps = {
   },
   description: "No description provided",
   imageCount: 0,
+  incidentType: {
+    name: "Unknown",
+  },
 } as const;
 
 export const ReportEmail = ({
@@ -53,6 +60,7 @@ export const ReportEmail = ({
   location = defaultProps.location,
   description = defaultProps.description,
   imageCount = defaultProps.imageCount,
+  incidentType = defaultProps.incidentType,
 }: ReportEmailProps) => {
   const safeLocation = location || defaultProps.location;
 
@@ -66,6 +74,20 @@ export const ReportEmail = ({
             <Heading style={header}>
               Ihre Meldung wurde bestätigt #{reportId}
             </Heading>
+
+            <Section style={section}>
+              <Heading as="h2" style={sectionHeader}>
+                Meldungstyp
+              </Heading>
+              <Text style={text}>
+                <strong>Kategorie:</strong> {incidentType.name}
+              </Text>
+              {incidentType.subtype && (
+                <Text style={text}>
+                  <strong>Unterkategorie:</strong> {incidentType.subtype}
+                </Text>
+              )}
+            </Section>
 
             <Section style={section}>
               <Heading as="h2" style={sectionHeader}>

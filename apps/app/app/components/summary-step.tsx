@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/routing";
 import { useReportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
 import {
+  Buildings,
   Camera,
   EnvelopeSimple,
   MapPin,
@@ -14,11 +15,36 @@ import {
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 interface IncidentTypeInfo {
   name: string;
   subtype?: string;
+  key: string;
+  subtypeKey?: string;
+}
+
+interface DepartmentInfo {
+  departmentName: string;
+  email: string;
+  phone?: string;
+}
+
+interface GovernmentDepartment {
+  department_name: string;
+  email: string;
+  phone?: string;
+  description?: string;
+}
+
+interface IncidentMappingResponse {
+  government_departments: {
+    department_name: string;
+    email: string;
+    phone?: string;
+    description?: string;
+  }[];
 }
 
 export default function SummaryStep() {
@@ -33,11 +59,15 @@ export default function SummaryStep() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [departmentInfo, setDepartmentInfo] = useState<DepartmentInfo | null>(
+    null
+  );
+  const t = useTranslations("incidentTypes");
 
-  // Fetch incident type and subtype names
+  // Fetch incident type, subtype, and department info
   useEffect(() => {
-    const fetchIncidentInfo = async () => {
-      if (!reportData.incidentTypeId) return;
+    const fetchInfo = async () => {
+      if (!reportData.incidentTypeId || !location) return;
 
       const supabase = createClient();
 
@@ -49,7 +79,6 @@ export default function SummaryStep() {
           .eq("id", reportData.incidentTypeId)
           .single();
 
-        // Fetch subtype if it exists
         let subtypeName;
         if (reportData.incidentSubtypeId) {
           const { data: subtypeData } = await supabase
@@ -60,17 +89,53 @@ export default function SummaryStep() {
           subtypeName = subtypeData?.name;
         }
 
-        setIncidentInfo({
-          name: typeData?.name || "Unknown Type",
-          subtype: subtypeName,
-        });
+        if (typeData) {
+          setIncidentInfo({
+            name: t(`${typeData.name}.name`),
+            key: typeData.name,
+            subtype: subtypeName
+              ? t(`${typeData.name}.subtypes.${subtypeName}.name`)
+              : undefined,
+            subtypeKey: subtypeName,
+          });
+        }
+
+        // Fetch department info based on incident mapping
+        const { data: mappingData } = await supabase
+          .from("incident_mapping")
+          .select(
+            `
+            government_departments (
+              department_name,
+              email,
+              phone,
+              description
+            )
+          `
+          )
+          .eq("canton", "Zug")
+          .eq("incident_type_id", reportData.incidentTypeId)
+          .eq(
+            reportData.incidentSubtypeId ? "incident_subtype_id" : "is_default",
+            reportData.incidentSubtypeId || true
+          )
+          .single();
+
+        if (mappingData?.government_departments?.[0]) {
+          const dept = mappingData.government_departments[0];
+          setDepartmentInfo({
+            departmentName: dept.department_name,
+            email: dept.email,
+            phone: dept.phone,
+          });
+        }
       } catch (error) {
-        console.error("Error fetching incident info:", error);
+        console.error("Error fetching info:", error);
       }
     };
 
-    fetchIncidentInfo();
-  }, [reportData.incidentTypeId, reportData.incidentSubtypeId]);
+    fetchInfo();
+  }, [reportData.incidentTypeId, reportData.incidentSubtypeId, location, t]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -187,10 +252,10 @@ export default function SummaryStep() {
             <h3 className="font-medium">Incident Type</h3>
           </div>
           <div className="pl-6 space-y-1">
-            <p className="text-sm">{incidentInfo?.name}</p>
+            <p className="text-sm font-medium">{incidentInfo?.name}</p>
             {incidentInfo?.subtype && (
               <p className="text-sm text-muted-foreground">
-                Subtype: {incidentInfo.subtype}
+                {incidentInfo.subtype}
               </p>
             )}
           </div>
@@ -261,6 +326,32 @@ export default function SummaryStep() {
               )}
             </div>
           </div>
+        )}
+
+        {/* Department Section - Show only if department info is available */}
+        {departmentInfo && (
+          <>
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Buildings className="w-4 h-4 text-primary" weight="fill" />
+                <h3 className="font-medium">Responsible Department</h3>
+              </div>
+              <div className="pl-6 space-y-1">
+                <p className="text-sm font-medium">
+                  {departmentInfo.departmentName}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Email: {departmentInfo.email}
+                </p>
+                {departmentInfo.phone && (
+                  <p className="text-sm text-muted-foreground">
+                    Phone: {departmentInfo.phone}
+                  </p>
+                )}
+              </div>
+            </div>
+          </>
         )}
       </div>
 
