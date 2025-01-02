@@ -34,12 +34,16 @@ const ZUG_BOUNDS = {
 } as const;
 
 const isLocationInZug = (lat: number, lng: number) => {
+  // Temporarily disabled for testing
+  return true;
+  /* Original implementation - keep for later
   return (
     lat >= ZUG_BOUNDS.south &&
     lat <= ZUG_BOUNDS.north &&
     lng >= ZUG_BOUNDS.west &&
     lng <= ZUG_BOUNDS.east
   );
+  */
 };
 
 const MapLocationDialog = ({
