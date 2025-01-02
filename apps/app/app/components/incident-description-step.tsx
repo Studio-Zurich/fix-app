@@ -1,8 +1,6 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import { PencilSimple } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
@@ -133,14 +131,6 @@ export default function IncidentDescriptionStep() {
             <h3 className="font-medium">
               {tIncident(`${typeInfo.typeName}.name`)}
             </h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleEditType}
-              className="h-auto p-2"
-            >
-              <PencilSimple className="w-4 h-4" />
-            </Button>
           </div>
           {typeInfo.subtypeName && (
             <p className="text-sm text-muted-foreground">
@@ -151,15 +141,6 @@ export default function IncidentDescriptionStep() {
           )}
         </div>
       )}
-
-      <div>
-        <h2 className="text-lg font-semibold mb-2">
-          {t("steps.description.title")}
-        </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          {t("steps.description.description")}
-        </p>
-      </div>
 
       <div className="space-y-2">
         <Textarea

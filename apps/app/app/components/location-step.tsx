@@ -97,7 +97,7 @@ const LocationPopup = ({ address }: { address: string }) => {
       exit={{ opacity: 0, scale: 0.9 }}
       className="absolute -top-[4.25rem] left-4 pointer-events-none z-10"
     >
-      <div className="bg-background p-3 w-[calc(50vw-20px)] mx-auto rounded-lg shadow-lg">
+      <div className="bg-background p-3 w-[calc(50vw-40px)] mx-auto rounded-lg shadow-lg">
         <TypographySpan size="text-[12px]" className="block">
           {address}
         </TypographySpan>
@@ -380,7 +380,7 @@ export default function LocationStep() {
   }, [isLocationConfirmed, isOutsideZug, setStepValidation]);
 
   return (
-    <div className="relative">
+    <div className="relative px-5">
       <Map
         ref={mapRef}
         initialViewState={
@@ -394,7 +394,7 @@ export default function LocationStep() {
         }
         style={{
           width: "100%",
-          height: "calc(95svh - 186px)",
+          height: "calc(95svh - 232px)",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}

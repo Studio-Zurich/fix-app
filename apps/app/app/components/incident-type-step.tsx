@@ -35,8 +35,12 @@ export default function IncidentTypeStep() {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { setCurrentStep, setStepValidation } = useReportStore();
+  const { setCurrentStep, setStepValidation, setIsSelectingSubtype } =
+    useReportStore();
   const reportData = useReportStore((state) => state.reportData);
+  const isSelectingSubtype = useReportStore(
+    (state) => state.isSelectingSubtype
+  );
   const t = useTranslations("incidentTypes");
 
   // Fetch incident types
@@ -84,42 +88,27 @@ export default function IncidentTypeStep() {
     setFilteredTypes(filtered);
   }, [searchQuery, types]);
 
-  const fetchSubtypes = useCallback(
-    async (typeId: string) => {
-      try {
-        const { data, error } = await supabase
-          .from("incident_subtypes")
-          .select("*")
-          .eq("incident_type_id", typeId)
-          .eq("active", true);
+  const fetchSubtypes = useCallback(async (typeId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("incident_subtypes")
+        .select("*")
+        .eq("incident_type_id", typeId)
+        .eq("active", true);
 
-        if (error) throw error;
-        setSubtypes(data || []);
-
-        // If there are no subtypes, automatically select just the main type
-        if (!data || data.length === 0) {
-          useReportStore.setState((state) => ({
-            reportData: {
-              ...state.reportData,
-              incidentTypeId: typeId,
-              incidentSubtypeId: undefined,
-            },
-          }));
-          setStepValidation("incidentType", true);
-          setCurrentStep(3); // Skip to next step
-        }
-      } catch (err) {
-        setError("Failed to load subtypes");
-        console.error(err);
-      }
-    },
-    [setCurrentStep, setStepValidation]
-  );
+      if (error) throw error;
+      setSubtypes(data || []);
+      return data;
+    } catch (err) {
+      setError("Failed to load subtypes");
+      console.error(err);
+      return null;
+    }
+  }, []);
 
   const handleTypeSelect = async (type: IncidentType) => {
     setSelectedType(type);
     setSubtypes([]);
-    // Reset any previously selected subtype in the store
     useReportStore.setState((state) => ({
       reportData: {
         ...state.reportData,
@@ -127,8 +116,16 @@ export default function IncidentTypeStep() {
         incidentSubtypeId: undefined,
       },
     }));
-    setStepValidation("incidentType", false); // Reset validation until subtype is selected
-    await fetchSubtypes(type.id);
+    setStepValidation("incidentType", false);
+
+    const subtypesResult = await fetchSubtypes(type.id);
+    if (subtypesResult && subtypesResult.length > 0) {
+      setIsSelectingSubtype(true);
+    } else {
+      // If no subtypes, proceed to next step
+      setStepValidation("incidentType", true);
+      setCurrentStep(3);
+    }
   };
 
   const handleSubtypeSelect = (subtypeId: string) => {
@@ -143,16 +140,35 @@ export default function IncidentTypeStep() {
     setCurrentStep(3);
   };
 
+  const handleBackFromSubtypes = () => {
+    setIsSelectingSubtype(false);
+    setSelectedType(null);
+    setSubtypes([]);
+    useReportStore.setState((state) => ({
+      reportData: {
+        ...state.reportData,
+        incidentTypeId: undefined,
+        incidentSubtypeId: undefined,
+      },
+    }));
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   // If we have a selected type and there are subtypes, show subtype selection
-  if (selectedType && subtypes.length > 0) {
+  if (selectedType && subtypes.length > 0 && isSelectingSubtype) {
     return (
       <div className="space-y-4 px-5">
         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">{t(`${selectedType.name}.name`)}</h3>
+            <button
+              onClick={handleBackFromSubtypes}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Change type
+            </button>
           </div>
         </div>
 

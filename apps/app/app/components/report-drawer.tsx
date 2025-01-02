@@ -95,7 +95,10 @@ export default function ReportDrawer({
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
+    if (currentStep === 2 && useReportStore.getState().isSelectingSubtype) {
+      // If we're selecting a subtype, go back to type selection
+      useReportStore.getState().setIsSelectingSubtype(false);
+    } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -162,7 +165,14 @@ export default function ReportDrawer({
         </div>
 
         {!isConfirmStep && (
-          <div className="px-5 py-2 flex justify-between items-center space-x-6">
+          <div className="px-5 py-4 grid gap-2">
+            <Button onClick={handleNext} disabled={!isNextEnabled()}>
+              {currentStep === 5
+                ? isSubmitting
+                  ? t("buttons.submitting")
+                  : t("buttons.submit")
+                : t("buttons.next")}
+            </Button>
             <Button
               disabled={currentStep === 0}
               variant="ghost"
@@ -170,13 +180,6 @@ export default function ReportDrawer({
               onClick={handleBack}
             >
               {t("buttons.back")}
-            </Button>
-            <Button onClick={handleNext} disabled={!isNextEnabled()}>
-              {currentStep === 5
-                ? isSubmitting
-                  ? t("buttons.submitting")
-                  : t("buttons.submit")
-                : t("buttons.next")}
             </Button>
           </div>
         )}

@@ -18,6 +18,7 @@ interface ReportState {
     userData?: boolean;
   };
   skipIncidentType: boolean;
+  isSelectingSubtype: boolean;
 }
 
 interface ReportStore extends ReportState {
@@ -32,6 +33,7 @@ interface ReportStore extends ReportState {
     step: keyof ReportState["stepValidation"],
     isValid: boolean
   ) => void;
+  setIsSelectingSubtype: (value: boolean) => void;
 }
 
 const initialState: ReportState = {
@@ -44,6 +46,7 @@ const initialState: ReportState = {
   imagesMetadata: {},
   stepValidation: {},
   skipIncidentType: false,
+  isSelectingSubtype: false,
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -95,4 +98,5 @@ export const useReportStore = create<ReportStore>((set) => ({
         [step]: isValid,
       },
     })),
+  setIsSelectingSubtype: (value) => set({ isSelectingSubtype: value }),
 }));
