@@ -2,8 +2,6 @@
 
 import { useReportStore } from "@/lib/store";
 import { CheckCircle } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
-import { Separator } from "@repo/ui/separator";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
@@ -41,7 +39,7 @@ export default function ConfirmStep() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-5">
       <div className="flex flex-col items-center space-y-2 text-center">
         <CheckCircle className="w-16 h-16 text-primary" weight="fill" />
         <h1 className="text-2xl font-bold">{t("title")}</h1>
@@ -53,14 +51,6 @@ export default function ConfirmStep() {
         <p className="text-sm text-muted-foreground">
           {t("nextStepsDescription")}
         </p>
-      </div>
-
-      <Separator />
-
-      <div className="fixed bottom-4 left-4 right-4">
-        <Button className="w-full" onClick={handleNewReport}>
-          {t("newReport")}
-        </Button>
       </div>
     </div>
   );

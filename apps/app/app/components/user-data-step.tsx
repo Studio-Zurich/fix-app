@@ -81,14 +81,7 @@ export default function UserDataStep() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold">Contact Information</h2>
-        <p className="text-sm text-muted-foreground">
-          Please provide your contact details
-        </p>
-      </div>
-
+    <div className="space-y-6 px-5">
       <div className="space-y-4">
         <div className="space-y-2">
           <Input

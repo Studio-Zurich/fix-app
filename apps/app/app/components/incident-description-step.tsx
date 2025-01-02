@@ -83,7 +83,7 @@ export default function IncidentDescriptionStep() {
   const charactersLeft = MAX_CHARS - description.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-5">
       {typeInfo && (
         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between">

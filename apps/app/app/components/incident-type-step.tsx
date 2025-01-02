@@ -1,8 +1,7 @@
 "use client";
 
 import { useReportStore } from "@/lib/store";
-import { MagnifyingGlass, PencilSimple } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Input } from "@repo/ui/input";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
@@ -150,18 +149,10 @@ export default function IncidentTypeStep() {
   // If we have a selected type and there are subtypes, show subtype selection
   if (selectedType && subtypes.length > 0) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 px-5">
         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">{t(`${selectedType.name}.name`)}</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedType(null)}
-              className="h-auto p-2"
-            >
-              <PencilSimple className="w-4 h-4" />
-            </Button>
           </div>
         </div>
 
@@ -194,7 +185,7 @@ export default function IncidentTypeStep() {
 
   // Show type selection
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-5">
       <div className="relative">
         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input

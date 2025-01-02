@@ -64,8 +64,8 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       <div className="absolute top-2.5 right-1/2 left-1/2 -translate-x-1/2 bg-gray-200 w-10 h-1 z-20" />
-      <SheetPrimitive.Close className="z-20 absolute right-5 top-[1.75rem] flex items-center justify-center rounded-full opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="text-muted-foreground" size={24} />
+      <SheetPrimitive.Close className="z-20 absolute right-5 top-2.5 flex items-center justify-center rounded-full opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-secondary">
+        <X className="text-muted-foreground" size={28} />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
       {children}

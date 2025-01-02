@@ -91,12 +91,9 @@ const LocationPopup = ({ address }: { address: string }) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute -top-[5.75rem] left-4 pointer-events-none z-10"
+      className="absolute -top-[4.25rem] left-4 pointer-events-none z-10"
     >
-      <div className="bg-background p-3 w-44 mx-auto rounded-lg shadow-lg">
-        <TypographyH3 size="text-base" weight="medium" className="text-primary">
-          Location
-        </TypographyH3>
+      <div className="bg-background p-3 w-[calc(50vw-20px)] mx-auto rounded-lg shadow-lg">
         <TypographySpan size="text-[12px]" className="block">
           {address}
         </TypographySpan>
@@ -393,7 +390,7 @@ export default function LocationStep() {
         }
         style={{
           width: "100%",
-          height: "calc(95svh - 208px)",
+          height: "calc(95svh - 186px)",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}

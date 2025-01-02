@@ -13,7 +13,6 @@ import {
   TextT,
   User,
 } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
 import { Separator } from "@repo/ui/separator";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -200,14 +199,7 @@ export default function SummaryStep() {
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <div>
-        <h2 className="text-lg font-semibold">Summary</h2>
-        <p className="text-sm text-muted-foreground">
-          Please review your report before submitting
-        </p>
-      </div>
-
+    <div className="space-y-6 px-5">
       <div className="space-y-6">
         {/* Images Section */}
         {images.length > 0 && (
@@ -356,16 +348,6 @@ export default function SummaryStep() {
       </div>
 
       {error && <div className="text-sm text-destructive">Error: {error}</div>}
-
-      <div className="fixed bottom-4 left-4 right-4">
-        <Button
-          className="w-full"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Submitting..." : "Submit Report"}
-        </Button>
-      </div>
     </div>
   );
 }

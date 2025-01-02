@@ -3,7 +3,6 @@
 import { submitReport } from "@/app/[locale]/actions";
 import { useReportStore } from "@/lib/store";
 import { ReportData } from "@/lib/types";
-import { ArrowCircleRight } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Sheet, SheetContent } from "@repo/ui/sheet";
 import { useTranslations } from "next-intl";
@@ -163,28 +162,21 @@ export default function ReportDrawer({
         </div>
 
         {!isConfirmStep && (
-          <div className="px-5 py-4 flex justify-between items-center space-x-6">
+          <div className="px-5 py-2 flex justify-between items-center space-x-6">
             <Button
               disabled={currentStep === 0}
-              variant="link"
-              className="flex-1"
+              variant="ghost"
+              size="none"
               onClick={handleBack}
             >
               {t("buttons.back")}
             </Button>
-            <Button
-              variant={currentStep === 5 ? "default" : "icon"}
-              size={currentStep === 5 ? "default" : "icon"}
-              className={`w-[65%] ${currentStep === 5 ? "bg-primary" : ""}`}
-              onClick={handleNext}
-              disabled={!isNextEnabled()}
-            >
+            <Button onClick={handleNext} disabled={!isNextEnabled()}>
               {currentStep === 5
                 ? isSubmitting
                   ? t("buttons.submitting")
                   : t("buttons.submit")
-                : t("buttons.next")}{" "}
-              <ArrowCircleRight className="flex-shrink-0 w-20" />
+                : t("buttons.next")}
             </Button>
           </div>
         )}
