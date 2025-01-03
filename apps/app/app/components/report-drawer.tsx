@@ -10,6 +10,7 @@ import { useState } from "react";
 import ConfirmStep from "./confirm-step";
 import ImageStep from "./image-step";
 import IncidentDescriptionStep from "./incident-description-step";
+import IncidentSubtypeStep from "./incident-subtype-step";
 import IncidentTypeStep from "./incident-type-step";
 import LocationStep from "./location-step";
 import StepHeader from "./step-header";
@@ -20,10 +21,11 @@ const steps = [
   { id: 0, component: <ImageStep /> },
   { id: 1, component: <LocationStep /> },
   { id: 2, component: <IncidentTypeStep /> },
-  { id: 3, component: <IncidentDescriptionStep /> },
-  { id: 4, component: <UserDataStep /> },
-  { id: 5, component: <SummaryStep /> },
-  { id: 6, component: <ConfirmStep /> },
+  { id: 3, component: <IncidentSubtypeStep /> },
+  { id: 4, component: <IncidentDescriptionStep /> },
+  { id: 5, component: <UserDataStep /> },
+  { id: 6, component: <SummaryStep /> },
+  { id: 7, component: <ConfirmStep /> },
 ];
 
 interface ReportDrawerProps {
@@ -42,6 +44,7 @@ export default function ReportDrawer({
   const setCurrentStep = useReportStore((state) => state.setCurrentStep);
   const reportData = useReportStore((state) => state.reportData);
   const location = useReportStore((state) => state.location);
+  const hasSubtypes = useReportStore((state) => state.hasSubtypes);
 
   const isNextEnabled = () => {
     switch (currentStep) {
@@ -51,11 +54,13 @@ export default function ReportDrawer({
         return stepValidation.location === true;
       case 2: // Incident type step
         return stepValidation.incidentType === true;
-      case 3: // Description step - always enabled since description is optional
+      case 3: // Subtype step
+        return stepValidation.incidentType === true;
+      case 4: // Description step - always enabled since description is optional
         return true;
-      case 4: // User data step
+      case 5: // User data step
         return stepValidation.userData === true;
-      case 5: // Summary step
+      case 6: // Summary step
         return !isSubmitting;
       default:
         return false;
@@ -63,9 +68,12 @@ export default function ReportDrawer({
   };
 
   const handleNext = async () => {
-    if (currentStep === 5) {
+    if (currentStep === 6) {
+      const selectedTypeId = useReportStore.getState().selectedTypeId;
+      const selectedSubtypeId = useReportStore.getState().selectedSubtypeId;
+
       // Validate required fields before submission
-      if (!location || !reportData.incidentTypeId) {
+      if (!location || !selectedTypeId) {
         console.error("Missing required fields");
         return;
       }
@@ -76,30 +84,42 @@ export default function ReportDrawer({
           ...reportData,
           location,
           images: reportData.images || [],
-          incidentTypeId: reportData.incidentTypeId,
-        } as ReportData); // Type assertion here is safe because we validated required fields
+          incidentTypeId: selectedTypeId,
+          incidentSubtypeId: selectedSubtypeId,
+        } as ReportData);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to submit report");
         }
 
-        setCurrentStep(6);
+        setCurrentStep(7);
       } catch (error) {
         console.error("Error submitting report:", error);
       } finally {
         setIsSubmitting(false);
       }
-    } else if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+    } else {
+      let nextStep = currentStep + 1;
+
+      // Skip subtype step if type has no subtypes
+      if (currentStep === 2 && !hasSubtypes) {
+        nextStep = 4; // Skip to description step
+      }
+
+      setCurrentStep(nextStep);
     }
   };
 
   const handleBack = () => {
-    if (currentStep === 2 && useReportStore.getState().isSelectingSubtype) {
-      // If we're selecting a subtype, go back to type selection
-      useReportStore.getState().setIsSelectingSubtype(false);
-    } else if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (currentStep > 0) {
+      let prevStep = currentStep - 1;
+
+      // Skip subtype step when going back if type has no subtypes
+      if (currentStep === 4 && !hasSubtypes) {
+        prevStep = 2; // Go back to type step
+      }
+
+      setCurrentStep(prevStep);
     }
   };
 
@@ -113,7 +133,7 @@ export default function ReportDrawer({
   };
 
   const isLastStep = currentStep === steps.length - 1;
-  const isConfirmStep = currentStep === 6;
+  const isConfirmStep = currentStep === 7;
 
   // Get step title and description based on current step
   const getStepContent = () => {
@@ -135,15 +155,20 @@ export default function ReportDrawer({
         };
       case 3:
         return {
+          title: t("steps.incidentSubtype.title"),
+          description: t("steps.incidentSubtype.description"),
+        };
+      case 4:
+        return {
           title: t("steps.description.title"),
           description: t("steps.description.description"),
         };
-      case 4:
+      case 5:
         return {
           title: t("steps.userData.title"),
           description: t("steps.userData.description"),
         };
-      case 5:
+      case 6:
         return {
           title: t("steps.summary.title"),
           description: t("steps.summary.description"),
@@ -165,21 +190,25 @@ export default function ReportDrawer({
         </div>
 
         {!isConfirmStep && (
-          <div className="px-5 py-4 grid gap-2">
-            <Button onClick={handleNext} disabled={!isNextEnabled()}>
-              {currentStep === 5
+          <div className="px-5 py-4 flex justify-between items-center space-x-4">
+            <Button
+              disabled={currentStep === 0}
+              variant="ghost"
+              onClick={handleBack}
+              className="w-32"
+            >
+              {t("buttons.back")}
+            </Button>
+            <Button
+              onClick={handleNext}
+              disabled={!isNextEnabled()}
+              className="w-full"
+            >
+              {currentStep === 6
                 ? isSubmitting
                   ? t("buttons.submitting")
                   : t("buttons.submit")
                 : t("buttons.next")}
-            </Button>
-            <Button
-              disabled={currentStep === 0}
-              variant="ghost"
-              size="none"
-              onClick={handleBack}
-            >
-              {t("buttons.back")}
             </Button>
           </div>
         )}

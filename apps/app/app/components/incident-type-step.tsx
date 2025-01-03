@@ -2,10 +2,11 @@
 
 import { useReportStore } from "@/lib/store";
 import { MagnifyingGlass } from "@phosphor-icons/react";
+import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IncidentType {
   id: string;
@@ -28,18 +29,15 @@ const supabase = createClient(
 export default function IncidentTypeStep() {
   const [types, setTypes] = useState<IncidentType[]>([]);
   const [filteredTypes, setFilteredTypes] = useState<IncidentType[]>([]);
-  const [subtypes, setSubtypes] = useState<IncidentSubtype[]>([]);
-  const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
-  const { setCurrentStep, setStepValidation, setIsSelectingSubtype } =
-    useReportStore();
-  const reportData = useReportStore((state) => state.reportData);
-  const isSelectingSubtype = useReportStore(
-    (state) => state.isSelectingSubtype
+  const { setStepValidation, setHasSubtypes } = useReportStore();
+  const selectedTypeId = useReportStore((state) => state.selectedTypeId);
+  const setSelectedTypeId = useReportStore((state) => state.setSelectedTypeId);
+  const setSelectedSubtypeId = useReportStore(
+    (state) => state.setSelectedSubtypeId
   );
   const t = useTranslations("incidentTypes");
 
@@ -55,17 +53,6 @@ export default function IncidentTypeStep() {
         if (error) throw error;
         setTypes(data);
         setFilteredTypes(data);
-
-        // If we have a pre-selected type (from quick access), load it
-        if (reportData.incidentTypeId) {
-          const selectedType = data.find(
-            (type) => type.id === reportData.incidentTypeId
-          );
-          if (selectedType) {
-            setSelectedType(selectedType);
-            await fetchSubtypes(selectedType.id);
-          }
-        }
       } catch (err) {
         setError("Failed to load incident types");
         console.error(err);
@@ -75,7 +62,7 @@ export default function IncidentTypeStep() {
     };
 
     fetchTypes();
-  }, [reportData.incidentTypeId]);
+  }, []);
 
   // Handle search
   useEffect(() => {
@@ -88,118 +75,47 @@ export default function IncidentTypeStep() {
     setFilteredTypes(filtered);
   }, [searchQuery, types]);
 
-  const fetchSubtypes = useCallback(async (typeId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("incident_subtypes")
-        .select("*")
-        .eq("incident_type_id", typeId)
-        .eq("active", true);
+  // Update validation when type selection changes
+  useEffect(() => {
+    const checkSubtypes = async () => {
+      if (!selectedTypeId) {
+        setStepValidation("incidentType", false);
+        setHasSubtypes(false);
+        return;
+      }
 
-      if (error) throw error;
-      setSubtypes(data || []);
-      return data;
-    } catch (err) {
-      setError("Failed to load subtypes");
-      console.error(err);
-      return null;
-    }
-  }, []);
+      try {
+        const { data, error } = await supabase
+          .from("incident_subtypes")
+          .select("id")
+          .eq("incident_type_id", selectedTypeId)
+          .eq("active", true);
 
-  const handleTypeSelect = async (type: IncidentType) => {
-    setSelectedType(type);
-    setSubtypes([]);
-    useReportStore.setState((state) => ({
-      reportData: {
-        ...state.reportData,
-        incidentTypeId: type.id,
-        incidentSubtypeId: undefined,
-      },
-    }));
-    setStepValidation("incidentType", false);
+        if (error) throw error;
 
-    const subtypesResult = await fetchSubtypes(type.id);
-    if (subtypesResult && subtypesResult.length > 0) {
-      setIsSelectingSubtype(true);
-    } else {
-      // If no subtypes, proceed to next step
-      setStepValidation("incidentType", true);
-      setCurrentStep(3);
-    }
-  };
+        const hasSubtypes = data && data.length > 0;
+        setHasSubtypes(hasSubtypes);
 
-  const handleSubtypeSelect = (subtypeId: string) => {
-    useReportStore.setState((state) => ({
-      reportData: {
-        ...state.reportData,
-        incidentTypeId: selectedType?.id,
-        incidentSubtypeId: subtypeId,
-      },
-    }));
-    setStepValidation("incidentType", true);
-    setCurrentStep(3);
-  };
+        // Always validate the step if a type is selected
+        // If there are subtypes, this will be re-validated in the subtype step
+        setStepValidation("incidentType", true);
+      } catch (err) {
+        console.error("Error checking subtypes:", err);
+      }
+    };
 
-  const handleBackFromSubtypes = () => {
-    setIsSelectingSubtype(false);
-    setSelectedType(null);
-    setSubtypes([]);
-    useReportStore.setState((state) => ({
-      reportData: {
-        ...state.reportData,
-        incidentTypeId: undefined,
-        incidentSubtypeId: undefined,
-      },
-    }));
+    checkSubtypes();
+  }, [selectedTypeId, setStepValidation, setHasSubtypes]);
+
+  const handleTypeSelect = (typeId: string) => {
+    // Clear subtype selection when changing type
+    setSelectedSubtypeId(null);
+    setSelectedTypeId(selectedTypeId === typeId ? null : typeId);
   };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // If we have a selected type and there are subtypes, show subtype selection
-  if (selectedType && subtypes.length > 0 && isSelectingSubtype) {
-    return (
-      <div className="space-y-4 px-5">
-        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{t(`${selectedType.name}.name`)}</h3>
-            <button
-              onClick={handleBackFromSubtypes}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Change type
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Select subtype</h2>
-          {subtypes.map((subtype) => (
-            <button
-              key={subtype.id}
-              className="w-full justify-between flex p-4 border rounded-md hover:bg-muted/50 transition-colors"
-              onClick={() => handleSubtypeSelect(subtype.id)}
-            >
-              <div className="text-left">
-                <div className="font-medium">
-                  {t(`${selectedType.name}.subtypes.${subtype.name}.name`)}
-                </div>
-                {subtype.description && (
-                  <div className="text-sm text-muted-foreground">
-                    {t(
-                      `${selectedType.name}.subtypes.${subtype.name}.description`
-                    )}
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Show type selection
   return (
     <div className="space-y-4 px-5">
       <div className="relative">
@@ -214,20 +130,29 @@ export default function IncidentTypeStep() {
 
       <div className="space-y-2">
         {filteredTypes.map((type) => (
-          <button
+          <div
             key={type.id}
-            className="w-full justify-between flex p-4 border rounded-md hover:bg-muted/50 transition-colors"
-            onClick={() => handleTypeSelect(type)}
+            className="flex items-start space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
           >
-            <div className="text-left">
-              <div className="font-medium">{t(`${type.name}.name`)}</div>
+            <Checkbox
+              id={type.id}
+              checked={selectedTypeId === type.id}
+              onCheckedChange={() => handleTypeSelect(type.id)}
+            />
+            <div className="flex-1">
+              <label
+                htmlFor={type.id}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {t(`${type.name}.name`)}
+              </label>
               {type.description && (
-                <div className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {t(`${type.name}.description`)}
-                </div>
+                </p>
               )}
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </div>

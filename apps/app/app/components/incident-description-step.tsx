@@ -6,6 +6,19 @@ import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
+interface IncidentType {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface IncidentSubtype {
+  id: string;
+  incident_type_id: string;
+  name: string;
+  description: string | null;
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,86 +30,54 @@ export default function IncidentDescriptionStep() {
   const [description, setDescription] = useState(
     useReportStore.getState().reportData.description || ""
   );
-  const [typeInfo, setTypeInfo] = useState<{
-    typeName: string;
-    subtypeName?: string;
-  } | null>(null);
+  const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
+  const [selectedSubtype, setSelectedSubtype] =
+    useState<IncidentSubtype | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const reportData = useReportStore((state) => state.reportData);
-  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+  const selectedTypeId = useReportStore((state) => state.selectedTypeId);
+  const selectedSubtypeId = useReportStore((state) => state.selectedSubtypeId);
   const t = useTranslations("reportDrawer");
   const tIncident = useTranslations("incidentTypes");
 
   useEffect(() => {
-    const fetchTypeInfo = async () => {
-      console.log("Current reportData:", reportData); // Debug log
-
-      if (!reportData.incidentTypeId) {
-        console.log("No incident type ID found"); // Debug log
+    const fetchTypeAndSubtype = async () => {
+      if (!selectedTypeId) {
         setIsLoading(false);
         return;
       }
 
       try {
-        console.log("Fetching type info for ID:", reportData.incidentTypeId); // Debug log
-
-        // First fetch the incident type
+        // Fetch type
         const { data: typeData, error: typeError } = await supabase
           .from("incident_types")
-          .select("name")
-          .eq("id", reportData.incidentTypeId)
+          .select("*")
+          .eq("id", selectedTypeId)
           .single();
 
-        console.log("Type Data Response:", typeData, "Error:", typeError); // Debug log
-
         if (typeError) throw typeError;
+        setSelectedType(typeData);
 
-        // Then fetch the subtype if it exists
-        let subtypeData = null;
-        if (reportData.incidentSubtypeId) {
-          console.log(
-            "Fetching subtype info for ID:",
-            reportData.incidentSubtypeId
-          ); // Debug log
-
-          const { data: subtype, error: subtypeError } = await supabase
+        // Fetch subtype if exists
+        if (selectedSubtypeId) {
+          const { data: subtypeData, error: subtypeError } = await supabase
             .from("incident_subtypes")
-            .select("name")
-            .eq("id", reportData.incidentSubtypeId)
+            .select("*")
+            .eq("id", selectedSubtypeId)
             .single();
 
-          console.log(
-            "Subtype Data Response:",
-            subtype,
-            "Error:",
-            subtypeError
-          ); // Debug log
-
           if (subtypeError) throw subtypeError;
-          subtypeData = subtype;
-        }
-
-        if (typeData) {
-          console.log("Setting type info:", {
-            typeName: typeData.name,
-            subtypeName: subtypeData?.name,
-          });
-
-          setTypeInfo({
-            typeName: typeData.name,
-            subtypeName: subtypeData?.name,
-          });
+          setSelectedSubtype(subtypeData);
         }
       } catch (error) {
-        console.error("Error fetching type info:", error);
+        console.error("Error fetching type/subtype:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchTypeInfo();
-  }, [reportData.incidentTypeId, reportData.incidentSubtypeId]);
+    fetchTypeAndSubtype();
+  }, [selectedTypeId, selectedSubtypeId]);
 
   const handleDescriptionChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -113,10 +94,6 @@ export default function IncidentDescriptionStep() {
     }
   };
 
-  const handleEditType = () => {
-    setCurrentStep(2);
-  };
-
   const charactersLeft = MAX_CHARS - description.length;
 
   if (isLoading) {
@@ -125,17 +102,17 @@ export default function IncidentDescriptionStep() {
 
   return (
     <div className="space-y-4 px-5">
-      {typeInfo && (
+      {selectedType && (
         <div className="bg-muted/50 p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">
-              {tIncident(`${typeInfo.typeName}.name`)}
+              {tIncident(`${selectedType.name}.name`)}
             </h3>
           </div>
-          {typeInfo.subtypeName && (
+          {selectedSubtype && (
             <p className="text-sm text-muted-foreground">
               {tIncident(
-                `${typeInfo.typeName}.subtypes.${typeInfo.subtypeName}.name`
+                `${selectedType.name}.subtypes.${selectedSubtype.name}.name`
               )}
             </p>
           )}

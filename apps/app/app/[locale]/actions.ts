@@ -160,7 +160,7 @@ export async function submitReport(data: ReportData) {
 
       await resend.emails.send({
         from: "Fix App <notifications@fixapp.ch>",
-        to: ["hello@studio-zurich.ch"].concat(
+        to: ["hello@studio-zurich.ch", "Remigi.rageth@gmail.com"].concat(
           validatedData.reporterEmail ? [validatedData.reporterEmail] : []
         ),
         subject: "Ihre Meldung wurde bestätigt",

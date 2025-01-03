@@ -287,6 +287,10 @@
             "summary": {
                 "title": "Summary",
                 "description": "Review your report before submitting"
+            },
+            "incidentSubtype": {
+                "title": "Incident Subtype",
+                "description": "Select a more specific category for your incident"
             }
         },
         "buttons": {

@@ -394,7 +394,7 @@ export default function LocationStep() {
         }
         style={{
           width: "100%",
-          height: "calc(95svh - 232px)",
+          height: "calc(95svh - 200px)",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}

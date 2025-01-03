@@ -16,12 +16,19 @@ import {
 import { Separator } from "@repo/ui/separator";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import SummaryMapPreview from "./summary-map-preview";
 
-interface IncidentTypeInfo {
+interface IncidentType {
+  id: string;
   name: string;
-  subtype?: string;
-  key: string;
-  subtypeKey?: string;
+  description: string | null;
+}
+
+interface IncidentSubtype {
+  id: string;
+  incident_type_id: string;
+  name: string;
+  description: string | null;
 }
 
 interface DepartmentInfo {
@@ -30,73 +37,55 @@ interface DepartmentInfo {
   phone?: string;
 }
 
-interface GovernmentDepartment {
-  department_name: string;
-  email: string;
-  phone?: string;
-  description?: string;
-}
-
-interface IncidentMappingResponse {
-  government_departments: {
-    department_name: string;
-    email: string;
-    phone?: string;
-    description?: string;
-  }[];
-}
-
 export default function SummaryStep() {
-  const reportData = useReportStore((state) => state.reportData);
-  const location = useReportStore((state) => state.location);
-  const images = useReportStore((state) => state.images);
-  const imagesMetadata = useReportStore((state) => state.imagesMetadata);
-  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
-  const [incidentInfo, setIncidentInfo] = useState<IncidentTypeInfo | null>(
+  const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
+  const [selectedSubtype, setSelectedSubtype] =
+    useState<IncidentSubtype | null>(null);
+  const [departmentInfo, setDepartmentInfo] = useState<DepartmentInfo | null>(
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const reportData = useReportStore((state) => state.reportData);
+  const location = useReportStore((state) => state.location);
+  const images = useReportStore((state) => state.images);
+  const imagesMetadata = useReportStore((state) => state.imagesMetadata);
+  const selectedTypeId = useReportStore((state) => state.selectedTypeId);
+  const selectedSubtypeId = useReportStore((state) => state.selectedSubtypeId);
+  const setCurrentStep = useReportStore((state) => state.setCurrentStep);
+
   const router = useRouter();
-  const [departmentInfo, setDepartmentInfo] = useState<DepartmentInfo | null>(
-    null
-  );
   const t = useTranslations("incidentTypes");
 
   // Fetch incident type, subtype, and department info
   useEffect(() => {
     const fetchInfo = async () => {
-      if (!reportData.incidentTypeId || !location) return;
+      if (!selectedTypeId || !location) return;
 
       const supabase = createClient();
 
       try {
         // Fetch incident type
-        const { data: typeData } = await supabase
+        const { data: typeData, error: typeError } = await supabase
           .from("incident_types")
-          .select("name")
-          .eq("id", reportData.incidentTypeId)
+          .select("*")
+          .eq("id", selectedTypeId)
           .single();
 
-        let subtypeName;
-        if (reportData.incidentSubtypeId) {
-          const { data: subtypeData } = await supabase
-            .from("incident_subtypes")
-            .select("name")
-            .eq("id", reportData.incidentSubtypeId)
-            .single();
-          subtypeName = subtypeData?.name;
-        }
+        if (typeError) throw typeError;
+        setSelectedType(typeData);
 
-        if (typeData) {
-          setIncidentInfo({
-            name: t(`${typeData.name}.name`),
-            key: typeData.name,
-            subtype: subtypeName
-              ? t(`${typeData.name}.subtypes.${subtypeName}.name`)
-              : undefined,
-            subtypeKey: subtypeName,
-          });
+        // Fetch subtype if exists
+        if (selectedSubtypeId) {
+          const { data: subtypeData, error: subtypeError } = await supabase
+            .from("incident_subtypes")
+            .select("*")
+            .eq("id", selectedSubtypeId)
+            .single();
+
+          if (subtypeError) throw subtypeError;
+          setSelectedSubtype(subtypeData);
         }
 
         // Fetch department info based on incident mapping
@@ -113,10 +102,10 @@ export default function SummaryStep() {
           `
           )
           .eq("canton", "Zug")
-          .eq("incident_type_id", reportData.incidentTypeId)
+          .eq("incident_type_id", selectedTypeId)
           .eq(
-            reportData.incidentSubtypeId ? "incident_subtype_id" : "is_default",
-            reportData.incidentSubtypeId || true
+            selectedSubtypeId ? "incident_subtype_id" : "is_default",
+            selectedSubtypeId || true
           )
           .single();
 
@@ -134,7 +123,7 @@ export default function SummaryStep() {
     };
 
     fetchInfo();
-  }, [reportData.incidentTypeId, reportData.incidentSubtypeId, location, t]);
+  }, [selectedTypeId, selectedSubtypeId, location]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -164,7 +153,7 @@ export default function SummaryStep() {
                 ? "image/png"
                 : "image/jpeg",
             fileSize: blob.size,
-            blob, // Pass the blob to the server action
+            blob,
           };
         })
       );
@@ -173,9 +162,9 @@ export default function SummaryStep() {
       const result = await submitReport({
         ...reportData,
         location: location!,
-        images: imageData.map(({ blob, ...rest }) => rest), // Remove blob before sending to server
-        incidentTypeId: reportData.incidentTypeId!,
-        incidentSubtypeId: reportData.incidentSubtypeId!,
+        images: imageData.map(({ blob, ...rest }) => rest),
+        incidentTypeId: selectedTypeId!,
+        incidentSubtypeId: selectedSubtypeId || undefined,
         reporterFirstName: reportData.reporterFirstName || "",
         reporterLastName: reportData.reporterLastName || "",
         reporterEmail: reportData.reporterEmail || "",
@@ -186,8 +175,7 @@ export default function SummaryStep() {
         throw new Error(result.error || "Failed to get report ID");
       }
 
-      // Move to confirm step
-      setCurrentStep(6);
+      setCurrentStep(7);
     } catch (error) {
       console.error("Error submitting report:", error);
       setError(
@@ -230,9 +218,16 @@ export default function SummaryStep() {
             <MapPin className="w-4 h-4 text-primary" weight="fill" />
             <h3 className="font-medium">Location</h3>
           </div>
-          <p className="text-sm text-muted-foreground pl-6">
-            {location?.address || "No location provided"}
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground pl-6">
+              {location?.address || "No location provided"}
+            </p>
+            {location && (
+              <div className="pl-6">
+                <SummaryMapPreview location={location} />
+              </div>
+            )}
+          </div>
         </div>
 
         <Separator />
@@ -244,11 +239,19 @@ export default function SummaryStep() {
             <h3 className="font-medium">Incident Type</h3>
           </div>
           <div className="pl-6 space-y-1">
-            <p className="text-sm font-medium">{incidentInfo?.name}</p>
-            {incidentInfo?.subtype && (
-              <p className="text-sm text-muted-foreground">
-                {incidentInfo.subtype}
-              </p>
+            {selectedType && (
+              <>
+                <p className="text-sm font-medium">
+                  {t(`${selectedType.name}.name`)}
+                </p>
+                {selectedSubtype && (
+                  <p className="text-sm text-muted-foreground">
+                    {t(
+                      `${selectedType.name}.subtypes.${selectedSubtype.name}.name`
+                    )}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>

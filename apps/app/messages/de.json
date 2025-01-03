@@ -287,6 +287,10 @@
             "summary": {
                 "title": "Zusammenfassung",
                 "description": "Überprüfe Deine Meldung vor dem Absenden"
+            },
+            "incidentSubtype": {
+                "title": "Vorfallsunterkategorie",
+                "description": "Wähle eine genauere Kategorie für deinen Vorfall"
             }
         },
         "buttons": {

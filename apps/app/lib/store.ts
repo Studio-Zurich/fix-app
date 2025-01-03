@@ -19,6 +19,9 @@ interface ReportState {
   };
   skipIncidentType: boolean;
   isSelectingSubtype: boolean;
+  selectedTypeId: string | null;
+  selectedSubtypeId: string | null;
+  hasSubtypes: boolean;
 }
 
 interface ReportStore extends ReportState {
@@ -34,6 +37,9 @@ interface ReportStore extends ReportState {
     isValid: boolean
   ) => void;
   setIsSelectingSubtype: (value: boolean) => void;
+  setSelectedTypeId: (id: string | null) => void;
+  setSelectedSubtypeId: (id: string | null) => void;
+  setHasSubtypes: (value: boolean) => void;
 }
 
 const initialState: ReportState = {
@@ -47,6 +53,9 @@ const initialState: ReportState = {
   stepValidation: {},
   skipIncidentType: false,
   isSelectingSubtype: false,
+  selectedTypeId: null,
+  selectedSubtypeId: null,
+  hasSubtypes: false,
 };
 
 export const useReportStore = create<ReportStore>((set) => ({
@@ -99,4 +108,7 @@ export const useReportStore = create<ReportStore>((set) => ({
       },
     })),
   setIsSelectingSubtype: (value) => set({ isSelectingSubtype: value }),
+  setSelectedTypeId: (id) => set({ selectedTypeId: id }),
+  setSelectedSubtypeId: (id) => set({ selectedSubtypeId: id }),
+  setHasSubtypes: (value) => set({ hasSubtypes: value }),
 }));
