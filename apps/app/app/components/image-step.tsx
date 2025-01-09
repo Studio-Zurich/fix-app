@@ -5,7 +5,7 @@ import { Camera, ImageSquare, X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { TypographyParagraph } from "@repo/ui/text";
 import exifr from "exifr";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Helper function to convert decimal degrees to DMS format
 function convertToDMS(decimal: number, isLatitude: boolean): string {
@@ -54,6 +54,18 @@ export default function ImageStep() {
   const [captureMode, setCaptureMode] = useState<"upload" | "capture" | null>(
     null
   );
+  const [isChromeOnMobile, setIsChromeOnMobile] = useState(false);
+
+  // Check if we're on Chrome mobile
+  useEffect(() => {
+    const isChrome =
+      /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+    setIsChromeOnMobile(isChrome && isMobile);
+  }, []);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -138,8 +150,15 @@ export default function ImageStep() {
   const handleCapture = () => {
     setCaptureMode("capture");
     if (fileInputRef.current) {
-      fileInputRef.current.setAttribute("capture", "environment");
-      fileInputRef.current.accept = "image/*;capture=camera";
+      if (isChromeOnMobile) {
+        // For Chrome on mobile, we'll use a different approach
+        fileInputRef.current.accept = "image/*";
+        fileInputRef.current.capture = "environment"; // This is non-standard but works on some Android devices
+      } else {
+        // For Safari and other browsers
+        fileInputRef.current.setAttribute("capture", "environment");
+        fileInputRef.current.accept = "image/*;capture=camera";
+      }
       fileInputRef.current.click();
     }
   };
@@ -167,18 +186,35 @@ export default function ImageStep() {
       <div className="px-5 space-y-8">
         <div className="grid border border-dashed border-foreground/20 rounded-md p-4 gap-4">
           <div className="grid gap-4 md:hidden">
-            <Button
-              onClick={handleCapture}
-              className="w-full"
-              variant="default"
-            >
-              <Camera className="mr-2" />
-              Take Photo
-            </Button>
-            <Button onClick={handleUpload} variant="outline" className="w-full">
-              <ImageSquare className="mr-2" />
-              Choose from Gallery
-            </Button>
+            {!isChromeOnMobile ? (
+              <Button
+                onClick={handleCapture}
+                className="w-full"
+                variant="default"
+              >
+                <Camera className="mr-2" />
+                Take Photo
+              </Button>
+            ) : (
+              <Button
+                onClick={handleUpload}
+                className="w-full"
+                variant="default"
+              >
+                <Camera className="mr-2" />
+                Take Photo or Choose Image
+              </Button>
+            )}
+            {!isChromeOnMobile && (
+              <Button
+                onClick={handleUpload}
+                variant="outline"
+                className="w-full"
+              >
+                <ImageSquare className="mr-2" />
+                Choose from Gallery
+              </Button>
+            )}
           </div>
 
           <Button
