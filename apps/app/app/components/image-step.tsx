@@ -139,6 +139,7 @@ export default function ImageStep() {
     setCaptureMode("capture");
     if (fileInputRef.current) {
       fileInputRef.current.setAttribute("capture", "environment");
+      fileInputRef.current.accept = "image/*;capture=camera";
       fileInputRef.current.click();
     }
   };
@@ -147,6 +148,7 @@ export default function ImageStep() {
     setCaptureMode("upload");
     if (fileInputRef.current) {
       fileInputRef.current.removeAttribute("capture");
+      fileInputRef.current.accept = "image/*";
       fileInputRef.current.click();
     }
   };
@@ -159,17 +161,32 @@ export default function ImageStep() {
         onChange={handleFileChange}
         accept="image/*"
         className="hidden"
-        multiple
+        multiple={captureMode === "upload"}
       />
 
       <div className="px-5 space-y-8">
         <div className="grid border border-dashed border-foreground/20 rounded-md p-4 gap-4">
-          <Button onClick={handleCapture} className="md:hidden">
-            <Camera />
-            Take Photo
-          </Button>
-          <Button onClick={handleUpload} variant="outline">
-            <ImageSquare />
+          <div className="grid gap-4 md:hidden">
+            <Button
+              onClick={handleCapture}
+              className="w-full"
+              variant="default"
+            >
+              <Camera className="mr-2" />
+              Take Photo
+            </Button>
+            <Button onClick={handleUpload} variant="outline" className="w-full">
+              <ImageSquare className="mr-2" />
+              Choose from Gallery
+            </Button>
+          </div>
+
+          <Button
+            onClick={handleUpload}
+            variant="outline"
+            className="hidden md:flex"
+          >
+            <ImageSquare className="mr-2" />
             Upload Image
           </Button>
         </div>
