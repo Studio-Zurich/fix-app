@@ -56,10 +56,12 @@ export default function ImageStep() {
   );
   const [isChromeOnMobile, setIsChromeOnMobile] = useState(false);
 
-  // Check if we're on Chrome mobile
+  // Enhanced Chrome detection for both Android and iOS
   useEffect(() => {
     const isChrome =
-      /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+      /CriOS/.test(navigator.userAgent) || // iOS Chrome
+      (/Chrome/.test(navigator.userAgent) &&
+        /Google Inc/.test(navigator.vendor)); // Android Chrome
     const isMobile =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
