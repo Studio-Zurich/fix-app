@@ -322,5 +322,13 @@
             "locationError": "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut",
             "geocodingError": "Fehler beim Abrufen der Adresse"
         }
+    },
+    "Navigation": {
+        "home": "Startseite",
+        "investments": "Investitionen",
+        "contact": "Kontakt",
+        "close": "Schließen",
+        "imprint": "Impressum",
+        "privacy": "Datenschutz"
     }
 }

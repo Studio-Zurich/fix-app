@@ -322,5 +322,13 @@
             "locationError": "Unable to get your location. Please try again",
             "geocodingError": "Error fetching address"
         }
+    },
+    "Navigation": {
+        "home": "Home",
+        "investments": "Investments",
+        "contact": "Contact",
+        "close": "Close",
+        "imprint": "Imprint",
+        "privacy": "Privacy"
     }
 }

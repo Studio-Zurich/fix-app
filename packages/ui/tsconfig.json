@@ -7,6 +7,6 @@
       "@repo/ui/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mjs"],
   "exclude": ["node_modules", "dist"]
 }
