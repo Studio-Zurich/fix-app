@@ -5,7 +5,6 @@
   "exports": {
     "./globals.css": "./globals.css",
     "./postcss.config": "./postcss.config.mjs",
-    "./tailwind.config": "./tailwind.config.ts",
     "./lib/*": "./lib/*.ts",
     "./*": "./ui/*.tsx"
   },

@@ -91,8 +91,8 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
 
   const navLinks = [
     { title: t("home"), href: "/" },
-    { title: t("investments"), href: "/investments" },
-    { title: t("contact"), href: "/contact" },
+
+    { title: t("contact"), href: "/" },
   ];
 
   return (
@@ -160,7 +160,7 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
             </div>
             <div className="absolute bottom-4 left-0 w-full flex justify-center items-center space-x-4">
               <TypographySpan className="text-primary/50" size="text-sm">
-                Copyright © {new Date().getFullYear()} B CAPITAL GmbH
+                Copyright © {new Date().getFullYear()} Fixapp GmbH
               </TypographySpan>
             </div>
           </div>

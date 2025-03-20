@@ -1,4 +1,7 @@
+@source "./";
+
 @import "tailwindcss";
+
 
 @plugin "tailwindcss-animate";
 

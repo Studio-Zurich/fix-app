@@ -1,26 +1,20 @@
 import Sample from "@/public/images/sample.jpg";
+import { TypographyH2 } from "@repo/ui/headline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/tabs";
+import { TypographyParagraph } from "@repo/ui/text";
 import NextImage from "next/image";
-import { TypewriterEffectSmooth } from "./typewriter-effect";
+import { TypewriterEffect } from "./typewriter-effect";
+import { AnimatedCamera, AnimatedLogo } from "./ui/animated-icons";
 
 const TextImageSection = () => {
-  const words = [
-    { text: "Ich" },
-    { text: "möchte" },
-    { text: "gernen" },
-    { text: "einen" },
-    { text: "umgefallenen" },
-    { text: "Baum" },
-    { text: "melden." },
-  ];
   return (
     <section className="h-full w-full container mx-auto my-16 space-y-8">
       <div className="space-y-4 px-[5vw] md:px-6">
-        <h2 className="text-4xl font-bold text-center">Here is the intros</h2>
-        <p className="text-center">
+        <TypographyH2>Here is the intros</TypographyH2>
+        <TypographyParagraph>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
           quos.
-        </p>
+        </TypographyParagraph>
       </div>
       <div className="w-[calc(100vw-10vw)] md:w-[calc(100vw-3rem)] h-[50svh] md:h-svh overflow-hidden rounded-3xl mx-[5vw] md:mx-6 relative">
         <NextImage
@@ -29,26 +23,34 @@ const TextImageSection = () => {
           className="w-full h-full object-cover absolute top-0 left-0"
         />
         <div className="relative z-10 h-full w-full p-[5vw] md:p-6">
-          <Tabs defaultValue="report" className="w-[400px]">
-            <TabsList>
-              <TabsTrigger value="report">Report</TabsTrigger>
-              <TabsTrigger value="check">Check</TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="report">
+            <div className="flex justify-center items-center">
+              <TabsList className="">
+                <TabsTrigger value="report">Report</TabsTrigger>
+                <TabsTrigger value="check">Check</TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="report">
-              <div className="flex items-start gap-2">
-                <span className="bg-white w-5 h-5 rounded-full block flex-shrink-0 mt-2" />
+              <div className="absolute bottom-[5vw] md:bottom-6 space-y-4">
+                <div className="flex justify-start items-start gap-2 w-full">
+                  <AnimatedCamera />
 
-                <TypewriterEffectSmooth words={words} />
+                  <TypewriterEffect
+                    text="This is a long text that will wrap naturally across multiple lines while maintaining the typewriter effect."
+                    speed={50}
+                  />
+                </div>
+                <div className="flex justify-start items-start gap-2 w-full">
+                  <AnimatedLogo />
+
+                  <TypewriterEffect
+                    text="Thank you we go it from here"
+                    speed={50}
+                  />
+                </div>
               </div>
             </TabsContent>
-            <TabsContent value="check">
-              <div className="flex items-start gap-2">
-                <span className="bg-white w-5 h-5 rounded-full block flex-shrink-0 mt-2" />
-                <p className="text-white text-2xl font-bold text-end">
-                  dfsfsdfsdfsdfsdfsdf
-                </p>
-              </div>
-            </TabsContent>
+            <TabsContent value="check">empty</TabsContent>
           </Tabs>
         </div>
       </div>

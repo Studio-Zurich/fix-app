@@ -6,9 +6,6 @@ const textVariants = cva("", {
   variants: {
     weight: {
       normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
     },
   },
   defaultVariants: {
