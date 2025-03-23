@@ -3,7 +3,7 @@
         "title": "Hello world!",
         "about": "Go to the about page",
         "newReport": "Start New Report",
-        "overview": "Overview",
+        "overview": "Current Reports",
         "quickReports": "Quick Reports"
     },
     "quickReports": {
@@ -330,5 +330,11 @@
         "close": "Close",
         "imprint": "Imprint",
         "privacy": "Privacy"
+    },
+    "imageStepComponent": {
+        "takePhoto": "Take Photo",
+        "chooseFromGallery": "Choose from Gallery",
+        "takePhotoOrChooseImage": "Take Photo or Choose Image",
+        "uploadImage": "Upload Image"
     }
 }

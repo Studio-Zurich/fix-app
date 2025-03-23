@@ -3,7 +3,7 @@
         "title": "Hallo Welt!",
         "about": "Zum Dashboard",
         "newReport": "Neue Meldung",
-        "overview": "Übersicht",
+        "overview": "Aktuelle Meldungen",
         "quickReports": "Schnellmeldungen"
     },
     "quickReports": {
@@ -330,5 +330,11 @@
         "close": "Schließen",
         "imprint": "Impressum",
         "privacy": "Datenschutz"
+    },
+    "imageStepComponent": {
+        "takePhoto": "Foto aufnehmen",
+        "chooseFromGallery": "Aus Galerie wählen",
+        "takePhotoOrChooseImage": "Foto aufnehmen oder Bild wählen",
+        "uploadImage": "Bild hochladen"
     }
 }

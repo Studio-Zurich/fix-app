@@ -6,7 +6,6 @@ import { Button } from "@repo/ui/button";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import MapOverview from "./map-overview";
-import QuickAccessReports from "./quick-access-reports";
 import ReportDrawer from "./report-drawer";
 
 export default function Dashboard() {
@@ -30,10 +29,10 @@ export default function Dashboard() {
           <MapOverview />
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <h2 className="text-lg font-semibold">{t("quickReports")}</h2>
           <QuickAccessReports onStartReport={() => setDrawerOpen(true)} />
-        </div>
+        </div> */}
       </div>
 
       <ReportDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />

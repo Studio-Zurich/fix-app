@@ -5,6 +5,7 @@ import { Camera, ImageSquare, X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { TypographyParagraph } from "@repo/ui/text";
 import exifr from "exifr";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 // Helper function to convert decimal degrees to DMS format
@@ -47,6 +48,7 @@ type ImageMetadata = {
 };
 
 export default function ImageStep() {
+  const t = useTranslations("imageStepComponent");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { images, setImages, setLocation, setImageMetadata, imagesMetadata } =
     useReportStore();
@@ -195,7 +197,7 @@ export default function ImageStep() {
                 variant="default"
               >
                 <Camera className="mr-2" />
-                Take Photo
+                {t("takePhoto")}
               </Button>
             )}
             <Button
@@ -205,8 +207,8 @@ export default function ImageStep() {
             >
               <ImageSquare className="mr-2" />
               {isChromeOnMobile
-                ? "Take Photo or Choose Image"
-                : "Choose from Gallery"}
+                ? t("takePhotoOrChooseImage")
+                : t("chooseFromGallery")}
             </Button>
           </div>
 
@@ -216,7 +218,7 @@ export default function ImageStep() {
             className="hidden md:flex"
           >
             <ImageSquare className="mr-2" />
-            Upload Image
+            {t("uploadImage")}
           </Button>
         </div>
         <div className="grid grid-cols-2 gap-4">

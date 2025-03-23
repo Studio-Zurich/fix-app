@@ -132,12 +132,13 @@ export default function IncidentTypeStep() {
         {filteredTypes.map((type) => (
           <div
             key={type.id}
-            className="flex items-start space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
           >
             <Checkbox
               id={type.id}
               checked={selectedTypeId === type.id}
               onCheckedChange={() => handleTypeSelect(type.id)}
+              className="w-6 h-6"
             />
             <div className="flex-1">
               <label

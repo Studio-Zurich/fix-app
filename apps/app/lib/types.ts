@@ -35,3 +35,16 @@ export type ImageMetadata = {
 export type ImagesMetadata = {
   [url: string]: ImageMetadata;
 };
+
+export interface IncidentType {
+  id: string;
+  name: string;
+  description: string;
+  subtypes?: IncidentSubtype[];
+}
+
+export interface IncidentSubtype {
+  id: string;
+  name: string;
+  description: string;
+}

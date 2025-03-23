@@ -68,7 +68,7 @@ const MapOverview = () => {
       initialViewState={ZUG_CENTER}
       style={{
         width: "100%",
-        height: "240px",
+        height: "calc(100svh - 240px)",
         borderRadius: "0.75rem",
         overflow: "hidden",
       }}
