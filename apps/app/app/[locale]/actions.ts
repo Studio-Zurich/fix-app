@@ -182,7 +182,7 @@ export async function submitReport(data: ReportData) {
       // Send internal email
       await resend.emails.send({
         from: "Fix App <notifications@fixapp.ch>",
-        to: ["hello@studio-zurich.ch"],
+        to: ["hello@studio-zurich.ch", "remigi.rageth@gmail.com"],
         subject: "Neue Meldung auf Fix App",
         html: internalEmailHtml,
       });
