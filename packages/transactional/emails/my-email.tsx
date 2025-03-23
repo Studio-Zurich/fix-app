@@ -72,7 +72,7 @@ export const ReportEmail = ({
         <Container>
           <Section style={content}>
             <Heading style={header}>
-              Ihre Meldung wurde bestätigt #{reportId}
+              Neue Meldung wurde bestätigt #{reportId}
             </Heading>
 
             <Section style={section}>
