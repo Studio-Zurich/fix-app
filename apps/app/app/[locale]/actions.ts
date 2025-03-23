@@ -163,7 +163,7 @@ export async function submitReport(data: ReportData) {
         to: ["hello@studio-zurich.ch", "Remigi.rageth@gmail.com"].concat(
           validatedData.reporterEmail ? [validatedData.reporterEmail] : []
         ),
-        subject: "Ihre Meldung wurde bestätigt",
+        subject: "Neue Meldung auf Fix App",
         html: emailHtml,
       });
     } catch (emailError) {

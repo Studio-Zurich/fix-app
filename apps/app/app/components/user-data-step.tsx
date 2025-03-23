@@ -2,6 +2,7 @@
 
 import { useReportStore } from "@/lib/store";
 import { Input } from "@repo/ui/input";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
@@ -15,6 +16,7 @@ const userDataSchema = z.object({
 type UserDataForm = z.infer<typeof userDataSchema>;
 
 export default function UserDataStep() {
+  const t = useTranslations("userDataStepComponent");
   const reportData = useReportStore((state) => state.reportData);
   const setStepValidation = useReportStore((state) => state.setStepValidation);
 
@@ -85,7 +87,7 @@ export default function UserDataStep() {
       <div className="space-y-4">
         <div className="space-y-2">
           <Input
-            placeholder="First name *"
+            placeholder={t("firstName")}
             value={formData.firstName}
             onChange={handleChange("firstName")}
             onBlur={handleBlur("firstName")}
@@ -97,7 +99,7 @@ export default function UserDataStep() {
 
         <div className="space-y-2">
           <Input
-            placeholder="Last name *"
+            placeholder={t("lastName")}
             value={formData.lastName}
             onChange={handleChange("lastName")}
             onBlur={handleBlur("lastName")}
@@ -110,7 +112,7 @@ export default function UserDataStep() {
         <div className="space-y-2">
           <Input
             type="email"
-            placeholder="Email address *"
+            placeholder={t("email")}
             value={formData.email}
             onChange={handleChange("email")}
             onBlur={handleBlur("email")}
@@ -123,7 +125,7 @@ export default function UserDataStep() {
         <div className="space-y-2">
           <Input
             type="tel"
-            placeholder="Phone number (optional)"
+            placeholder={t("phone")}
             value={formData.phone}
             onChange={handleChange("phone")}
           />
@@ -131,13 +133,13 @@ export default function UserDataStep() {
       </div>
 
       <div className="text-sm text-muted-foreground space-y-1">
-        <p>Why provide contact information?</p>
+        <p>{t("whyProvideInfo")}</p>
         <ul className="list-disc list-inside pl-2">
-          <li>Get updates about your report</li>
-          <li>Allow follow-up questions if needed</li>
-          <li>Receive confirmation when resolved</li>
+          <li>{t("reasons.updates")}</li>
+          <li>{t("reasons.followUp")}</li>
+          <li>{t("reasons.confirmation")}</li>
         </ul>
-        <p className="text-xs mt-2">* Required fields</p>
+        <p className="text-xs mt-2">{t("requiredFields")}</p>
       </div>
     </div>
   );

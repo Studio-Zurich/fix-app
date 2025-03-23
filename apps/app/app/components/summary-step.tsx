@@ -57,6 +57,7 @@ export default function SummaryStep() {
 
   const router = useRouter();
   const t = useTranslations("incidentTypes");
+  const tSummary = useTranslations("summaryStepComponent");
 
   // Fetch incident type, subtype, and department info
   useEffect(() => {
@@ -195,7 +196,7 @@ export default function SummaryStep() {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Camera className="w-4 h-4 text-primary" weight="fill" />
-                <h3 className="font-medium">Images</h3>
+                <h3 className="font-medium">{tSummary("images")}</h3>
               </div>
               <div className="pl-6 flex gap-2">
                 {images.map((image, index) => (
@@ -216,11 +217,11 @@ export default function SummaryStep() {
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <MapPin className="w-4 h-4 text-primary" weight="fill" />
-            <h3 className="font-medium">Location</h3>
+            <h3 className="font-medium">{tSummary("location")}</h3>
           </div>
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground pl-6">
-              {location?.address || "No location provided"}
+              {location?.address || tSummary("noLocationProvided")}
             </p>
             {location && (
               <div className="pl-6">
@@ -236,7 +237,7 @@ export default function SummaryStep() {
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <TextT className="w-4 h-4 text-primary" weight="fill" />
-            <h3 className="font-medium">Incident Type</h3>
+            <h3 className="font-medium">{tSummary("incidentType")}</h3>
           </div>
           <div className="pl-6 space-y-1">
             {selectedType && (
@@ -264,7 +265,7 @@ export default function SummaryStep() {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <TextT className="w-4 h-4 text-primary" weight="fill" />
-                <h3 className="font-medium">Description</h3>
+                <h3 className="font-medium">{tSummary("description")}</h3>
               </div>
               <p className="text-sm text-muted-foreground pl-6 whitespace-pre-line">
                 {reportData.description}
@@ -282,14 +283,14 @@ export default function SummaryStep() {
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-primary" weight="fill" />
-              <h3 className="font-medium">Contact Information</h3>
+              <h3 className="font-medium">{tSummary("contactInformation")}</h3>
             </div>
             <div className="pl-6 space-y-2">
               {reportData.reporterFirstName && (
                 <div className="flex items-center space-x-2">
                   <User className="w-4 h-4 text-muted-foreground" />
                   <p className="text-sm">
-                    First Name: {reportData.reporterFirstName}
+                    {tSummary("firstName")}: {reportData.reporterFirstName}
                   </p>
                 </div>
               )}
@@ -297,7 +298,7 @@ export default function SummaryStep() {
                 <div className="flex items-center space-x-2">
                   <User className="w-4 h-4 text-muted-foreground" />
                   <p className="text-sm">
-                    Last Name: {reportData.reporterLastName}
+                    {tSummary("lastName")}: {reportData.reporterLastName}
                   </p>
                 </div>
               )}
@@ -307,7 +308,9 @@ export default function SummaryStep() {
                     className="w-4 h-4 text-muted-foreground"
                     weight="fill"
                   />
-                  <p className="text-sm">Email: {reportData.reporterEmail}</p>
+                  <p className="text-sm">
+                    {tSummary("email")}: {reportData.reporterEmail}
+                  </p>
                 </div>
               )}
               {reportData.reporterPhone && (
@@ -316,7 +319,9 @@ export default function SummaryStep() {
                     className="w-4 h-4 text-muted-foreground"
                     weight="fill"
                   />
-                  <p className="text-sm">Phone: {reportData.reporterPhone}</p>
+                  <p className="text-sm">
+                    {tSummary("phone")}: {reportData.reporterPhone}
+                  </p>
                 </div>
               )}
             </div>
@@ -330,7 +335,9 @@ export default function SummaryStep() {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Buildings className="w-4 h-4 text-primary" weight="fill" />
-                <h3 className="font-medium">Responsible Department</h3>
+                <h3 className="font-medium">
+                  {tSummary("responsibleDepartment")}
+                </h3>
               </div>
               <div className="pl-6 space-y-1">
                 <p className="text-sm font-medium">
@@ -350,7 +357,11 @@ export default function SummaryStep() {
         )}
       </div>
 
-      {error && <div className="text-sm text-destructive">Error: {error}</div>}
+      {error && (
+        <div className="text-sm text-destructive">
+          {tSummary("error")}: {error}
+        </div>
+      )}
     </div>
   );
 }

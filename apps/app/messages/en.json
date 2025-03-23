@@ -22,6 +22,7 @@
         "newReport": "Submit Another Report"
     },
     "incidentTypes": {
+        "searchIncidentTypes": "Enter search terms",
         "animals": {
             "name": "Animals",
             "description": "Report issues with animals",
@@ -323,6 +324,39 @@
             "geocodingError": "Error fetching address"
         }
     },
+    "imageStepComponent": {
+        "takePhoto": "Take Photo",
+        "chooseFromGallery": "Choose from Gallery",
+        "takePhotoOrChooseImage": "Take Photo or Choose Image",
+        "uploadImage": "Upload Image"
+    },
+    "userDataStepComponent": {
+        "firstName": "First name *",
+        "lastName": "Last name *",
+        "email": "Email address *",
+        "phone": "Phone number (optional)",
+        "whyProvideInfo": "Why provide contact information?",
+        "reasons": {
+            "updates": "Get updates about your report",
+            "followUp": "Allow follow-up questions if needed",
+            "confirmation": "Receive confirmation when resolved"
+        },
+        "requiredFields": "* Required fields"
+    },
+    "summaryStepComponent": {
+        "images": "Images",
+        "location": "Location",
+        "incidentType": "Incident Type",
+        "description": "Description",
+        "contactInformation": "Contact Information",
+        "responsibleDepartment": "Responsible Department",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "noLocationProvided": "No location provided",
+        "error": "Error"
+    },
     "Navigation": {
         "home": "Home",
         "investments": "Investments",
@@ -330,11 +364,5 @@
         "close": "Close",
         "imprint": "Imprint",
         "privacy": "Privacy"
-    },
-    "imageStepComponent": {
-        "takePhoto": "Take Photo",
-        "chooseFromGallery": "Choose from Gallery",
-        "takePhotoOrChooseImage": "Take Photo or Choose Image",
-        "uploadImage": "Upload Image"
     }
 }

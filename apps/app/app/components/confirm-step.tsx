@@ -43,14 +43,7 @@ export default function ConfirmStep() {
       <div className="flex flex-col items-center space-y-2 text-center">
         <CheckCircle className="w-16 h-16 text-primary" weight="fill" />
         <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("subtitle")}</p>
-      </div>
-
-      <div className="w-full space-y-2">
-        <h2 className="font-semibold">{t("nextSteps")}</h2>
-        <p className="text-sm text-muted-foreground">
-          {t("nextStepsDescription")}
-        </p>
+        <p className="text-muted-foreground">{t("nextStepsDescription")}</p>
       </div>
     </div>
   );

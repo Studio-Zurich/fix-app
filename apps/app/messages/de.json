@@ -14,14 +14,15 @@
     },
     "ConfirmPage": {
         "title": "Meldung Eingereicht",
-        "subtitle": "Vielen Dank für Ihre Meldung",
+        "subtitle": "Vielen Dank für Deine Meldung",
         "reportNumber": "Meldungsnummer",
         "nextSteps": "Nächste Schritte",
-        "nextStepsDescription": "Wir werden Ihre Meldung prüfen und entsprechende Maßnahmen ergreifen. Sie erhalten in Kürze eine E-Mail-Bestätigung.",
+        "nextStepsDescription": "Wir werden Deine Meldung prüfen und entsprechende Maßnahmen ergreifen. Du erhältst in Kürze eine E-Mail-Bestätigung.",
         "backToDashboard": "Zurück zur Übersicht",
         "newReport": "Weitere Meldung Erstellen"
     },
     "incidentTypes": {
+        "searchIncidentTypes": "Suchbegriffe eingeben",
         "animals": {
             "name": "Tiere",
             "description": "Probleme mit Tieren melden",
@@ -260,7 +261,7 @@
                 "useCurrentLocation": "Aktuellen Standort verwenden",
                 "useImageLocation": "Bildstandort verwenden",
                 "useOwnLocation": "Eigenen Standort wählen",
-                "locationFromImage": "Wir haben einen Standort in Ihrem Bild gefunden",
+                "locationFromImage": "Wir haben einen Standort in Deinem Bild gefunden",
                 "outsideZug": "Der gewählte Standort liegt außerhalb von Zug"
             },
             "incidentType": {
@@ -269,14 +270,14 @@
             },
             "description": {
                 "title": "Beschreibung",
-                "description": "Geben Sie weitere Details zum Vorfall an",
-                "placeholder": "Beschreiben Sie den Vorfall genauer...",
+                "description": "Gib weitere Details zum Vorfall an",
+                "placeholder": "Beschreibe den Vorfall genauer...",
                 "charactersLeft": "Zeichen übrig",
                 "guidelines": {
                     "title": "Richtlinien",
-                    "specific": "Seien Sie konkret und klar",
-                    "noPersonalInfo": "Vermeiden Sie persönliche Informationen",
-                    "respectful": "Bleiben Sie respektvoll",
+                    "specific": "Sei konkret und klar",
+                    "noPersonalInfo": "Vermeide persönliche Informationen",
+                    "respectful": "Bleib respektvoll",
                     "noOffensive": "Keine Schimpfwörter oder beleidigende Sprache"
                 }
             },
@@ -303,7 +304,7 @@
     "locationStepComponent": {
         "dialog": {
             "title": "Bildstandort verwenden?",
-            "description": "Wir haben einen Standort in Ihrem Bild gefunden",
+            "description": "Wir haben einen Standort in Deinem Bild gefunden",
             "useImageLocation": "Bildstandort verwenden",
             "useOwnLocation": "Eigenen Standort wählen"
         },
@@ -318,10 +319,43 @@
         },
         "errors": {
             "outsideZug": "Der gewählte Standort liegt außerhalb von Zug",
-            "locationAccess": "Bitte aktivieren Sie den Standortzugriff in Ihren Geräteeinstellungen",
-            "locationError": "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut",
+            "locationAccess": "Bitte aktiviere den Standortzugriff in Deinen Geräteeinstellungen",
+            "locationError": "Standort konnte nicht ermittelt werden. Bitte versuche es erneut",
             "geocodingError": "Fehler beim Abrufen der Adresse"
         }
+    },
+    "imageStepComponent": {
+        "takePhoto": "Foto aufnehmen",
+        "chooseFromGallery": "Aus Galerie wählen",
+        "takePhotoOrChooseImage": "Foto aufnehmen oder Bild wählen",
+        "uploadImage": "Bild hochladen"
+    },
+    "userDataStepComponent": {
+        "firstName": "Vorname *",
+        "lastName": "Nachname *",
+        "email": "E-Mail-Adresse *",
+        "phone": "Telefonnummer (optional)",
+        "whyProvideInfo": "Warum Kontaktinformationen angeben?",
+        "reasons": {
+            "updates": "Erhalte Updates zu Deiner Meldung",
+            "followUp": "Erlaube Nachfragen bei Bedarf",
+            "confirmation": "Erhalte eine Bestätigung nach Abschluss"
+        },
+        "requiredFields": "* Pflichtfelder"
+    },
+    "summaryStepComponent": {
+        "images": "Bilder",
+        "location": "Standort",
+        "incidentType": "Vorfallsart",
+        "description": "Beschreibung",
+        "contactInformation": "Kontaktinformationen",
+        "responsibleDepartment": "Zuständige Abteilung",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "noLocationProvided": "Kein Standort angegeben",
+        "error": "Fehler"
     },
     "Navigation": {
         "home": "Startseite",
@@ -330,11 +364,5 @@
         "close": "Schließen",
         "imprint": "Impressum",
         "privacy": "Datenschutz"
-    },
-    "imageStepComponent": {
-        "takePhoto": "Foto aufnehmen",
-        "chooseFromGallery": "Aus Galerie wählen",
-        "takePhotoOrChooseImage": "Foto aufnehmen oder Bild wählen",
-        "uploadImage": "Bild hochladen"
     }
 }

@@ -104,12 +104,13 @@ export default function IncidentSubtypeStep() {
         {subtypes.map((subtype) => (
           <div
             key={subtype.id}
-            className="flex items-start space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
           >
             <Checkbox
               id={subtype.id}
               checked={selectedSubtypeId === subtype.id}
               onCheckedChange={() => handleSubtypeSelect(subtype.id)}
+              className="w-6 h-6"
             />
             <div className="flex-1">
               <label
