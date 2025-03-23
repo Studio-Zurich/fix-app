@@ -35,7 +35,7 @@ export const TypewriterEffect = ({
   return (
     <div className={cn("relative", className)}>
       <div ref={scope} className="whitespace-pre-wrap">
-        <TypographyParagraph className="text-background">
+        <TypographyParagraph className="text-background" size="text-xl">
           {displayedText}
         </TypographyParagraph>
       </div>

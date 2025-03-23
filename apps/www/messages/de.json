@@ -1,7 +1,12 @@
 {
-    "HomePage": {
-        "title": "Hallo Welt!",
-        "about": "Zur About-Seite gehen"
+    "heroPage": {
+        "title": "Deine Stadt, Deine Initiative",
+        "examples": [
+            "Ein umgestürzter Baum auf der Bergstrasse blockiert den Gehweg.",
+            "Überfüllter Mülleimer an der Bushaltestelle muss geleert werden.",
+            "Glasscherben auf dem Spielplatz müssen entfernt werden."
+        ],
+        "reported": "Vorfall gemeldet, vielen Dank!"
     },
     "Navigation": {
         "home": "Startseite",

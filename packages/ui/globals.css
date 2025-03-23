@@ -120,7 +120,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: var(--font-rubik);
+  --font-medium: var(--font-brockmann-medium), sans-serif;
+  --font-regular: var(--font-brockmann-regular), sans-serif;
 }
 
 @layer base {
@@ -129,6 +130,6 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-regular;
   }
 }

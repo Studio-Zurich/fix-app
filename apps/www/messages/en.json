@@ -1,7 +1,12 @@
 {
-    "HomePage": {
-        "title": "Hello world!",
-        "about": "Go to the about page"
+    "heroPage": {
+        "title": "Make Your City Better",
+        "examples": [
+            "A fallen tree on the Bergstrasse is blocking the sidewalk.",
+            "Overflowing trash bin at the bus stop needs attention.",
+            "Broken glass at the playground needs to be cleaned up."
+        ],
+        "reported": "Incident reported, thank you!"
     },
     "Navigation": {
         "home": "Home",
