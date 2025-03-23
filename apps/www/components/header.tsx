@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@repo/ui/button";
+import { TypographySpan } from "@repo/ui/text";
 import { useState } from "react";
 import { Menu } from "./menu";
 
@@ -12,9 +13,9 @@ const Header = () => {
         <div className="container mx-auto px-[5vw] md:px-6 bg-[#343434]/40 backdrop-blur-[40px] rounded-full py-2 w-[calc(100vw-10vw)] md:w-[calc(100vw-3rem)]">
           <div className="flex justify-between items-center">
             <span className="text-white">Fix App</span>
-            <a href="https://app.fixapp.ch" target="_blank">
-              <Button variant="secondary">Report</Button>
-            </a>
+            <Button variant="secondary" onClick={() => setIsMenuOpen(true)}>
+              <TypographySpan>Menü</TypographySpan>
+            </Button>
           </div>
         </div>
       </header>

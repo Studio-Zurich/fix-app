@@ -1,6 +1,7 @@
 "use client";
 import { Link } from "@/i18n/navigation";
 
+import { Button } from "@repo/ui/button";
 import { TypographySpan } from "@repo/ui/text";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -89,11 +90,7 @@ const MobileNavLink = ({
 export const Menu = ({ isOpen, onClose }: MenuProps) => {
   const t = useTranslations("Navigation");
 
-  const navLinks = [
-    { title: t("home"), href: "/" },
-
-    { title: t("contact"), href: "/" },
-  ];
+  const navLinks = [{ title: t("home"), href: "/" }];
 
   return (
     <AnimatePresence>
@@ -107,9 +104,8 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
         >
           <div className="flex h-full flex-col relative">
             <div className="absolute top-0 left-0 w-full grid grid-cols-8 lg:grid-cols-12 py-8 px-4 lg:px-6 gap-8">
-              <div className="col-span-4 lg:col-span-7 flex justify-start items-center">
-                Logo
-              </div>
+              <div className="col-span-4 lg:col-span-7 flex justify-start items-center" />
+
               <div className="col-span-4 lg:col-span-5 flex justify-end items-center">
                 <button
                   className="cursor-pointer text-primary font-body-light"
@@ -133,17 +129,25 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
               exit="initial"
               className="flex flex-col h-full justify-center items-center gap-6"
             >
-              {navLinks.map((link) => (
+              {/* {navLinks.map((link) => (
                 <MobileNavLink
                   key={link.title}
                   title={link.title}
                   href={link.href}
                   onClose={onClose}
                 />
-              ))}
+              ))} */}
+              <a href="https://app.fixapp.ch" target="_blank">
+                <Button className="w-full min-w-lg">Report</Button>
+              </a>
             </motion.div>
-            <div className="absolute bottom-10 left-0 w-full flex justify-center items-center space-x-4">
-              <Link
+            <div className="absolute bottom-12 left-0 w-full flex justify-center items-center space">
+              <a href="mailto:info@fixapp.ch" target="_blank">
+                <TypographySpan className="block" size="text-lg">
+                  info@fixapp.ch
+                </TypographySpan>
+              </a>
+              {/* <Link
                 href="/imprint"
                 className="text-primary/80 font-body-light"
                 onClick={onClose}
@@ -156,7 +160,7 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
                 onClick={onClose}
               >
                 {t("privacy")}
-              </Link>
+              </Link> */}
             </div>
             <div className="absolute bottom-4 left-0 w-full flex justify-center items-center space-x-4">
               <TypographySpan className="text-primary/50" size="text-sm">
