@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { Separator } from "@repo/ui/separator";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import SummaryMapPreview from "./summary-map-preview";
 
@@ -159,6 +160,9 @@ export default function SummaryStep() {
         })
       );
 
+      const params = useParams();
+      const locale = params.locale as "de" | "en";
+
       // Submit report with image data
       const result = await submitReport({
         ...reportData,
@@ -166,10 +170,11 @@ export default function SummaryStep() {
         images: imageData.map(({ blob, ...rest }) => rest),
         incidentTypeId: selectedTypeId!,
         incidentSubtypeId: selectedSubtypeId || undefined,
-        reporterFirstName: reportData.reporterFirstName || "",
-        reporterLastName: reportData.reporterLastName || "",
-        reporterEmail: reportData.reporterEmail || "",
-        reporterPhone: reportData.reporterPhone || "",
+        reporterFirstName: reportData.reporterFirstName || undefined,
+        reporterLastName: reportData.reporterLastName || undefined,
+        reporterEmail: reportData.reporterEmail || undefined,
+        reporterPhone: reportData.reporterPhone || undefined,
+        locale,
       });
 
       if (!result.success || !result.reportId) {

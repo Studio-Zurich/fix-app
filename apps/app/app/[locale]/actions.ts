@@ -4,7 +4,8 @@ import { reportSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { ReportData } from "@/lib/types";
 import { renderAsync } from "@react-email/render";
-import { ReportEmail } from "@repo/transactional/emails/my-email";
+import { ReportEmail as ExternalEmail } from "@repo/transactional/emails/external-email";
+import { ReportEmail as InternalEmail } from "@repo/transactional/emails/my-email";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { ZodError } from "zod";
@@ -141,8 +142,9 @@ export async function submitReport(data: ReportData) {
 
     // Send email notifications
     try {
-      const emailHtml = await renderAsync(
-        ReportEmail({
+      // Send internal email (always in German)
+      const internalEmailHtml = await renderAsync(
+        InternalEmail({
           reportId: report.id,
           reporterName:
             `${validatedData.reporterFirstName ?? ""} ${validatedData.reporterLastName ?? ""}`.trim(),
@@ -158,15 +160,45 @@ export async function submitReport(data: ReportData) {
         })
       );
 
+      // Send external email (in user's locale)
+      const externalEmailHtml = await renderAsync(
+        ExternalEmail({
+          reportId: report.id,
+          reporterName:
+            `${validatedData.reporterFirstName ?? ""} ${validatedData.reporterLastName ?? ""}`.trim(),
+          reporterEmail: validatedData.reporterEmail ?? "",
+          reporterPhone: validatedData.reporterPhone ?? "",
+          location: validatedData.location,
+          description: validatedData.description ?? "",
+          imageCount: validatedData.images?.length ?? 0,
+          incidentType: {
+            name: typeInfo?.name || "Unknown",
+            subtype: subtypeInfo?.name,
+          },
+          locale: validatedData.locale || "de", // Default to German if no locale provided
+        })
+      );
+
+      // Send internal email
       await resend.emails.send({
         from: "Fix App <notifications@fixapp.ch>",
         to: ["hello@studio-zurich.ch"],
-        // to: ["hello@studio-zurich.ch", "Remigi.rageth@gmail.com"].concat(
-        //   validatedData.reporterEmail ? [validatedData.reporterEmail] : []
-        // ),
         subject: "Neue Meldung auf Fix App",
-        html: emailHtml,
+        html: internalEmailHtml,
       });
+
+      // Send external email to user if email is provided
+      if (validatedData.reporterEmail) {
+        await resend.emails.send({
+          from: "Fix App <notifications@fixapp.ch>",
+          to: [validatedData.reporterEmail],
+          subject:
+            validatedData.locale === "en"
+              ? "Report Submitted"
+              : "Meldung Eingereicht",
+          html: externalEmailHtml,
+        });
+      }
     } catch (emailError) {
       console.error("Error sending email:", emailError);
       // Create error report entry for email failure

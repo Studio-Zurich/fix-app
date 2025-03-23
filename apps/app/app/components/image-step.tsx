@@ -191,11 +191,7 @@ export default function ImageStep() {
         <div className="grid border border-dashed border-foreground/20 rounded-md p-4 gap-4">
           <div className="grid gap-4 md:hidden">
             {!isChromeOnMobile && (
-              <Button
-                onClick={handleCapture}
-                className="w-full"
-                variant="default"
-              >
+              <Button onClick={handleCapture} className="w-full">
                 <Camera className="mr-2" />
                 {t("takePhoto")}
               </Button>
@@ -212,11 +208,7 @@ export default function ImageStep() {
             </Button>
           </div>
 
-          <Button
-            onClick={handleUpload}
-            variant="outline"
-            className="hidden md:flex"
-          >
+          <Button onClick={handleUpload} className="hidden md:flex">
             <ImageSquare className="mr-2" />
             {t("uploadImage")}
           </Button>

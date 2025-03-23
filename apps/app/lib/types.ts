@@ -22,6 +22,7 @@ export type ReportData = {
   reporterPhone?: string;
   incidentTypeId: string;
   incidentSubtypeId?: string;
+  locale?: "de" | "en";
 };
 
 export type ImageMetadata = {

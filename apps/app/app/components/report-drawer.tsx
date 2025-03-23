@@ -85,7 +85,7 @@ export default function ReportDrawer({
           location,
           images: reportData.images || [],
           incidentTypeId: selectedTypeId,
-          incidentSubtypeId: selectedSubtypeId,
+          incidentSubtypeId: selectedSubtypeId || undefined, // Make sure it's undefined if not selected
         } as ReportData);
 
         if (!result.success) {

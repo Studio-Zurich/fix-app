@@ -64,6 +64,33 @@ export default function IncidentTypeStep() {
     fetchTypes();
   }, []);
 
+  // Check for subtypes when type is selected
+  useEffect(() => {
+    const checkSubtypes = async () => {
+      if (!selectedTypeId) {
+        setHasSubtypes(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("incident_subtypes")
+          .select("id")
+          .eq("incident_type_id", selectedTypeId)
+          .eq("active", true)
+          .limit(1);
+
+        if (error) throw error;
+        setHasSubtypes(!!data && data.length > 0);
+      } catch (err) {
+        console.error("Error checking subtypes:", err);
+        setHasSubtypes(false);
+      }
+    };
+
+    checkSubtypes();
+  }, [selectedTypeId, setHasSubtypes]);
+
   // Handle search
   useEffect(() => {
     const query = searchQuery.toLowerCase();

@@ -26,6 +26,7 @@ interface ReportEmailProps {
     name: string;
     subtype?: string;
   };
+  locale: "de" | "en";
 }
 
 // Use environment variables type-safely
@@ -62,21 +63,22 @@ export const ReportEmail = ({
   description = defaultProps.description,
   imageCount = defaultProps.imageCount,
   incidentType = defaultProps.incidentType,
+  locale = "de",
 }: ReportEmailProps) => {
   const safeLocation = location || defaultProps.location;
-  const t = messages.de; // Always use German for internal emails
+  const t = messages[locale];
 
   return (
     <Html>
       <Head />
-      <Preview>Neue Meldung auf Fix App</Preview>
+      <Preview>{t.ConfirmPage.title}</Preview>
       <Body style={main}>
         <Container>
           <Section style={content}>
             <Heading style={header}>
               Fixapp.ch
               <br />
-              Neue Meldung
+              {t.ConfirmPage.title}
             </Heading>
 
             <Section style={section}>
@@ -150,6 +152,13 @@ export const ReportEmail = ({
                 {t.ConfirmPage.reportNumber}
               </Heading>
               <Text style={text}>{reportId}</Text>
+            </Section>
+
+            <Section style={section}>
+              <Heading as="h2" style={sectionHeader}>
+                {t.ConfirmPage.nextSteps}
+              </Heading>
+              <Text style={text}>{t.ConfirmPage.nextStepsDescription}</Text>
             </Section>
           </Section>
 

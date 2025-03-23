@@ -24,6 +24,7 @@ export const reportSchema = z.object({
   reporterPhone: z.string().optional(),
   incidentTypeId: z.string(),
   incidentSubtypeId: z.string().optional(),
+  locale: z.enum(["de", "en"]).optional(),
 });
 
 export const imageMetadataSchema = z.object({

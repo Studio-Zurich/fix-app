@@ -37,6 +37,7 @@ export default function IncidentSubtypeStep() {
   );
   const { setStepValidation } = useReportStore();
   const t = useTranslations("incidentTypes");
+  const tSummary = useTranslations("summary");
 
   // Fetch selected type and subtypes
   useEffect(() => {
@@ -79,9 +80,14 @@ export default function IncidentSubtypeStep() {
 
   // Update validation when subtype selection changes
   useEffect(() => {
-    // Only validate if we have a selected subtype
+    // If there are no subtypes, validate immediately
+    if (subtypes.length === 0) {
+      setStepValidation("incidentType", true);
+      return;
+    }
+    // Otherwise validate based on selection
     setStepValidation("incidentType", !!selectedSubtypeId);
-  }, [selectedSubtypeId, setStepValidation]);
+  }, [selectedSubtypeId, setStepValidation, subtypes.length]);
 
   const handleSubtypeSelect = (subtypeId: string) => {
     setSelectedSubtypeId(selectedSubtypeId === subtypeId ? null : subtypeId);
@@ -89,6 +95,24 @@ export default function IncidentSubtypeStep() {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+
+  // If there are no subtypes, show a message and auto-validate
+  if (subtypes.length === 0) {
+    return (
+      <div className="space-y-4 px-5">
+        {selectedType && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">{t(`${selectedType.name}.name`)}</h3>
+            </div>
+          </div>
+        )}
+        <p className="text-sm text-muted-foreground">
+          {tSummary("noSubtypesAvailable")}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 px-5">
