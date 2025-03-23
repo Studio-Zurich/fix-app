@@ -108,15 +108,6 @@ export const ReportEmail = ({
 
             <Section style={section}>
               <Heading as="h2" style={sectionHeader}>
-                {t.summaryStepComponent.images}
-              </Heading>
-              <Text style={text}>
-                {imageCount} {t.summaryStepComponent.images.toLowerCase()}
-              </Text>
-            </Section>
-
-            <Section style={section}>
-              <Heading as="h2" style={sectionHeader}>
                 {t.summaryStepComponent.description}
               </Heading>
               <Text style={text}>{description}</Text>
