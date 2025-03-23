@@ -93,7 +93,7 @@ export default function IncidentSubtypeStep() {
   return (
     <div className="space-y-4 px-5">
       {selectedType && (
-        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">{t(`${selectedType.name}.name`)}</h3>
           </div>

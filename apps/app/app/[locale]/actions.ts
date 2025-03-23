@@ -160,9 +160,10 @@ export async function submitReport(data: ReportData) {
 
       await resend.emails.send({
         from: "Fix App <notifications@fixapp.ch>",
-        to: ["hello@studio-zurich.ch", "Remigi.rageth@gmail.com"].concat(
-          validatedData.reporterEmail ? [validatedData.reporterEmail] : []
-        ),
+        to: ["hello@studio-zurich.ch"],
+        // to: ["hello@studio-zurich.ch", "Remigi.rageth@gmail.com"].concat(
+        //   validatedData.reporterEmail ? [validatedData.reporterEmail] : []
+        // ),
         subject: "Neue Meldung auf Fix App",
         html: emailHtml,
       });

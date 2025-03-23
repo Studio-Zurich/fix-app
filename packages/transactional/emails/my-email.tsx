@@ -72,7 +72,9 @@ export const ReportEmail = ({
         <Container>
           <Section style={content}>
             <Heading style={header}>
-              Neue Meldung wurde bestätigt #{reportId}
+              Fixapp.ch
+              <br />
+              Meldung wurde bestätigt
             </Heading>
 
             <Section style={section}>
@@ -128,6 +130,12 @@ export const ReportEmail = ({
                 </Text>
               )}
             </Section>
+            <Section style={section}>
+              <Heading as="h2" style={sectionHeader}>
+                ID (Bei Rückfragen)
+              </Heading>
+              <Text style={text}>{reportId}</Text>
+            </Section>
 
             {/* <Section style={buttonContainer}>
               <Button href={`${baseUrl}/reports/${reportId}`} style={button}>
@@ -137,7 +145,7 @@ export const ReportEmail = ({
           </Section>
 
           <Text style={footer}>
-            © {new Date().getFullYear()} | Fix App | www.fix-app.ch
+            © {new Date().getFullYear()} | Fix App | www.fixapp.ch
           </Text>
         </Container>
       </Body>
