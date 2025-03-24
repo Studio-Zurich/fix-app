@@ -14,6 +14,49 @@
         "contact": "Contact",
         "close": "Close",
         "imprint": "Imprint",
-        "privacy": "Privacy"
+        "privacy": "Privacy",
+        "how-it-works": "How it works"
+    },
+    "how-it-works-section": {
+        "title": "How it works",
+        "description": "Help make your community better by reporting issues that need attention. Together we can create a safer and more pleasant environment for everyone.",
+        "steps": {
+            "step1": {
+                "title": "Report an Issue",
+                "description": "Spot a problem? Report it in seconds. Your quick action keeps the community safe."
+            },
+            "step2": {
+                "title": "Track Progress",
+                "description": "Watch as your report turns into action. You'll receive an update once the issue is resolved."
+            },
+            "step3": {
+                "title": "See Results",
+                "description": "Problem solved! Your report made the neighborhood better for everyone."
+            }
+        },
+        "processFlow": {
+            "title": "Community Impact",
+            "description": "At FixApp, we're dedicated to improving community spaces by enabling quick reporting and resolution of local issues.",
+            "step1": "Report helps to react quickly",
+            "step2": "Track the progress",
+            "step3": "Community improved!"
+        }
+    },
+    "FaqSection": {
+        "title": "Frequently Asked Questions",
+        "items": [
+            {
+                "question": "How do I report an incident?",
+                "answer": "You can easily report an incident through our web application. Simply describe the issue, add a location, and optionally upload a photo."
+            },
+            {
+                "question": "How long does it take to process my report?",
+                "answer": "Reports are typically processed within 24-48 hours. Urgent matters may be handled more quickly depending on their severity."
+            },
+            {
+                "question": "Is the service available in my area?",
+                "answer": "Our service is currently available in the Canton of Zug."
+            }
+        ]
     }
 }

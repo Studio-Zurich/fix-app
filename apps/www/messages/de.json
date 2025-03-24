@@ -14,6 +14,49 @@
         "contact": "Kontakt",
         "close": "Schließen",
         "imprint": "Impressum",
-        "privacy": "Datenschutz"
+        "privacy": "Datenschutz",
+        "how-it-works": "Wie es funktioniert"
+    },
+    "how-it-works-section": {
+        "title": "Wie es funktioniert",
+        "description": "Hilf mit, Deine Gemeinde zu verbessern, indem Du Probleme meldest, die Aufmerksamkeit benötigen. Gemeinsam können wir eine sicherere und angenehmere Umgebung für alle schaffen.",
+        "steps": {
+            "step1": {
+                "title": "Problem melden",
+                "description": "Problem entdeckt? In Sekunden gemeldet. Deine schnelle Aktion schützt die Gemeinschaft."
+            },
+            "step2": {
+                "title": "Fortschritt verfolgen",
+                "description": "Sieh zu, wie Deine Meldung Wirkung zeigt. Du erhältst ein Update, sobald der Vorfall gelöst wird."
+            },
+            "step3": {
+                "title": "Ergebnisse sehen",
+                "description": "Problem gelöst! Deine Meldung hat die Nachbarschaft verbessert."
+            }
+        },
+        "processFlow": {
+            "title": "Einfluss auf die Gemeinschaft",
+            "description": "Bei FixApp setzen wir uns dafür ein, öffentliche Räume durch schnelle Meldung und Lösung lokaler Probleme zu verbessern.",
+            "step1": "Meldung hilft schnell zu reagieren",
+            "step2": "Verfolge den Fortschritt",
+            "step3": "Gemeinschaft verbessert!"
+        }
+    },
+    "FaqSection": {
+        "title": "Häufig gestellte Fragen",
+        "items": [
+            {
+                "question": "Wie melde ich einen Vorfall?",
+                "answer": "Du kannst einen Vorfall einfach über unsere Web-App melden. Beschreibe das Problem, füge einen Standort hinzu und lade optional ein Foto hoch."
+            },
+            {
+                "question": "Wie lange dauert die Bearbeitung meiner Meldung?",
+                "answer": "Meldungen werden in der Regel innerhalb von 24-48 Stunden bearbeitet. Dringende Angelegenheiten können je nach Schweregrad schneller bearbeitet werden."
+            },
+            {
+                "question": "Ist der Service in meiner Region verfügbar?",
+                "answer": "Unser Service ist derzeit im Kanton Zug verfügbar."
+            }
+        ]
     }
 }

@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { routing } from "@/i18n/routing";
@@ -55,8 +56,9 @@ export default async function LocaleLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <Header />
+            <Header locale={locale} />
             {children}
+            <Footer locale={locale} />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

@@ -1,7 +1,6 @@
 "use client";
 import { Link } from "@/i18n/navigation";
 
-import { Button } from "@repo/ui/button";
 import { TypographySpan } from "@repo/ui/text";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -79,10 +78,16 @@ const MobileNavLink = ({
   return (
     <Link
       href={href}
+      target={href.includes("https") ? "_blank" : undefined}
       onClick={onClose}
-      className="text-5xl uppercase text-primary font-headline overflow-hidden block hover:underline underline-offset-4"
+      className="text-4xl sm:text-5xl uppercase text-primary font-headline overflow-hidden block hover:underline underline-offset-4"
     >
-      <motion.div variants={mobileLinkVars}>{title}</motion.div>
+      <motion.div
+        variants={mobileLinkVars}
+        className={`${href.includes("https") ? "underline underline-offset-5" : ""}`}
+      >
+        {title}
+      </motion.div>
     </Link>
   );
 };
@@ -90,7 +95,11 @@ const MobileNavLink = ({
 export const Menu = ({ isOpen, onClose }: MenuProps) => {
   const t = useTranslations("Navigation");
 
-  const navLinks = [{ title: t("home"), href: "/" }];
+  const navLinks = [
+    { title: t("home"), href: "/" },
+    { title: t("how-it-works"), href: "/#how-it-works" },
+    { title: "Report", href: "https://app.fixapp.ch" },
+  ];
 
   return (
     <AnimatePresence>
@@ -127,19 +136,19 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
               initial="initial"
               animate="open"
               exit="initial"
-              className="flex flex-col h-full justify-center items-center gap-6"
+              className="flex flex-col h-full justify-center items-center gap-6 text-center"
             >
-              {/* {navLinks.map((link) => (
+              {navLinks.map((link) => (
                 <MobileNavLink
                   key={link.title}
                   title={link.title}
                   href={link.href}
                   onClose={onClose}
                 />
-              ))} */}
-              <a href="https://app.fixapp.ch" target="_blank">
-                <Button className="w-full min-w-lg">Report</Button>
-              </a>
+              ))}
+              {/* <a href="https://app.fixapp.ch" target="_blank">
+                <Button className="w-full min-w-60 lg:min-w-lg">Report</Button>
+              </a> */}
             </motion.div>
             <div className="absolute bottom-12 left-0 w-full flex justify-center items-center space">
               <a href="mailto:info@fixapp.ch" target="_blank">
@@ -164,7 +173,7 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
             </div>
             <div className="absolute bottom-4 left-0 w-full flex justify-center items-center space-x-4">
               <TypographySpan className="text-primary/50" size="text-sm">
-                Copyright © {new Date().getFullYear()} Fixapp GmbH
+                Copyright © {new Date().getFullYear()} Fixapp GmbH i.G.
               </TypographySpan>
             </div>
           </div>
