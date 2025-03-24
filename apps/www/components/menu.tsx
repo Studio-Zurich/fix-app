@@ -96,7 +96,6 @@ export const Menu = ({ isOpen, onClose }: MenuProps) => {
   const t = useTranslations("Navigation");
 
   const navLinks = [
-    { title: t("home"), href: "/" },
     { title: t("how-it-works"), href: "/#how-it-works" },
     { title: "Report", href: "https://app.fixapp.ch" },
   ];

@@ -9,10 +9,7 @@ import { Menu } from "./menu";
 const Header = ({ locale }: { locale: string }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const t = useTranslations("Navigation");
-  const navLinks = [
-    { title: t("home"), href: "/" },
-    { title: t("how-it-works"), href: "/#how-it-works" },
-  ];
+  const navLinks = [{ title: t("how-it-works"), href: "/#how-it-works" }];
 
   return (
     <>
