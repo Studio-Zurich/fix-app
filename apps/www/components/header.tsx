@@ -52,7 +52,7 @@ const Header = ({ locale }: { locale: string }) => {
         </div>
         <Button
           variant="secondary"
-          className="fixed top-8 right-[5vw] lg:hidden"
+          className="fixed top-7 right-[5vw] lg:hidden"
         >
           Report
         </Button>
