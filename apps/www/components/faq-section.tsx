@@ -19,7 +19,7 @@ const FaqSection = () => {
           .raw("items")
           .map((item: { question: string; answer: string }, index: number) => (
             <AccordionItem key={`faq-${index}`} value={`item-${index + 1}`}>
-              <AccordionTrigger className="rounded-full">
+              <AccordionTrigger className="rounded-full cursor-pointer">
                 <TypographyH3 size="text-sm text-start md:text-lg">
                   {item.question}
                 </TypographyH3>

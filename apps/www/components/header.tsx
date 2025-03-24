@@ -27,9 +27,18 @@ const Header = ({ locale }: { locale: string }) => {
                   </TypographySpan>
                 </NextLink>
               ))}
-              <Button className="hidden md:flex" variant="secondary">
-                Report
-              </Button>
+              <a
+                href="https://app.fixapp.ch"
+                target="_blank"
+                className="cursor-pointer"
+              >
+                <Button
+                  className="hidden md:flex cursor-pointer"
+                  variant="secondary"
+                >
+                  Report
+                </Button>
+              </a>
             </div>
             <Button
               className="md:hidden"
