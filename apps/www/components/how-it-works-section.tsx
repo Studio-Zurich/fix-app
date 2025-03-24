@@ -133,7 +133,7 @@ const HowItWorksSection = () => {
         </div>
         <ProcessFlow activeStep={activeStep} t={t} />
       </div>
-      <div className="flex justify-center mt-24">
+      <div className="flex justify-center mt-16">
         <NextLink
           href="https://app.fixapp.ch"
           target="_blank"

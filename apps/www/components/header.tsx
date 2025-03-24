@@ -1,11 +1,18 @@
 "use client";
 import { Button } from "@repo/ui/button";
 import { TypographySpan } from "@repo/ui/text";
+import { useTranslations } from "next-intl";
 import NextLink from "next/link";
 import { useState } from "react";
 import { Menu } from "./menu";
+
 const Header = ({ locale }: { locale: string }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const t = useTranslations("Navigation");
+  const navLinks = [
+    { title: t("home"), href: "/" },
+    { title: t("how-it-works"), href: "/#how-it-works" },
+  ];
 
   return (
     <>
@@ -15,7 +22,23 @@ const Header = ({ locale }: { locale: string }) => {
             <NextLink href="/">
               <span className="text-white">Fix App</span>
             </NextLink>
-            <Button variant="secondary" onClick={() => setIsMenuOpen(true)}>
+            <div className="hidden md:flex gap-8 items-center">
+              {navLinks.map((link) => (
+                <NextLink key={link.href} href={link.href}>
+                  <TypographySpan className="text-background " size="text-base">
+                    {link.title}
+                  </TypographySpan>
+                </NextLink>
+              ))}
+              <Button className="hidden md:flex" variant="secondary">
+                Report
+              </Button>
+            </div>
+            <Button
+              className="md:hidden"
+              variant="secondary"
+              onClick={() => setIsMenuOpen(true)}
+            >
               <TypographySpan>
                 {locale === "de" ? "Menü" : "Menu"}
               </TypographySpan>
