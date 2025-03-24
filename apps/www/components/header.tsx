@@ -50,12 +50,14 @@ const Header = ({ locale }: { locale: string }) => {
             </div>
           </div>
         </div>
-        <Button
-          variant="secondary"
-          className="fixed top-7 right-[5vw] lg:hidden"
-        >
-          Report
-        </Button>
+        <a href="https://app.fixapp.ch" target="_blank">
+          <Button
+            variant="secondary"
+            className="fixed top-7 right-[5vw] lg:hidden"
+          >
+            Report
+          </Button>
+        </a>
       </header>
       <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </>
