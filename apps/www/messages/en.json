@@ -36,11 +36,18 @@
         },
         "processFlow": {
             "title": "Community Impact",
-            "description": "At FixApp, we're dedicated to improving community spaces by enabling quick reporting and resolution of local issues.",
+            "description": "With FIX, anyone can quickly report local infrastructure issues, ensuring the right authorities take action-whether it's a blocked pathway, a safety hazard, or a lost item. By bridging the gap between the public and local services, FIX helps keep Swiss communities cleaner, safer, and better connected.",
             "step1": "Report helps to react quickly",
             "step2": "Track the progress",
             "step3": "Community improved!"
         }
+    },
+    "AboutUsSection": {
+        "title": "About us",
+        "description": "FIX began with a simple question: Who takes care of abandoned bikes?",
+        "description2": "It all began with a lone bicycle in Zug. Day after day, it sat under a tree, enduring sun, rain, and snow. Four weeks went by unnoticed - until one day it simply vanished.",
+        "outro": "Was it stolen? Did the owner search for it? Did the police even know it was there?",
+        "outro2": "No one had the answer."
     },
     "FaqSection": {
         "title": "Frequently Asked Questions",

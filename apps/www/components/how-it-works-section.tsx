@@ -12,7 +12,7 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 const ProcessFlow = ({ activeStep, t }: { activeStep: number; t: any }) => (
-  <div className="relative p-8 bg-[#1010dd]/20 rounded-3xl h-full">
+  <div className="relative p-8 bg-[#ff781e]/20 rounded-3xl h-full">
     <TypographyH3 size="text-xl font-semibold mb-4">
       {t("processFlow.title")}
     </TypographyH3>
@@ -21,7 +21,7 @@ const ProcessFlow = ({ activeStep, t }: { activeStep: number; t: any }) => (
     </TypographyParagraph>
     <div className="relative">
       <div
-        className="absolute left-6 top-6 w-0.5 bg-[#1010dd] transition-all duration-300"
+        className="absolute left-6 top-6 w-0.5 bg-[#ff781e] transition-all duration-300"
         style={{
           height: `${(activeStep / 2) * 80}%`,
         }}
@@ -38,7 +38,7 @@ const ProcessFlow = ({ activeStep, t }: { activeStep: number; t: any }) => (
               className={`
                 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0
                 transition-colors duration-300
-                ${index <= activeStep ? "bg-[#1010dd] text-white" : "bg-[#1010dd]/20 text-gray-600"}
+                ${index <= activeStep ? "bg-[#ff781e] text-white" : "bg-[#ff781e]/20 text-gray-600"}
               `}
             >
               {stepNum}
@@ -86,7 +86,7 @@ const HowItWorksSection = () => {
         <div className="space-y-8">
           <TypographyH2 size="text-4xl">{t("title")}</TypographyH2>
           <div className="relative w-full">
-            <div className="absolute inset-0 bg-[#1010dd] rounded-3xl z-0" />
+            <div className="absolute inset-0 bg-[#ff781e] rounded-3xl z-0" />
 
             <div className="absolute top-8 left-6 z-10">
               <TypographySpan className="text-sm text-white">

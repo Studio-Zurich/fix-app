@@ -36,11 +36,18 @@
         },
         "processFlow": {
             "title": "Einfluss auf die Gemeinschaft",
-            "description": "Bei FixApp setzen wir uns dafür ein, öffentliche Räume durch schnelle Meldung und Lösung lokaler Probleme zu verbessern.",
+            "description": "Mit FIX kann jeder schnell lokale Infrastrukturprobleme melden, die richtigen Behörden zu informieren - ob es um einen blockierten Weg, eine Sicherheitsgefahr oder ein verlorengegangenes Item geht. Durch das Bridge-Gap zwischen der Öffentlichkeit und den lokalen Diensten hilft FIX, Schweizer Gemeinschaften sauberer, sicherer und besser verbunden zu halten.",
             "step1": "Meldung hilft schnell zu reagieren",
             "step2": "Verfolge den Fortschritt",
             "step3": "Gemeinschaft verbessert!"
         }
+    },
+    "AboutUsSection": {
+        "title": "Über uns",
+        "description": "FIX begann mit einer einfachen Frage: Wer kümmert sich um verlassene Fahrräder?",
+        "description2": "Alles begann mit einem einsamen Fahrrad in Zug. Tag für Tag stand es unter einem Baum, trotzte Sonne, Regen und Schnee. Vier Wochen lang blieb es unentdeckt - bis es eines Tages einfach verschwand.",
+        "outro": "Wurde es gestohlen? Hatte der Besitzer nach ihm gesucht? Wusste die Polizei überhaupt, dass es da war?",
+        "outro2": "Niemand hatte die Antwort."
     },
     "FaqSection": {
         "title": "Häufig gestellte Fragen",

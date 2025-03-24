@@ -13,7 +13,9 @@ const FaqSection = () => {
 
   return (
     <section className="container mx-auto px-[5vw] md:px-6 py-16 space-y-8">
-      <TypographyH2 className="text-center">{t("title")}</TypographyH2>
+      <TypographyH2 className="text-center" size="text-4xl">
+        {t("title")}
+      </TypographyH2>
       <Accordion type="single" collapsible className="space-y-4">
         {t
           .raw("items")
