@@ -47,7 +47,8 @@
         "description": "FIX began with a simple question: Who takes care of abandoned bikes?",
         "description2": "It all began with a lone bicycle in Zug. Day after day, it sat under a tree, enduring sun, rain, and snow. Four weeks went by unnoticed - until one day it simply vanished.",
         "outro": "Was it stolen? Did the owner search for it? Did the police even know it was there?",
-        "outro2": "No one had the answer."
+        "outro2": "No one had the answer.",
+        "outroButton": "Change that with your first report"
     },
     "FaqSection": {
         "title": "Frequently Asked Questions",

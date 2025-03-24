@@ -76,7 +76,7 @@ const AboutUsSection = () => {
                       className="mt-8 bg-transparent border border-[#64d25f] text-[#64d25f] shadow-none cursor-pointer hover:bg-[#64d25f] hover:text-white transition-all duration-300"
                       onClick={() => router.push("/report")}
                     >
-                      Report
+                      {t("outroButton")}
                     </Button>
                   </a>
                 </motion.div>
