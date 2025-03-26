@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import Header from "../components/header";
 
 const brockmannRegular = localFont({
   src: "./../fonts/brockmann-regular.woff2",
@@ -47,7 +46,6 @@ export default async function RootLayout({
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <Header />
           <main className="h-max w-full flex flex-col">{children}</main>
         </NextIntlClientProvider>
       </body>
