@@ -1,3 +1,5 @@
+import InitiateReport from "./components/initiate-report";
+
 export default async function DashboardPage() {
-  return <div>Dashboard</div>;
+  return <InitiateReport />;
 }
