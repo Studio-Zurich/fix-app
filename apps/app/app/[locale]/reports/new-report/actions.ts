@@ -8,6 +8,7 @@ import {
   EmailSendParams,
   FileUploadResponse,
   Location,
+  SelectedIncidentType,
 } from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
@@ -62,6 +63,8 @@ export async function submitReport(
     const locale = formData.get("locale") as "de" | "en";
     const locationJson = formData.get("location") as string;
     const location = JSON.parse(locationJson) as Location;
+    const incidentTypeJson = formData.get("incidentType") as string;
+    const incidentType = JSON.parse(incidentTypeJson) as SelectedIncidentType;
 
     // Validate file count
     if (files.length === 0) {
@@ -89,6 +92,7 @@ export async function submitReport(
       files,
       locale,
       location,
+      incidentType,
     });
 
     // Create a new report record with minimal data
@@ -99,6 +103,8 @@ export async function submitReport(
         location_lat: validatedData.location.lat,
         location_lng: validatedData.location.lng,
         location_address: validatedData.location.address,
+        incident_type_id: validatedData.incidentType.type.id,
+        incident_subtype_id: validatedData.incidentType.subtype?.id,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -235,6 +241,7 @@ export async function submitReport(
       locale: validatedData.locale,
       reportId: report.id,
       location: validatedData.location.address,
+      incidentType: validatedData.incidentType,
     };
 
     try {

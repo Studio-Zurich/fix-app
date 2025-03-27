@@ -23,6 +23,7 @@ export const ReportEmail = ({
   imageCount = defaultProps.imageCount,
   locale = defaultProps.locale,
   location,
+  incidentType,
 }: EmailProps) => {
   const t = messages[locale].mails.internal;
 
@@ -44,6 +45,7 @@ export const ReportEmail = ({
                 imageCount={imageCount}
                 locale={locale}
                 location={location}
+                incidentType={incidentType}
               />
             </Section>
           </Section>

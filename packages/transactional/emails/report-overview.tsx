@@ -4,15 +4,44 @@ import { EmailProps } from "../../../apps/app/lib/types";
 
 type ReportOverviewProps = Pick<
   EmailProps,
-  "imageCount" | "locale" | "location"
+  "imageCount" | "locale" | "location" | "incidentType"
 >;
+
+type IncidentTypeTranslation = {
+  name: string;
+  description: string;
+  subtypes?: {
+    [key: string]: {
+      name: string;
+      description: string;
+    };
+  };
+};
+
+type IncidentTypesTranslation = {
+  searchIncidentTypes: string;
+  [key: string]: IncidentTypeTranslation | string;
+};
 
 export const ReportOverview = ({
   imageCount,
   locale,
   location,
+  incidentType,
 }: ReportOverviewProps) => {
   const t = messages[locale].components.reportOverview;
+  const tTypes = messages[locale]
+    .incidentTypes as unknown as IncidentTypesTranslation;
+
+  const getIncidentTypeName = (typeName: string) => {
+    const typeTranslation = tTypes[typeName] as IncidentTypeTranslation;
+    return typeTranslation?.name || typeName;
+  };
+
+  const getIncidentSubtypeName = (typeName: string, subtypeName: string) => {
+    const typeTranslation = tTypes[typeName] as IncidentTypeTranslation;
+    return typeTranslation?.subtypes?.[subtypeName]?.name || subtypeName;
+  };
 
   return (
     <Section style={section}>
@@ -22,6 +51,16 @@ export const ReportOverview = ({
       {location && (
         <Text style={text}>
           {t.location}: {location}
+        </Text>
+      )}
+      {incidentType && (
+        <Text style={text}>
+          {t.incidentType}: {getIncidentTypeName(incidentType.type.name)}
+          {incidentType.subtype &&
+            ` - ${getIncidentSubtypeName(
+              incidentType.type.name,
+              incidentType.subtype.name
+            )}`}
         </Text>
       )}
     </Section>

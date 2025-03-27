@@ -1,10 +1,12 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
-import { Location } from "@/lib/types";
+import { IncidentSubtype, IncidentType, Location } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
+import IncidentSubtypeStep from "./incident-subtype-step";
+import IncidentTypeStep from "./incident-type-step";
 import LocationMap from "./location-map";
 
 const MAX_FILES = 5;
@@ -16,6 +18,13 @@ const ReportFlow = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
+  const [selectedType, setSelectedType] = useState<IncidentType | undefined>(
+    undefined
+  );
+  const [selectedSubtype, setSelectedSubtype] = useState<
+    IncidentSubtype | undefined
+  >(undefined);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -46,16 +55,33 @@ const ReportFlow = () => {
     setError(null);
   };
 
+  const handleTypeSelect = (type: IncidentType) => {
+    setSelectedType(type);
+    setSelectedSubtype(undefined); // Clear subtype when changing type
+  };
+
+  const handleSubtypeSelect = (subtype: IncidentSubtype) => {
+    setSelectedSubtype(subtype);
+  };
+
+  const handleNext = () => {
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    setCurrentStep((prev) => prev - 1);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!files.length) {
-      setError(t("errors.noFilesSelected"));
+    if (!location) {
+      setError(t("errors.noLocationSelected"));
       return;
     }
 
-    if (!location) {
-      setError(t("errors.noLocationSelected"));
+    if (!selectedType) {
+      setError(t("errors.noIncidentTypeSelected"));
       return;
     }
 
@@ -67,6 +93,13 @@ const ReportFlow = () => {
       files.forEach((file) => formData.append("files", file));
       formData.append("locale", locale);
       formData.append("location", JSON.stringify(location));
+      formData.append(
+        "incidentType",
+        JSON.stringify({
+          type: selectedType,
+          subtype: selectedSubtype,
+        })
+      );
 
       const result = await submitReport(formData);
       if (!result.success) {
@@ -74,9 +107,12 @@ const ReportFlow = () => {
         return;
       }
 
-      // Clear files after successful upload
+      // Clear form after successful upload
       setFiles([]);
       setLocation(null);
+      setSelectedType(undefined);
+      setSelectedSubtype(undefined);
+      setCurrentStep(1);
     } catch (err) {
       setError(t("errors.uploadFailed"));
     } finally {
@@ -91,6 +127,9 @@ const ReportFlow = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
+
+  // Check if all required fields are filled
+  const isFormValid = location && selectedType;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -182,16 +221,39 @@ const ReportFlow = () => {
             )}
           </div>
 
-          <Button type="submit" disabled={uploading}>
-            {uploading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {t("uploading")}
-              </div>
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-4">
+              {t("selectIncidentType")}
+            </h2>
+            {currentStep === 1 ? (
+              <IncidentTypeStep
+                onSelect={handleTypeSelect}
+                selectedType={selectedType}
+                onNext={handleNext}
+              />
             ) : (
-              t("uploadImage")
+              <IncidentSubtypeStep
+                selectedType={selectedType!}
+                onSelect={handleSubtypeSelect}
+                selectedSubtype={selectedSubtype}
+                onNext={handleNext}
+                onBack={handleBack}
+              />
             )}
-          </Button>
+          </div>
+
+          {isFormValid && (
+            <Button type="submit" disabled={uploading}>
+              {uploading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t("uploading")}
+                </div>
+              ) : (
+                t("uploadImage")
+              )}
+            </Button>
+          )}
         </>
       )}
 

@@ -25,8 +25,23 @@ export const contactInfoSchema = z.object({
 
 // Incident type validation
 export const incidentTypeSchema = z.object({
-  name: z.string().min(1, "Incident type is required"),
-  subtype: z.string().optional(),
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  active: z.boolean(),
+});
+
+export const incidentSubtypeSchema = z.object({
+  id: z.string(),
+  incident_type_id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  active: z.boolean(),
+});
+
+export const selectedIncidentTypeSchema = z.object({
+  type: incidentTypeSchema,
+  subtype: incidentSubtypeSchema.optional(),
 });
 
 // Report submission validation
@@ -34,4 +49,5 @@ export const reportSubmissionSchema = z.object({
   files: z.array(fileSchema),
   locale: z.enum(["de", "en"]),
   location: locationSchema,
+  incidentType: selectedIncidentTypeSchema,
 });

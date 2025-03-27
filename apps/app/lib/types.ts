@@ -24,6 +24,10 @@ export type EmailMessages = {
     };
     reportOverview: {
       imagesUploaded: string;
+      image: string;
+      images: string;
+      location: string;
+      incidentType: string;
     };
   };
   mails: {
@@ -56,11 +60,11 @@ export type BaseEmailProps = {
 // Extended email props for internal emails
 export type EmailProps = BaseEmailProps & {
   reportId?: string;
-  reporterName?: string; // Make optional since we don't have it yet
-  reporterEmail?: string; // Make optional since we don't have it yet
-  location?: string; // Make optional since we don't have it yet
-  description?: string; // Make optional since we don't have it yet
-  incidentType?: IncidentType; // Make optional since we don't have it yet
+  reporterName?: string;
+  reporterEmail?: string;
+  location?: string;
+  description?: string;
+  incidentType?: SelectedIncidentType;
 };
 
 // Report related types
@@ -79,9 +83,25 @@ export type ContactInfo = {
   phone?: string;
 };
 
+// Incident type related types
 export type IncidentType = {
+  id: string;
   name: string;
-  subtype?: string;
+  description: string | null;
+  active: boolean;
+};
+
+export type IncidentSubtype = {
+  id: string;
+  incident_type_id: string;
+  name: string;
+  description: string | null;
+  active: boolean;
+};
+
+export type SelectedIncidentType = {
+  type: IncidentType;
+  subtype?: IncidentSubtype;
 };
 
 // File upload related types
