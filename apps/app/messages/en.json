@@ -13,10 +13,18 @@
             "takePhotoOrChooseImage": "Take a photo or choose an image",
             "uploading": "Uploading...",
             "uploadImage": "Upload image",
+            "filesSelected": "{count} file selected",
+            "filesSelectedPlural": "{count} files selected",
+            "clearAll": "Clear all",
+            "remove": "Remove",
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
                 "uploadFailed": "Upload failed",
-                "fileTooLarge": "File exceeds maximum size of 5MB"
+                "fileTooLarge": "File exceeds maximum size of 5MB",
+                "tooManyFiles": "Too many files. Maximum is {max}",
+                "noFilesSelected": "No files selected",
+                "databaseError": "Database error",
+                "someUploadsFailed": "Some uploads failed"
             }
         },
         "reportOverview": {

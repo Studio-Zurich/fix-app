@@ -43,7 +43,9 @@ const ReportFlow = () => {
     setError(null);
   };
 
-  const handleUpload = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!files.length) {
       setError(t("errors.noFilesSelected"));
       return;
@@ -81,7 +83,7 @@ const ReportFlow = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="relative">
         <input
           type="file"
@@ -103,8 +105,13 @@ const ReportFlow = () => {
           {files.length > 0 ? (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span>{t("filesSelected", { count: files.length })}</span>
+                <span>
+                  {files.length === 1
+                    ? t("filesSelected", { count: files.length })
+                    : t("filesSelectedPlural", { count: files.length })}
+                </span>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={(e) => {
@@ -129,6 +136,7 @@ const ReportFlow = () => {
                       </span>
                     </div>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={(e) => {
@@ -151,7 +159,7 @@ const ReportFlow = () => {
       </div>
 
       {files.length > 0 && (
-        <Button onClick={handleUpload} disabled={uploading}>
+        <Button type="submit" disabled={uploading}>
           {uploading ? (
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -168,7 +176,7 @@ const ReportFlow = () => {
           {error}
         </p>
       )}
-    </div>
+    </form>
   );
 };
 
