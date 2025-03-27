@@ -104,6 +104,12 @@ export type SelectedIncidentType = {
   subtype?: IncidentSubtype;
 };
 
+// Report description type
+export type ReportDescription = {
+  text: string;
+  maxLength: number;
+};
+
 // File upload related types
 export type ReportError = {
   code:

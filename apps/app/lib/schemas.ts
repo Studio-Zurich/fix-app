@@ -44,10 +44,17 @@ export const selectedIncidentTypeSchema = z.object({
   subtype: incidentSubtypeSchema.optional(),
 });
 
+// Report description validation
+export const reportDescriptionSchema = z.object({
+  text: z.string().max(500, "Description must be at most 500 characters"),
+  maxLength: z.number().default(500),
+});
+
 // Report submission validation
 export const reportSubmissionSchema = z.object({
   files: z.array(fileSchema),
   locale: z.enum(["de", "en"]),
   location: locationSchema,
   incidentType: selectedIncidentTypeSchema,
+  description: reportDescriptionSchema.optional(),
 });

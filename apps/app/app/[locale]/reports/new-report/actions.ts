@@ -8,6 +8,7 @@ import {
   EmailSendParams,
   FileUploadResponse,
   Location,
+  ReportDescription,
   SelectedIncidentType,
 } from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
@@ -65,6 +66,10 @@ export async function submitReport(
     const location = JSON.parse(locationJson) as Location;
     const incidentTypeJson = formData.get("incidentType") as string;
     const incidentType = JSON.parse(incidentTypeJson) as SelectedIncidentType;
+    const descriptionJson = formData.get("description") as string | null;
+    const description = descriptionJson
+      ? (JSON.parse(descriptionJson) as ReportDescription)
+      : undefined;
 
     // Validate file count
     if (files.length === 0) {
@@ -93,6 +98,7 @@ export async function submitReport(
       locale,
       location,
       incidentType,
+      description,
     });
 
     // Create a new report record with minimal data
@@ -105,6 +111,7 @@ export async function submitReport(
         location_address: validatedData.location.address,
         incident_type_id: validatedData.incidentType.type.id,
         incident_subtype_id: validatedData.incidentType.subtype?.id,
+        description: validatedData.description?.text,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -242,6 +249,7 @@ export async function submitReport(
       reportId: report.id,
       location: validatedData.location.address,
       incidentType: validatedData.incidentType,
+      description: validatedData.description?.text,
     };
 
     try {

@@ -1,10 +1,16 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
-import { IncidentSubtype, IncidentType, Location } from "@/lib/types";
+import {
+  IncidentSubtype,
+  IncidentType,
+  Location,
+  ReportDescription,
+} from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
+import IncidentDescriptionStep from "./incident-description-step";
 import IncidentSubtypeStep from "./incident-subtype-step";
 import IncidentTypeStep from "./incident-type-step";
 import LocationMap from "./location-map";
@@ -24,6 +30,9 @@ const ReportFlow = () => {
   const [selectedSubtype, setSelectedSubtype] = useState<
     IncidentSubtype | undefined
   >(undefined);
+  const [description, setDescription] = useState<ReportDescription | undefined>(
+    undefined
+  );
   const [currentStep, setCurrentStep] = useState(1);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +73,10 @@ const ReportFlow = () => {
     setSelectedSubtype(subtype);
   };
 
+  const handleDescriptionChange = (newDescription: ReportDescription) => {
+    setDescription(newDescription);
+  };
+
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
   };
@@ -100,6 +113,9 @@ const ReportFlow = () => {
           subtype: selectedSubtype,
         })
       );
+      if (description) {
+        formData.append("description", JSON.stringify(description));
+      }
 
       const result = await submitReport(formData);
       if (!result.success) {
@@ -112,6 +128,7 @@ const ReportFlow = () => {
       setLocation(null);
       setSelectedType(undefined);
       setSelectedSubtype(undefined);
+      setDescription(undefined);
       setCurrentStep(1);
     } catch (err) {
       setError(t("errors.uploadFailed"));
@@ -231,13 +248,21 @@ const ReportFlow = () => {
                 selectedType={selectedType}
                 onNext={handleNext}
               />
-            ) : (
+            ) : currentStep === 2 ? (
               <IncidentSubtypeStep
                 selectedType={selectedType!}
                 onSelect={handleSubtypeSelect}
                 selectedSubtype={selectedSubtype}
                 onNext={handleNext}
                 onBack={handleBack}
+              />
+            ) : (
+              <IncidentDescriptionStep
+                selectedType={selectedType!}
+                onDescriptionChange={handleDescriptionChange}
+                onNext={handleNext}
+                onBack={handleBack}
+                initialDescription={description?.text}
               />
             )}
           </div>

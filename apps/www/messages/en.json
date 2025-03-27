@@ -17,6 +17,49 @@
         "privacy": "Privacy",
         "how-it-works": "How it works"
     },
+    "components": {
+        "reportFlow": {
+            "takePhotoOrChooseImage": "Take a photo or choose an image",
+            "uploading": "Uploading...",
+            "uploadImage": "Upload image",
+            "filesSelected": "{count} file selected",
+            "filesSelectedPlural": "{count} files selected",
+            "clearAll": "Clear all",
+            "remove": "Remove",
+            "selectLocation": "Select location",
+            "selectedLocation": "Selected location: {address}",
+            "selectIncidentType": "Select incident type",
+            "addDescription": "Add description",
+            "descriptionPlaceholder": "Describe the incident...",
+            "charactersLeft": "{count} characters left",
+            "descriptionGuidelines": {
+                "title": "Guidelines",
+                "specific": "Be as specific as possible",
+                "noPersonalInfo": "No personal information",
+                "respectful": "Stay respectful",
+                "noOffensive": "No offensive content"
+            },
+            "errors": {
+                "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
+                "uploadFailed": "Upload failed",
+                "fileTooLarge": "File exceeds maximum size of 5MB",
+                "tooManyFiles": "Too many files. Maximum is {max}",
+                "noFilesSelected": "No files selected",
+                "databaseError": "Database error",
+                "someUploadsFailed": "Some uploads failed",
+                "noLocationSelected": "Please select a location",
+                "noIncidentTypeSelected": "Please select an incident type"
+            }
+        },
+        "reportOverview": {
+            "imagesUploaded": "Images uploaded",
+            "image": "Image",
+            "images": "Images",
+            "location": "Location",
+            "incidentType": "Incident type",
+            "description": "Description"
+        }
+    },
     "how-it-works-section": {
         "title": "How it works",
         "description": "Help make your community better by reporting issues that need attention. Together we can create a safer and more pleasant environment for everyone.",

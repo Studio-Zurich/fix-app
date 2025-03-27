@@ -19,6 +19,17 @@
             "remove": "Entfernen",
             "selectLocation": "Standort auswählen",
             "selectedLocation": "Ausgewählter Standort: {address}",
+            "selectIncidentType": "Vorfallstyp auswählen",
+            "addDescription": "Beschreibung hinzufügen",
+            "descriptionPlaceholder": "Beschreiben Sie den Vorfall...",
+            "charactersLeft": "{count} Zeichen übrig",
+            "descriptionGuidelines": {
+                "title": "Richtlinien",
+                "specific": "Seien Sie so spezifisch wie möglich",
+                "noPersonalInfo": "Keine persönlichen Informationen",
+                "respectful": "Bleiben Sie respektvoll",
+                "noOffensive": "Keine anstößigen Inhalte"
+            },
             "errors": {
                 "invalidFileType": "Ungültiger Dateityp. Nur JPEG, PNG und GIF sind erlaubt",
                 "uploadFailed": "Upload fehlgeschlagen",
@@ -27,7 +38,8 @@
                 "noFilesSelected": "Keine Dateien ausgewählt",
                 "databaseError": "Datenbankfehler",
                 "someUploadsFailed": "Einige Uploads fehlgeschlagen",
-                "noLocationSelected": "Bitte wählen Sie einen Standort aus"
+                "noLocationSelected": "Bitte wählen Sie einen Standort aus",
+                "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
             }
         },
         "reportOverview": {
@@ -35,7 +47,8 @@
             "image": "Bild",
             "images": "Bilder",
             "location": "Standort",
-            "incidentType": "Vorfallstyp"
+            "incidentType": "Vorfallstyp",
+            "description": "Beschreibung"
         }
     },
     "mails": {
