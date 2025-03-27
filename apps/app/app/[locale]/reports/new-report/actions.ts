@@ -11,13 +11,17 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getCETTimestamp() {
+  // Create a date object with the current time and set it to Swiss timezone
   const now = new Date();
-  const cetDate = new Date(
-    now.toLocaleString("en-US", { timeZone: "Europe/Zurich" })
+  // Use a more reliable approach for getting a timestamp in Swiss time
+  return (
+    now
+      .toLocaleString("sv-SE", { timeZone: "Europe/Zurich" })
+      .replace(" ", "T") + ".000Z"
   );
-  return cetDate.toISOString();
 }
 
+// Move this function above where it's used
 async function sendEmailWithRetry(params: EmailSendParams, maxRetries = 3) {
   let lastError: Error | null = null;
 
