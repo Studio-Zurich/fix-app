@@ -21,6 +21,7 @@ const defaultProps: EmailProps = {
 export const ReportEmail = ({
   imageCount = defaultProps.imageCount,
   locale = defaultProps.locale,
+  location,
 }: EmailProps) => {
   return (
     <Html>
@@ -36,7 +37,11 @@ export const ReportEmail = ({
             </Heading>
 
             <Section style={section}>
-              <ReportOverview imageCount={imageCount} locale={locale} />
+              <ReportOverview
+                imageCount={imageCount}
+                locale={locale}
+                location={location}
+              />
             </Section>
           </Section>
 

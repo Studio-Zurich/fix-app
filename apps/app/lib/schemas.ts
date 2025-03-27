@@ -33,4 +33,5 @@ export const incidentTypeSchema = z.object({
 export const reportSubmissionSchema = z.object({
   files: z.array(fileSchema),
   locale: z.enum(["de", "en"]),
+  location: locationSchema,
 });

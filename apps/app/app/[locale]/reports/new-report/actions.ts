@@ -88,6 +88,7 @@ export async function submitReport(
     const validatedData = reportSubmissionSchema.parse({
       files,
       locale,
+      location,
     });
 
     // Create a new report record with minimal data
@@ -95,9 +96,9 @@ export async function submitReport(
       .from("reports")
       .insert({
         status: "new",
-        location_lat: location.lat,
-        location_lng: location.lng,
-        location_address: location.address,
+        location_lat: validatedData.location.lat,
+        location_lng: validatedData.location.lng,
+        location_address: validatedData.location.address,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -233,7 +234,7 @@ export async function submitReport(
       imageCount: files.length,
       locale: validatedData.locale,
       reportId: report.id,
-      location: location.address,
+      location: validatedData.location.address,
     };
 
     try {
