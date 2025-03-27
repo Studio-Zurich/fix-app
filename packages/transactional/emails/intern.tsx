@@ -25,6 +25,7 @@ export const ReportEmail = ({
   location,
   incidentType,
   description,
+  userData,
 }: EmailProps) => {
   const t = messages[locale].mails.internal;
 
@@ -48,6 +49,7 @@ export const ReportEmail = ({
                 location={location}
                 incidentType={incidentType}
                 description={description}
+                userData={userData}
               />
             </Section>
           </Section>

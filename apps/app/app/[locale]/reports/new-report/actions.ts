@@ -10,6 +10,7 @@ import {
   Location,
   ReportDescription,
   SelectedIncidentType,
+  UserData,
 } from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
@@ -71,6 +72,9 @@ export async function submitReport(
       ? (JSON.parse(descriptionJson) as ReportDescription)
       : undefined;
 
+    const userDataJson = formData.get("userData") as string;
+    const userData = JSON.parse(userDataJson) as UserData;
+
     // Validate file count
     if (files.length === 0) {
       return {
@@ -99,9 +103,10 @@ export async function submitReport(
       location,
       incidentType,
       description,
+      userData,
     });
 
-    // Create a new report record with minimal data
+    // Create a new report record with user data
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
@@ -112,6 +117,10 @@ export async function submitReport(
         incident_type_id: validatedData.incidentType.type.id,
         incident_subtype_id: validatedData.incidentType.subtype?.id,
         description: validatedData.description?.text,
+        reporter_first_name: validatedData.userData.firstName,
+        reporter_last_name: validatedData.userData.lastName,
+        reporter_email: validatedData.userData.email,
+        reporter_phone: validatedData.userData.phone,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -250,6 +259,7 @@ export async function submitReport(
       location: validatedData.location.address,
       incidentType: validatedData.incidentType,
       description: validatedData.description?.text,
+      userData: validatedData.userData,
     };
 
     try {

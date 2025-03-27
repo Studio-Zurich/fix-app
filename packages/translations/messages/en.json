@@ -48,7 +48,29 @@
             "images": "Images",
             "location": "Location",
             "incidentType": "Incident Type",
-            "description": "Description"
+            "description": "Description",
+            "reporter": "Reporter",
+            "reporterEmail": "Reporter Email",
+            "reporterPhone": "Reporter Phone"
+        },
+        "userData": {
+            "title": "Your Contact Information",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "email": "Email",
+            "phone": "Phone (optional)",
+            "whyProvideInfo": "Why do we ask for your information?",
+            "reasons": {
+                "updates": "To keep you updated about your report",
+                "followUp": "For potential follow-up questions",
+                "confirmation": "To confirm your report submission"
+            },
+            "requiredFields": "* Required fields",
+            "errors": {
+                "firstNameRequired": "First name is required",
+                "lastNameRequired": "Last name is required",
+                "invalidEmail": "Invalid email address"
+            }
         }
     },
     "mails": {

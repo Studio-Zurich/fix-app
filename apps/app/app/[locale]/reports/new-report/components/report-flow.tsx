@@ -5,6 +5,7 @@ import {
   IncidentType,
   Location,
   ReportDescription,
+  UserData as UserDataType,
 } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
@@ -15,6 +16,7 @@ import IncidentSubtypeStep from "./incident-subtype-step";
 import IncidentTypeStep from "./incident-type-step";
 import LocationMap from "./location-map";
 import ReportSummaryStep from "./report-summary-step";
+import UserData from "./user-data";
 
 const MAX_FILES = 5;
 
@@ -35,6 +37,7 @@ const ReportFlow = () => {
     undefined
   );
   const [currentStep, setCurrentStep] = useState(1);
+  const [userData, setUserData] = useState<UserDataType | undefined>(undefined);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -78,6 +81,10 @@ const ReportFlow = () => {
     setDescription(newDescription);
   };
 
+  const handleUserDataChange = (data: UserDataType) => {
+    setUserData(data);
+  };
+
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
   };
@@ -89,13 +96,8 @@ const ReportFlow = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!location) {
-      setError(t("errors.noLocationSelected"));
-      return;
-    }
-
-    if (!selectedType) {
-      setError(t("errors.noIncidentTypeSelected"));
+    if (!location || !selectedType || !userData) {
+      setError(t("errors.missingRequiredFields"));
       return;
     }
 
@@ -117,6 +119,7 @@ const ReportFlow = () => {
       if (description) {
         formData.append("description", JSON.stringify(description));
       }
+      formData.append("userData", JSON.stringify(userData));
 
       const result = await submitReport(formData);
       if (!result.success) {
@@ -130,6 +133,7 @@ const ReportFlow = () => {
       setSelectedType(undefined);
       setSelectedSubtype(undefined);
       setDescription(undefined);
+      setUserData(undefined);
       setCurrentStep(1);
     } catch (err) {
       setError(t("errors.uploadFailed"));
@@ -311,6 +315,21 @@ const ReportFlow = () => {
       case 6:
         return (
           <div className="space-y-4">
+            <h2 className="text-lg font-semibold mb-4">
+              {t("userData.title")}
+            </h2>
+            <UserData
+              onDataChange={handleUserDataChange}
+              onNext={handleNext}
+              onBack={handleBack}
+              initialData={userData}
+            />
+          </div>
+        );
+
+      case 7:
+        return (
+          <div className="space-y-4">
             <ReportSummaryStep
               files={files}
               location={location!}
@@ -319,6 +338,7 @@ const ReportFlow = () => {
                 subtype: selectedSubtype,
               }}
               description={description}
+              userData={userData!}
               onBack={handleBack}
               onSubmit={handleSubmit}
               isSubmitting={uploading}

@@ -1,6 +1,11 @@
 "use client";
 
-import { Location, ReportDescription, SelectedIncidentType } from "@/lib/types";
+import {
+  Location,
+  ReportDescription,
+  SelectedIncidentType,
+  UserData,
+} from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useTranslations } from "next-intl";
 
@@ -12,6 +17,7 @@ interface ReportSummaryStepProps {
   onBack: () => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
+  userData: UserData;
 }
 
 export default function ReportSummaryStep({
@@ -22,6 +28,7 @@ export default function ReportSummaryStep({
   onBack,
   onSubmit,
   isSubmitting,
+  userData,
 }: ReportSummaryStepProps) {
   const t = useTranslations("components.reportFlow");
 
@@ -76,6 +83,18 @@ export default function ReportSummaryStep({
             </p>
           </div>
         )}
+
+        {/* User Data Summary */}
+        <div className="space-y-2">
+          <h4 className="font-medium">{t("summary.contactInfo")}</h4>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>
+              {userData.firstName} {userData.lastName}
+            </p>
+            <p>{userData.email}</p>
+            {userData.phone && <p>{userData.phone}</p>}
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between mt-6">

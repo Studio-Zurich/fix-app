@@ -28,6 +28,10 @@ export type EmailMessages = {
       images: string;
       location: string;
       incidentType: string;
+      description: string;
+      reporter: string;
+      reporterEmail: string;
+      reporterPhone: string;
     };
   };
   mails: {
@@ -65,6 +69,7 @@ export type EmailProps = BaseEmailProps & {
   location?: string;
   description?: string;
   incidentType?: SelectedIncidentType;
+  userData?: UserData;
 };
 
 // Report related types
@@ -141,4 +146,12 @@ export type EmailSendParams = {
   subject: string;
   react: React.ReactElement;
   attachments?: FileAttachment[];
+};
+
+// User data related types
+export type UserData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
 };

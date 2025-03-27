@@ -4,7 +4,12 @@ import { EmailProps } from "../../../apps/app/lib/types";
 
 type ReportOverviewProps = Pick<
   EmailProps,
-  "imageCount" | "locale" | "location" | "incidentType" | "description"
+  | "imageCount"
+  | "locale"
+  | "location"
+  | "incidentType"
+  | "description"
+  | "userData"
 >;
 
 type IncidentTypeTranslation = {
@@ -29,6 +34,7 @@ export const ReportOverview = ({
   location,
   incidentType,
   description,
+  userData,
 }: ReportOverviewProps) => {
   const t = messages[locale].components.reportOverview;
   const tTypes = messages[locale]
@@ -68,6 +74,21 @@ export const ReportOverview = ({
         <Text style={text}>
           {t.description}: {description}
         </Text>
+      )}
+      {userData && (
+        <>
+          <Text style={text}>
+            {t.reporter}: {userData.firstName} {userData.lastName}
+          </Text>
+          <Text style={text}>
+            {t.reporterEmail}: {userData.email}
+          </Text>
+          {userData.phone && (
+            <Text style={text}>
+              {t.reporterPhone}: {userData.phone}
+            </Text>
+          )}
+        </>
       )}
     </Section>
   );

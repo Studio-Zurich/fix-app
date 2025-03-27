@@ -4,6 +4,7 @@
 // import { useRouter } from "@/i18n/routing";
 // import { useReportStore } from "@/lib/store";
 // import { createClient } from "@/lib/supabase/client";
+// import { UserData } from "@/lib/types";
 // import {
 //   Buildings,
 //   Camera,
@@ -38,14 +39,33 @@
 //   phone?: string;
 // }
 
-// export default function SummaryStep() {
+// interface SummaryStepProps {
+//   files: File[];
+//   location: Location;
+//   selectedType: SelectedIncidentType;
+//   description?: ReportDescription;
+//   onBack: () => void;
+//   onSubmit: (e: React.FormEvent) => void;
+//   isSubmitting: boolean;
+//   userData: UserData;
+// }
+
+// export default function SummaryStep({
+//   files,
+//   location,
+//   selectedType,
+//   description,
+//   onBack,
+//   onSubmit,
+//   isSubmitting,
+//   userData,
+// }: SummaryStepProps) {
 //   const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
 //   const [selectedSubtype, setSelectedSubtype] =
 //     useState<IncidentSubtype | null>(null);
 //   const [departmentInfo, setDepartmentInfo] = useState<DepartmentInfo | null>(
 //     null
 //   );
-//   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [error, setError] = useState<string | null>(null);
 
 //   const reportData = useReportStore((state) => state.reportData);
