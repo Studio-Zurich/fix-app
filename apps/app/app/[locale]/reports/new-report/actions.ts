@@ -44,27 +44,40 @@ export async function submitReport(
   const supabase = await createClient();
   const timestamp = getCETTimestamp();
   const t = await getTranslations();
+  let uploadedFiles: string[] = [];
+  let files: File[] = [];
 
   try {
     // Get and validate form data
-    const files = formData.getAll("files") as File[];
+    files = formData.getAll("files") as File[];
     const locale = formData.get("locale") as "de" | "en";
+
+    // Validate file count
+    if (files.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: "NO_FILES",
+          message: t("components.reportFlow.errors.noFilesSelected"),
+        },
+      };
+    }
+
+    if (files.length > 5) {
+      return {
+        success: false,
+        error: {
+          code: "TOO_MANY_FILES",
+          message: t("components.reportFlow.errors.tooManyFiles", { max: 5 }),
+        },
+      };
+    }
 
     // Validate submission data
     const validatedData = reportSubmissionSchema.parse({
       files,
       locale,
     });
-
-    // Validate files
-    for (const file of files) {
-      if (file.size > FILE_CONSTANTS.MAX_SIZE) {
-        throw new Error(t("components.reportFlow.errors.fileTooLarge"));
-      }
-      if (!FILE_CONSTANTS.ALLOWED_TYPES.includes(file.type as any)) {
-        throw new Error(t("components.reportFlow.errors.invalidFileType"));
-      }
-    }
 
     // Create a new report record with minimal data
     const { data: report, error: reportError } = await supabase
@@ -78,12 +91,16 @@ export async function submitReport(
       .single();
 
     if (reportError) {
-      console.error("Error creating report:", reportError);
+      console.error("Error creating report:", {
+        error: reportError,
+        timestamp,
+        fileCount: files.length,
+      });
       return {
         success: false,
         error: {
-          code: "UPLOAD_FAILED",
-          message: t("components.reportFlow.errors.uploadFailed"),
+          code: "DATABASE_ERROR",
+          message: t("components.reportFlow.errors.databaseError"),
         },
       };
     }
@@ -93,9 +110,17 @@ export async function submitReport(
       const fileExt = file.name.split(".").pop()?.toLowerCase();
       if (
         !fileExt ||
-        !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(fileExt as any)
+        !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
+          fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
+        )
       ) {
-        throw new Error(t("components.reportFlow.errors.invalidFileType"));
+        return {
+          success: false,
+          error: {
+            code: "INVALID_FILE_TYPE",
+            message: t("components.reportFlow.errors.invalidFileType"),
+          },
+        };
       }
 
       const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -106,9 +131,22 @@ export async function submitReport(
         .upload(filePath, file);
 
       if (uploadError) {
-        console.error("Error uploading file:", uploadError);
-        throw uploadError;
+        console.error("Error uploading file:", {
+          error: uploadError,
+          fileName,
+          fileSize: file.size,
+          fileType: file.type,
+        });
+        return {
+          success: false,
+          error: {
+            code: "UPLOAD_FAILED",
+            message: t("components.reportFlow.errors.uploadFailed"),
+          },
+        };
       }
+
+      uploadedFiles.push(filePath);
 
       // Create report_images record
       const { error: imageError } = await supabase
@@ -123,15 +161,50 @@ export async function submitReport(
         });
 
       if (imageError) {
-        console.error("Error creating report image record:", imageError);
-        throw imageError;
+        console.error("Error creating report image record:", {
+          error: imageError,
+          filePath,
+          reportId: report.id,
+        });
+        // Try to clean up the uploaded file
+        await supabase.storage.from("report-images").remove([filePath]);
+        uploadedFiles = uploadedFiles.filter((f) => f !== filePath);
+        return {
+          success: false,
+          error: {
+            code: "DATABASE_ERROR",
+            message: t("components.reportFlow.errors.databaseError"),
+          },
+        };
       }
 
-      return filePath;
+      return { success: true, filePath };
     });
 
     // Wait for all uploads to complete
-    await Promise.all(uploadPromises);
+    const uploadResults = await Promise.all(uploadPromises);
+    const failedUploads = uploadResults.filter((result) => !result.success);
+
+    if (failedUploads.length > 0) {
+      // Clean up any successfully uploaded files
+      if (uploadedFiles.length > 0) {
+        await supabase.storage.from("report-images").remove(uploadedFiles);
+      }
+
+      console.error("Some uploads failed:", {
+        totalFiles: files.length,
+        failedCount: failedUploads.length,
+        errors: failedUploads.map((u) => u.error),
+      });
+
+      return {
+        success: false,
+        error: {
+          code: "UPLOAD_FAILED",
+          message: t("components.reportFlow.errors.someUploadsFailed"),
+        },
+      };
+    }
 
     // Prepare attachments for internal email
     const attachments = await Promise.all(
@@ -145,6 +218,7 @@ export async function submitReport(
     const emailProps: EmailProps = {
       imageCount: files.length,
       locale: validatedData.locale,
+      reportId: report.id,
     };
 
     try {
@@ -156,13 +230,28 @@ export async function submitReport(
         attachments,
       });
     } catch (error) {
-      console.error("Error sending internal email:", error);
+      console.error("Error sending internal email:", {
+        error,
+        reportId: report.id,
+        fileCount: files.length,
+      });
       // Log the error but don't fail the whole process
+      // The files are already uploaded and the report is created
     }
 
     return { success: true, reportId: report.id };
   } catch (error) {
-    console.error("Error in submitReport:", error);
+    console.error("Error in submitReport:", {
+      error,
+      timestamp,
+      fileCount: files?.length,
+    });
+
+    // Clean up any uploaded files if there was an error
+    if (uploadedFiles.length > 0) {
+      await supabase.storage.from("report-images").remove(uploadedFiles);
+    }
+
     return {
       success: false,
       error: {

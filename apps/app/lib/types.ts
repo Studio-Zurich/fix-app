@@ -83,7 +83,14 @@ export type IncidentType = {
 
 // File upload related types
 export type ReportError = {
-  code: "FILE_TOO_LARGE" | "INVALID_FILE_TYPE" | "UPLOAD_FAILED" | "UNKNOWN";
+  code:
+    | "FILE_TOO_LARGE"
+    | "INVALID_FILE_TYPE"
+    | "UPLOAD_FAILED"
+    | "UNKNOWN"
+    | "NO_FILES"
+    | "TOO_MANY_FILES"
+    | "DATABASE_ERROR";
   message: string;
 };
 

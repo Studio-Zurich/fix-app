@@ -2,20 +2,10 @@ import { z } from "zod";
 import { FILE_CONSTANTS } from "./constants";
 
 // File upload validation
-export const fileUploadSchema = z.object({
-  files: z.array(
-    z.object({
-      size: z
-        .number()
-        .max(FILE_CONSTANTS.MAX_SIZE, "File size must be less than 5MB"),
-      type: z.enum(FILE_CONSTANTS.ALLOWED_TYPES, {
-        errorMap: () => ({
-          message: "Invalid file type. Only JPEG, PNG and GIF are allowed",
-        }),
-      }),
-      name: z.string(),
-    })
-  ),
+export const fileSchema = z.object({
+  size: z.number().max(FILE_CONSTANTS.MAX_SIZE),
+  type: z.enum(FILE_CONSTANTS.ALLOWED_TYPES),
+  name: z.string(),
 });
 
 // Location validation
@@ -41,6 +31,6 @@ export const incidentTypeSchema = z.object({
 
 // Report submission validation
 export const reportSubmissionSchema = z.object({
-  files: z.array(z.any()),
+  files: z.array(fileSchema),
   locale: z.enum(["de", "en"]),
 });
