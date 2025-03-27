@@ -1,5 +1,10 @@
-import InitiateReport from "./components/initiate-report";
+import { Link } from "@/i18n/routing";
 
 export default async function DashboardPage() {
-  return <InitiateReport />;
+  return (
+    <div>
+      hello
+      <Link href="/reports/new">Report</Link>
+    </div>
+  );
 }
