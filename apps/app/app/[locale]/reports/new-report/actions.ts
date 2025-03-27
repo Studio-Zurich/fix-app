@@ -3,7 +3,12 @@
 import { EMAIL_CONSTANTS, FILE_CONSTANTS } from "@/lib/constants";
 import { reportSubmissionSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
-import { EmailProps, EmailSendParams, FileUploadResponse } from "@/lib/types";
+import {
+  EmailProps,
+  EmailSendParams,
+  FileUploadResponse,
+  Location,
+} from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
 import { Resend } from "resend";
@@ -55,6 +60,8 @@ export async function submitReport(
     // Get and validate form data
     files = formData.getAll("files") as File[];
     const locale = formData.get("locale") as "de" | "en";
+    const locationJson = formData.get("location") as string;
+    const location = JSON.parse(locationJson) as Location;
 
     // Validate file count
     if (files.length === 0) {
@@ -88,6 +95,9 @@ export async function submitReport(
       .from("reports")
       .insert({
         status: "new",
+        location_lat: location.lat,
+        location_lng: location.lng,
+        location_address: location.address,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -223,6 +233,7 @@ export async function submitReport(
       imageCount: files.length,
       locale: validatedData.locale,
       reportId: report.id,
+      location: location.address,
     };
 
     try {

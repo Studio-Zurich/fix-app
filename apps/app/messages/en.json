@@ -17,6 +17,8 @@
             "filesSelectedPlural": "{count} files selected",
             "clearAll": "Clear all",
             "remove": "Remove",
+            "selectLocation": "Select Location",
+            "selectedLocation": "Selected location: {address}",
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
                 "uploadFailed": "Upload failed",
@@ -24,7 +26,8 @@
                 "tooManyFiles": "Too many files. Maximum is {max}",
                 "noFilesSelected": "No files selected",
                 "databaseError": "Database error",
-                "someUploadsFailed": "Some uploads failed"
+                "someUploadsFailed": "Some uploads failed",
+                "noLocationSelected": "Please select a location"
             }
         },
         "reportOverview": {

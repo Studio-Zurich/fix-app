@@ -1,9 +1,11 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
+import { Location } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
+import LocationMap from "./location-map";
 
 const MAX_FILES = 5;
 
@@ -13,6 +15,7 @@ const ReportFlow = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<Location | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -51,6 +54,11 @@ const ReportFlow = () => {
       return;
     }
 
+    if (!location) {
+      setError(t("errors.noLocationSelected"));
+      return;
+    }
+
     setUploading(true);
     setError(null);
 
@@ -58,6 +66,7 @@ const ReportFlow = () => {
       const formData = new FormData();
       files.forEach((file) => formData.append("files", file));
       formData.append("locale", locale);
+      formData.append("location", JSON.stringify(location));
 
       const result = await submitReport(formData);
       if (!result.success) {
@@ -67,6 +76,7 @@ const ReportFlow = () => {
 
       // Clear files after successful upload
       setFiles([]);
+      setLocation(null);
     } catch (err) {
       setError(t("errors.uploadFailed"));
     } finally {
@@ -159,16 +169,30 @@ const ReportFlow = () => {
       </div>
 
       {files.length > 0 && (
-        <Button type="submit" disabled={uploading}>
-          {uploading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t("uploading")}
-            </div>
-          ) : (
-            t("uploadImage")
-          )}
-        </Button>
+        <>
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-4">
+              {t("selectLocation")}
+            </h2>
+            <LocationMap onLocationSelect={setLocation} />
+            {location && (
+              <p className="mt-2 text-sm text-gray-500">
+                {t("selectedLocation", { address: location.address })}
+              </p>
+            )}
+          </div>
+
+          <Button type="submit" disabled={uploading}>
+            {uploading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                {t("uploading")}
+              </div>
+            ) : (
+              t("uploadImage")
+            )}
+          </Button>
+        </>
       )}
 
       {error && (
