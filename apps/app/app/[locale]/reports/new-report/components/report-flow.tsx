@@ -5,8 +5,7 @@ import { useState } from "react";
 import { submitReport } from "../actions";
 
 const ReportFlow = () => {
-  const t = useTranslations("imageStepComponent");
-  const tSummary = useTranslations("summaryStepComponent");
+  const t = useTranslations("components.reportFlow");
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -4,7 +4,7 @@ export default async function DashboardPage() {
   return (
     <div>
       hello
-      <Link href="/reports/new">Report</Link>
+      <Link href="/reports/new-report">Report</Link>
     </div>
   );
 }

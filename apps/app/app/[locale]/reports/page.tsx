@@ -15,7 +15,7 @@ export default function ReportsPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <Link
-          href="/report/new"
+          href="/reports/new-report"
           className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
         >
           {t("title")}
