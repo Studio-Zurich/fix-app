@@ -19,6 +19,17 @@
             "remove": "Remove",
             "selectLocation": "Select Location",
             "selectedLocation": "Selected location: {address}",
+            "selectIncidentType": "Select Incident Type",
+            "addDescription": "Add Description",
+            "descriptionPlaceholder": "Describe the incident...",
+            "charactersLeft": "{count} characters left",
+            "descriptionGuidelines": {
+                "title": "Guidelines",
+                "specific": "Be as specific as possible",
+                "noPersonalInfo": "No personal information",
+                "respectful": "Stay respectful",
+                "noOffensive": "No offensive content"
+            },
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
                 "uploadFailed": "Upload failed",
@@ -27,7 +38,8 @@
                 "noFilesSelected": "No files selected",
                 "databaseError": "Database error",
                 "someUploadsFailed": "Some uploads failed",
-                "noLocationSelected": "Please select a location"
+                "noLocationSelected": "Please select a location",
+                "noIncidentTypeSelected": "Please select an incident type"
             }
         },
         "reportOverview": {
@@ -35,7 +47,8 @@
             "image": "Image",
             "images": "Images",
             "location": "Location",
-            "incidentType": "Incident Type"
+            "incidentType": "Incident Type",
+            "description": "Description"
         }
     },
     "mails": {

@@ -14,6 +14,7 @@ import IncidentDescriptionStep from "./incident-description-step";
 import IncidentSubtypeStep from "./incident-subtype-step";
 import IncidentTypeStep from "./incident-type-step";
 import LocationMap from "./location-map";
+import ReportSummaryStep from "./report-summary-step";
 
 const MAX_FILES = 5;
 
@@ -145,88 +146,98 @@ const ReportFlow = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  // Check if all required fields are filled
-  const isFormValid = location && selectedType;
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="relative">
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/gif"
-          multiple
-          onChange={handleFileChange}
-          disabled={uploading}
-          aria-label={t("takePhotoOrChooseImage")}
-          aria-describedby={error ? "file-error" : undefined}
-          className="hidden"
-          id="file-input"
-        />
-        <label
-          htmlFor="file-input"
-          className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-            uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-          }`}
-        >
-          {files.length > 0 ? (
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span>
-                  {files.length === 1
-                    ? t("filesSelected", { count: files.length })
-                    : t("filesSelectedPlural", { count: files.length })}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    clearFiles();
-                  }}
-                  disabled={uploading}
-                >
-                  {t("clearAll")}
-                </Button>
-              </div>
-              <div className="text-sm text-gray-500 space-y-1">
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{file.name}</span>
-                      <span className="text-gray-400">
-                        ({formatFileSize(file.size)})
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/gif"
+                multiple
+                onChange={handleFileChange}
+                disabled={uploading}
+                aria-label={t("takePhotoOrChooseImage")}
+                aria-describedby={error ? "file-error" : undefined}
+                className="hidden"
+                id="file-input"
+              />
+              <label
+                htmlFor="file-input"
+                className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  uploading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-gray-50"
+                }`}
+              >
+                {files.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span>
+                        {files.length === 1
+                          ? t("filesSelected", { count: files.length })
+                          : t("filesSelectedPlural", { count: files.length })}
                       </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          clearFiles();
+                        }}
+                        disabled={uploading}
+                      >
+                        {t("clearAll")}
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeFile(index);
-                      }}
-                      disabled={uploading}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {t("remove")}
-                    </Button>
+                    <div className="text-sm text-gray-500 space-y-1">
+                      {files.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center group"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{file.name}</span>
+                            <span className="text-gray-400">
+                              ({formatFileSize(file.size)})
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeFile(index);
+                            }}
+                            disabled={uploading}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            {t("remove")}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <span>{t("takePhotoOrChooseImage")}</span>
+                )}
+              </label>
             </div>
-          ) : (
-            <span>{t("takePhotoOrChooseImage")}</span>
-          )}
-        </label>
-      </div>
 
-      {files.length > 0 && (
-        <>
-          <div className="mt-8">
+            <div className="flex justify-end">
+              <Button onClick={handleNext} disabled={uploading}>
+                {t("next")}
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold mb-4">
               {t("selectLocation")}
             </h2>
@@ -236,52 +247,93 @@ const ReportFlow = () => {
                 {t("selectedLocation", { address: location.address })}
               </p>
             )}
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                {t("back")}
+              </Button>
+              <Button onClick={handleNext} disabled={!location}>
+                {t("next")}
+              </Button>
+            </div>
           </div>
+        );
 
-          <div className="mt-8">
+      case 3:
+        return (
+          <div className="space-y-4">
             <h2 className="text-lg font-semibold mb-4">
               {t("selectIncidentType")}
             </h2>
-            {currentStep === 1 ? (
-              <IncidentTypeStep
-                onSelect={handleTypeSelect}
-                selectedType={selectedType}
-                onNext={handleNext}
-              />
-            ) : currentStep === 2 ? (
-              <IncidentSubtypeStep
-                selectedType={selectedType!}
-                onSelect={handleSubtypeSelect}
-                selectedSubtype={selectedSubtype}
-                onNext={handleNext}
-                onBack={handleBack}
-              />
-            ) : (
-              <IncidentDescriptionStep
-                selectedType={selectedType!}
-                onDescriptionChange={handleDescriptionChange}
-                onNext={handleNext}
-                onBack={handleBack}
-                initialDescription={description?.text}
-              />
-            )}
+            <IncidentTypeStep
+              onSelect={handleTypeSelect}
+              selectedType={selectedType}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
           </div>
+        );
 
-          {isFormValid && (
-            <Button type="submit" disabled={uploading}>
-              {uploading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t("uploading")}
-                </div>
-              ) : (
-                t("uploadImage")
-              )}
-            </Button>
-          )}
-        </>
-      )}
+      case 4:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold mb-4">
+              {t("selectIncidentType")}
+            </h2>
+            <IncidentSubtypeStep
+              selectedType={selectedType!}
+              onSelect={handleSubtypeSelect}
+              selectedSubtype={selectedSubtype}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          </div>
+        );
 
+      case 5:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold mb-4">
+              {t("addDescription")}
+            </h2>
+            <IncidentDescriptionStep
+              selectedType={{
+                type: selectedType!,
+                subtype: selectedSubtype,
+              }}
+              onDescriptionChange={handleDescriptionChange}
+              onNext={handleNext}
+              onBack={handleBack}
+              initialDescription={description?.text}
+            />
+          </div>
+        );
+
+      case 6:
+        return (
+          <div className="space-y-4">
+            <ReportSummaryStep
+              files={files}
+              location={location!}
+              selectedType={{
+                type: selectedType!,
+                subtype: selectedSubtype,
+              }}
+              description={description}
+              onBack={handleBack}
+              onSubmit={handleSubmit}
+              isSubmitting={uploading}
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {renderStep()}
       {error && (
         <p id="file-error" role="alert" className="text-red-500">
           {error}
