@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { reportSchema } from "./db-schema";
 
+// Locale type
+export type Locale = "de" | "en";
+
 // Email related types
 export type EmailMessages = {
   pages: {

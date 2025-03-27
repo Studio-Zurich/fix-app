@@ -32,7 +32,9 @@
         },
         "reportOverview": {
             "imagesUploaded": "Bilder hochgeladen",
-            "images": "Bilder"
+            "image": "Bild",
+            "images": "Bilder",
+            "location": "Standort"
         }
     },
     "mails": {

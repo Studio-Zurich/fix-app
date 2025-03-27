@@ -1,4 +1,5 @@
 import { Section, Text } from "@react-email/components";
+import messages from "@repo/translations/messages";
 import { EmailProps } from "../../../apps/app/lib/types";
 
 type ReportOverviewProps = Pick<
@@ -11,23 +12,12 @@ export const ReportOverview = ({
   locale,
   location,
 }: ReportOverviewProps) => {
-  const translations = {
-    de: {
-      imagesUploaded: "Bilder hochgeladen",
-      location: "Standort",
-    },
-    en: {
-      imagesUploaded: "Images uploaded",
-      location: "Location",
-    },
-  };
-
-  const t = translations[locale];
+  const t = messages[locale].components.reportOverview;
 
   return (
     <Section style={section}>
       <Text style={text}>
-        {imageCount} {t.imagesUploaded}
+        {imageCount === 1 ? t.image : t.images} {t.imagesUploaded}
       </Text>
       {location && (
         <Text style={text}>

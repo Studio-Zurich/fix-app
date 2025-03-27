@@ -8,6 +8,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
+import messages from "@repo/translations/messages";
 import { EmailProps } from "../../../apps/app/lib/types";
 
 import { ReportOverview } from "./report-overview";
@@ -23,17 +24,19 @@ export const ReportEmail = ({
   locale = defaultProps.locale,
   location,
 }: EmailProps) => {
+  const t = messages[locale].mails.internal;
+
   return (
     <Html>
       <Head />
-      <Preview>Neue Meldung auf Fix App</Preview>
+      <Preview>{t.subject}</Preview>
       <Body style={main}>
         <Container>
           <Section style={content}>
             <Heading style={header}>
-              Fixapp.ch
+              {t.title}
               <br />
-              Neue Meldung
+              {t.newReport}
             </Heading>
 
             <Section style={section}>

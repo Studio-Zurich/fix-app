@@ -1,0 +1,22 @@
+{
+    "name": "@repo/translations",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./messages/index.ts",
+    "types": "./messages/index.ts",
+    "exports": {
+        "./messages": "./messages/index.ts",
+        "./messages/de": "./messages/de.json",
+        "./messages/en": "./messages/en.json"
+    },
+    "dependencies": {
+        "@react-email/components": "0.0.15",
+        "@types/node": "^20",
+        "react": "18.3.1",
+        "react-dom": "18.3.1",
+        "next-intl": "^3.26.3"
+    },
+    "devDependencies": {
+        "react-email": "2.1.0"
+    }
+}
