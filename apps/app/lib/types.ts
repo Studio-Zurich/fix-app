@@ -92,3 +92,12 @@ export type InternalEmailProps = {
   incidentType: IncidentType;
   locale: "de" | "en";
 };
+
+// Email sending related types
+export type EmailSendParams = {
+  from: string;
+  to: string;
+  subject: string;
+  react: React.ReactElement;
+  attachments?: FileAttachment[];
+};

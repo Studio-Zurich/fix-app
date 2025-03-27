@@ -1,11 +1,12 @@
 "use client";
 import { Button } from "@repo/ui/button";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
 
 const ReportFlow = () => {
   const t = useTranslations("components.reportFlow");
+  const locale = useLocale();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +39,7 @@ const ReportFlow = () => {
     try {
       const formData = new FormData();
       files.forEach((file) => formData.append("files", file));
+      formData.append("locale", locale);
 
       const result = await submitReport(formData);
       if (!result.success) {

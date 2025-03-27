@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FILE_CONSTANTS } from "./constants";
 
 // File upload constants
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -13,8 +14,10 @@ export const ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif"] as const;
 export const fileUploadSchema = z.object({
   files: z.array(
     z.object({
-      size: z.number().max(MAX_FILE_SIZE, "File size must be less than 5MB"),
-      type: z.enum(ALLOWED_FILE_TYPES, {
+      size: z
+        .number()
+        .max(FILE_CONSTANTS.MAX_SIZE, "File size must be less than 5MB"),
+      type: z.enum(FILE_CONSTANTS.ALLOWED_TYPES, {
         errorMap: () => ({
           message: "Invalid file type. Only JPEG, PNG and GIF are allowed",
         }),
@@ -47,10 +50,6 @@ export const incidentTypeSchema = z.object({
 
 // Report submission validation
 export const reportSubmissionSchema = z.object({
-  files: z.array(z.any()).optional(),
-  location: locationSchema,
-  incidentType: incidentTypeSchema,
-  description: z.string().min(1, "Description is required"),
-  contactInfo: contactInfoSchema,
+  files: z.array(z.any()),
   locale: z.enum(["de", "en"]),
 });

@@ -1,17 +1,9 @@
 "use server";
 
-import {
-  ALLOWED_FILE_EXTENSIONS,
-  ALLOWED_FILE_TYPES,
-  MAX_FILE_SIZE,
-  reportSubmissionSchema,
-} from "@/lib/schemas";
+import { EMAIL_CONSTANTS, FILE_CONSTANTS } from "@/lib/constants";
+import { reportSubmissionSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
-import {
-  FileAttachment,
-  FileUploadResponse,
-  InternalEmailProps,
-} from "@/lib/types";
+import { EmailProps, EmailSendParams, FileUploadResponse } from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
 import { Resend } from "resend";
@@ -26,16 +18,7 @@ function getCETTimestamp() {
   return cetDate.toISOString();
 }
 
-async function sendEmailWithRetry(
-  params: {
-    from: string;
-    to: string;
-    subject: string;
-    react: React.ReactElement;
-    attachments?: FileAttachment[];
-  },
-  maxRetries = 3
-) {
+async function sendEmailWithRetry(params: EmailSendParams, maxRetries = 3) {
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -65,45 +48,29 @@ export async function submitReport(
 
     // Get and validate form data
     const files = formData.getAll("files") as File[];
-    const location = JSON.parse(formData.get("location") as string);
-    const incidentType = JSON.parse(formData.get("incidentType") as string);
-    const description = formData.get("description") as string;
-    const contactInfo = JSON.parse(formData.get("contactInfo") as string);
     const locale = formData.get("locale") as "de" | "en";
 
     // Validate submission data
     const validatedData = reportSubmissionSchema.parse({
       files,
-      location,
-      incidentType,
-      description,
-      contactInfo,
       locale,
     });
 
     // Validate files
     for (const file of files) {
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > FILE_CONSTANTS.MAX_SIZE) {
         throw new Error(t("components.reportFlow.errors.fileTooLarge"));
       }
-      if (!ALLOWED_FILE_TYPES.includes(file.type as any)) {
+      if (!FILE_CONSTANTS.ALLOWED_TYPES.includes(file.type as any)) {
         throw new Error(t("components.reportFlow.errors.invalidFileType"));
       }
     }
 
-    // Create a new report record
+    // Create a new report record with minimal data
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
         status: "new",
-        description: validatedData.description,
-        location_lat: validatedData.location.lat,
-        location_lng: validatedData.location.lng,
-        location_address: validatedData.location.address,
-        reporter_email: validatedData.contactInfo.email,
-        reporter_phone: validatedData.contactInfo.phone,
-        reporter_first_name: validatedData.contactInfo.firstName,
-        reporter_last_name: validatedData.contactInfo.lastName,
         created_at: timestamp,
         updated_at: timestamp,
       })
@@ -121,12 +88,15 @@ export async function submitReport(
     // Upload files to Supabase storage
     const uploadPromises = files.map(async (file) => {
       const fileExt = file.name.split(".").pop()?.toLowerCase();
-      if (!fileExt || !ALLOWED_FILE_EXTENSIONS.includes(fileExt as any)) {
+      if (
+        !fileExt ||
+        !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(fileExt as any)
+      ) {
         throw new Error(t("components.reportFlow.errors.invalidFileType"));
       }
 
       const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `report-images/${fileName}`;
+      const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from("report-images")
@@ -160,17 +130,6 @@ export async function submitReport(
     // Wait for all uploads to complete
     await Promise.all(uploadPromises);
 
-    const emailProps: InternalEmailProps = {
-      reportId: report.id,
-      reporterName: `${validatedData.contactInfo.firstName} ${validatedData.contactInfo.lastName}`,
-      reporterEmail: validatedData.contactInfo.email,
-      location: validatedData.location.address,
-      description: validatedData.description,
-      imageCount: files.length,
-      incidentType: validatedData.incidentType,
-      locale: validatedData.locale,
-    };
-
     // Prepare attachments for internal email
     const attachments = await Promise.all(
       files.map(async (file) => ({
@@ -179,11 +138,16 @@ export async function submitReport(
       }))
     );
 
-    // Send internal notification email
+    // Send internal notification email with simplified data
+    const emailProps: EmailProps = {
+      imageCount: files.length,
+      locale: validatedData.locale,
+    };
+
     try {
       await sendEmailWithRetry({
-        from: "notifications@fixapp.ch",
-        to: "hello@studio-zurich.ch",
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
         subject: t("mails.internal.subject"),
         react: InternalReportEmail(emailProps),
         attachments,
