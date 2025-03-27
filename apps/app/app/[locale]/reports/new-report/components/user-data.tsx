@@ -22,6 +22,7 @@ export default function UserData({
   initialData,
 }: UserDataProps) {
   const t = useTranslations("components.userData");
+  const tReport = useTranslations("components.reportFlow");
 
   const [formData, setFormData] = useState<UserDataType>(
     initialData || {
@@ -130,10 +131,10 @@ export default function UserData({
 
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack}>
-          {t("back")}
+          {tReport("back")}
         </Button>
         <Button onClick={onNext} disabled={!isValid}>
-          {t("next")}
+          {tReport("next")}
         </Button>
       </div>
     </div>

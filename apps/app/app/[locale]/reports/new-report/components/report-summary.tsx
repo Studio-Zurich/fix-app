@@ -3,16 +3,16 @@
 import {
   Location,
   ReportDescription,
-  SelectedIncidentType,
+  SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useTranslations } from "next-intl";
 
-interface ReportSummaryStepProps {
+interface ReportSummaryProps {
   files: File[];
   location: Location;
-  selectedType: SelectedIncidentType;
+  selectedType: SelectedIncidentTypeType;
   description?: ReportDescription;
   onBack: () => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -20,7 +20,7 @@ interface ReportSummaryStepProps {
   userData: UserData;
 }
 
-export default function ReportSummaryStep({
+export default function ReportSummary({
   files,
   location,
   selectedType,
@@ -29,7 +29,7 @@ export default function ReportSummaryStep({
   onSubmit,
   isSubmitting,
   userData,
-}: ReportSummaryStepProps) {
+}: ReportSummaryProps) {
   const t = useTranslations("components.reportFlow");
 
   const formatFileSize = (bytes: number) => {

@@ -68,7 +68,7 @@ export type EmailProps = BaseEmailProps & {
   reporterEmail?: string;
   location?: string;
   description?: string;
-  incidentType?: SelectedIncidentType;
+  incidentType?: SelectedIncidentTypeType;
   userData?: UserData;
 };
 
@@ -89,14 +89,14 @@ export type ContactInfo = {
 };
 
 // Incident type related types
-export type IncidentType = {
+export type IncidentTypeType = {
   id: string;
   name: string;
   description: string | null;
   active: boolean;
 };
 
-export type IncidentSubtype = {
+export type IncidentSubtypeType = {
   id: string;
   incident_type_id: string;
   name: string;
@@ -104,9 +104,9 @@ export type IncidentSubtype = {
   active: boolean;
 };
 
-export type SelectedIncidentType = {
-  type: IncidentType;
-  subtype?: IncidentSubtype;
+export type SelectedIncidentTypeType = {
+  type: IncidentTypeType;
+  subtype?: IncidentSubtypeType;
 };
 
 // Report description type

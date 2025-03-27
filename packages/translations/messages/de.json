@@ -11,7 +11,7 @@
     "components": {
         "reportFlow": {
             "takePhotoOrChooseImage": "Foto aufnehmen oder Bild auswählen",
-            "uploading": "Wird hochgeladen...",
+            "uploading": "Report wird verarbeitet...",
             "uploadImage": "Bild hochladen",
             "filesSelected": "{count} Datei ausgewählt",
             "filesSelectedPlural": "{count} Dateien ausgewählt",
@@ -20,6 +20,9 @@
             "selectLocation": "Standort auswählen",
             "selectedLocation": "Ausgewählter Standort: {address}",
             "selectIncidentType": "Vorfallstyp auswählen",
+            "selectedIncidentType": "Ausgewählter Vorfallstyp:",
+            "selectIncidentSubtype": "Vorfalluntertyp auswählen",
+            "selectedIncidentSubtype": "Ausgewählter Vorfalluntertyp:",
             "addDescription": "Beschreibung hinzufügen",
             "descriptionPlaceholder": "Beschreiben Sie den Vorfall...",
             "charactersLeft": "{count} Zeichen übrig",
@@ -30,6 +33,23 @@
                 "respectful": "Bleiben Sie respektvoll",
                 "noOffensive": "Keine anstößigen Inhalte"
             },
+            "userData": {
+                "title": "Ihre Kontaktinformationen"
+            },
+            "summary": {
+                "title": "Zusammenfassung",
+                "images": "Bilder",
+                "location": "Standort",
+                "incidentType": "Vorfallstyp",
+                "description": "Beschreibung",
+                "contactInfo": "Kontaktinformationen",
+                "reporter": "Reporter",
+                "reporterEmail": "Reporter Email",
+                "reporterPhone": "Reporter Phone"
+            },
+            "next": "Weiter",
+            "back": "Zurück",
+            "submit": "Absenden",
             "errors": {
                 "invalidFileType": "Ungültiger Dateityp. Nur JPEG, PNG und GIF sind erlaubt",
                 "uploadFailed": "Upload fehlgeschlagen",
@@ -54,22 +74,22 @@
             "reporterPhone": "Reporter Phone"
         },
         "userData": {
-            "title": "Your Contact Information",
-            "firstName": "First Name",
-            "lastName": "Last Name",
+            "title": "Ihre Kontaktinformationen",
+            "firstName": "Vorname",
+            "lastName": "Nachname",
             "email": "Email",
-            "phone": "Phone (optional)",
-            "whyProvideInfo": "Why do we ask for your information?",
+            "phone": "Telefon (optional)",
+            "whyProvideInfo": "Warum bitten wir nach Ihren Informationen?",
             "reasons": {
-                "updates": "To keep you updated about your report",
-                "followUp": "For potential follow-up questions",
-                "confirmation": "To confirm your report submission"
+                "updates": "Um Sie über Ihre Meldung zu informieren",
+                "followUp": "Für mögliche Nachfragen",
+                "confirmation": "Um Ihre Meldung zu bestätigen"
             },
             "requiredFields": "* Required fields",
             "errors": {
-                "firstNameRequired": "First name is required",
-                "lastNameRequired": "Last name is required",
-                "invalidEmail": "Invalid email address"
+                "firstNameRequired": "Vorname ist erforderlich",
+                "lastNameRequired": "Nachname ist erforderlich",
+                "invalidEmail": "Ungültige E-Mail-Adresse"
             }
         }
     },

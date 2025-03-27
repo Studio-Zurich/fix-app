@@ -1,27 +1,28 @@
 "use client";
 
-import { ReportDescription, SelectedIncidentType } from "@/lib/types";
+import { ReportDescription, SelectedIncidentTypeType } from "@/lib/types";
+import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-interface IncidentDescriptionStepProps {
+interface IncidentDescriptionProps {
   onNext: () => void;
   onBack: () => void;
-  selectedType: SelectedIncidentType;
+  selectedType: SelectedIncidentTypeType;
   onDescriptionChange: (description: ReportDescription) => void;
   initialDescription?: string;
 }
 
 const MAX_CHARS = 500;
 
-export default function IncidentDescriptionStep({
+export default function IncidentDescription({
   onNext,
   onBack,
   selectedType,
   onDescriptionChange,
   initialDescription = "",
-}: IncidentDescriptionStepProps) {
+}: IncidentDescriptionProps) {
   const [description, setDescription] = useState(initialDescription);
   const t = useTranslations("components.reportFlow");
   const tIncident = useTranslations("incidentTypes");
@@ -46,12 +47,14 @@ export default function IncidentDescriptionStep({
       {selectedType && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            {/* <h3 className="font-medium">
+            <h3 className="font-medium">
+              {t("selectedIncidentType")}{" "}
               {tIncident(`${selectedType.type.name}.name`)}
-            </h3> */}
+            </h3>
           </div>
           {selectedType.subtype && (
             <p className="text-sm text-muted-foreground">
+              {t("selectedIncidentSubtype")}{" "}
               {tIncident(
                 `${selectedType.type.name}.subtypes.${selectedType.subtype.name}.name`
               )}
@@ -84,20 +87,10 @@ export default function IncidentDescriptionStep({
       </div>
 
       <div className="flex justify-between mt-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          className="text-sm text-primary hover:text-primary/80"
-        >
-          Next
-        </button>
+        <Button variant="outline" onClick={onBack}>
+          {t("back")}
+        </Button>
+        <Button onClick={onNext}>{t("next")}</Button>
       </div>
     </div>
   );

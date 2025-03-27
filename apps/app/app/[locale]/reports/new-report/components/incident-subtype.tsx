@@ -1,6 +1,6 @@
 "use client";
 
-import { IncidentSubtype, IncidentType } from "@/lib/types";
+import { IncidentSubtypeType, IncidentTypeType } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { createClient } from "@supabase/supabase-js";
@@ -12,25 +12,26 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface IncidentSubtypeStepProps {
-  selectedType: IncidentType;
-  onSelect: (subtype: IncidentSubtype) => void;
-  selectedSubtype?: IncidentSubtype;
+interface IncidentSubtypeProps {
+  selectedType: IncidentTypeType;
+  onSelect: (subtype: IncidentSubtypeType) => void;
+  selectedSubtype?: IncidentSubtypeType;
   onNext: () => void;
   onBack: () => void;
 }
 
-export default function IncidentSubtypeStep({
+export default function IncidentSubtype({
   selectedType,
   onSelect,
   selectedSubtype,
   onNext,
   onBack,
-}: IncidentSubtypeStepProps) {
-  const [subtypes, setSubtypes] = useState<IncidentSubtype[]>([]);
+}: IncidentSubtypeProps) {
+  const [subtypes, setSubtypes] = useState<IncidentSubtypeType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("incidentTypes");
+  const tReport = useTranslations("components.reportFlow");
 
   // Fetch subtypes
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function IncidentSubtypeStep({
   return (
     <div className="space-y-4">
       <div className="text-sm text-muted-foreground">
-        {t("selectedType", { type: t(`${selectedType.name}.name`) })}
+        {tReport("selectedIncidentType")} {t(`${selectedType.name}.name`)}
       </div>
 
       <div className="space-y-2">
@@ -107,10 +108,10 @@ export default function IncidentSubtypeStep({
 
       <div className="flex justify-between mt-6">
         <Button variant="outline" onClick={onBack}>
-          {t("back")}
+          {tReport("back")}
         </Button>
         <Button onClick={onNext} disabled={!selectedSubtype}>
-          {t("next")}
+          {tReport("next")}
         </Button>
       </div>
     </div>

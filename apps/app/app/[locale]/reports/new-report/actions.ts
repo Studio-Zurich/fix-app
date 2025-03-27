@@ -9,7 +9,7 @@ import {
   FileUploadResponse,
   Location,
   ReportDescription,
-  SelectedIncidentType,
+  SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
@@ -66,7 +66,9 @@ export async function submitReport(
     const locationJson = formData.get("location") as string;
     const location = JSON.parse(locationJson) as Location;
     const incidentTypeJson = formData.get("incidentType") as string;
-    const incidentType = JSON.parse(incidentTypeJson) as SelectedIncidentType;
+    const incidentType = JSON.parse(
+      incidentTypeJson
+    ) as SelectedIncidentTypeType;
     const descriptionJson = formData.get("description") as string | null;
     const description = descriptionJson
       ? (JSON.parse(descriptionJson) as ReportDescription)

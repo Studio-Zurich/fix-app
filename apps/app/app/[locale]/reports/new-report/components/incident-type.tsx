@@ -14,25 +14,26 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-interface IncidentTypeStepProps {
+interface IncidentTypeProps {
   onSelect: (type: IncidentType) => void;
   selectedType?: IncidentType;
   onNext: () => void;
   onBack?: () => void;
 }
 
-export default function IncidentTypeStep({
+export default function IncidentType({
   onSelect,
   selectedType,
   onNext,
   onBack,
-}: IncidentTypeStepProps) {
+}: IncidentTypeProps) {
   const [types, setTypes] = useState<IncidentType[]>([]);
   const [filteredTypes, setFilteredTypes] = useState<IncidentType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("incidentTypes");
+  const tReport = useTranslations("components.reportFlow");
 
   // Fetch incident types
   useEffect(() => {
@@ -115,11 +116,11 @@ export default function IncidentTypeStep({
       <div className="flex justify-between mt-6">
         {onBack && (
           <Button variant="outline" onClick={onBack}>
-            {t("back")}
+            {tReport("back")}
           </Button>
         )}
         <Button onClick={onNext} disabled={!selectedType}>
-          {t("next")}
+          {tReport("next")}
         </Button>
       </div>
     </div>

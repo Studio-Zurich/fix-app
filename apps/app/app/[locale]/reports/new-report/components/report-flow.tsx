@@ -1,8 +1,8 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
 import {
-  IncidentSubtype,
-  IncidentType,
+  IncidentSubtypeType,
+  IncidentTypeType,
   Location,
   ReportDescription,
   UserData as UserDataType,
@@ -11,11 +11,11 @@ import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
-import IncidentDescriptionStep from "./incident-description-step";
-import IncidentSubtypeStep from "./incident-subtype-step";
-import IncidentTypeStep from "./incident-type-step";
+import IncidentDescription from "./incident-description";
+import IncidentSubtype from "./incident-subtype";
+import IncidentType from "./incident-type";
 import LocationMap from "./location-map";
-import ReportSummaryStep from "./report-summary-step";
+import ReportSummary from "./report-summary";
 import UserData from "./user-data";
 
 const MAX_FILES = 5;
@@ -27,11 +27,11 @@ const ReportFlow = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
-  const [selectedType, setSelectedType] = useState<IncidentType | undefined>(
-    undefined
-  );
+  const [selectedType, setSelectedType] = useState<
+    IncidentTypeType | undefined
+  >(undefined);
   const [selectedSubtype, setSelectedSubtype] = useState<
-    IncidentSubtype | undefined
+    IncidentSubtypeType | undefined
   >(undefined);
   const [description, setDescription] = useState<ReportDescription | undefined>(
     undefined
@@ -68,12 +68,12 @@ const ReportFlow = () => {
     setError(null);
   };
 
-  const handleTypeSelect = (type: IncidentType) => {
+  const handleTypeSelect = (type: IncidentTypeType) => {
     setSelectedType(type);
     setSelectedSubtype(undefined); // Clear subtype when changing type
   };
 
-  const handleSubtypeSelect = (subtype: IncidentSubtype) => {
+  const handleSubtypeSelect = (subtype: IncidentSubtypeType) => {
     setSelectedSubtype(subtype);
   };
 
@@ -268,7 +268,7 @@ const ReportFlow = () => {
             <h2 className="text-lg font-semibold mb-4">
               {t("selectIncidentType")}
             </h2>
-            <IncidentTypeStep
+            <IncidentType
               onSelect={handleTypeSelect}
               selectedType={selectedType}
               onNext={handleNext}
@@ -281,9 +281,9 @@ const ReportFlow = () => {
         return (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold mb-4">
-              {t("selectIncidentType")}
+              {t("selectIncidentSubtype")}
             </h2>
-            <IncidentSubtypeStep
+            <IncidentSubtype
               selectedType={selectedType!}
               onSelect={handleSubtypeSelect}
               selectedSubtype={selectedSubtype}
@@ -299,7 +299,7 @@ const ReportFlow = () => {
             <h2 className="text-lg font-semibold mb-4">
               {t("addDescription")}
             </h2>
-            <IncidentDescriptionStep
+            <IncidentDescription
               selectedType={{
                 type: selectedType!,
                 subtype: selectedSubtype,
@@ -330,7 +330,7 @@ const ReportFlow = () => {
       case 7:
         return (
           <div className="space-y-4">
-            <ReportSummaryStep
+            <ReportSummary
               files={files}
               location={location!}
               selectedType={{

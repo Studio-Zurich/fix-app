@@ -187,7 +187,7 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
   }, [onLocationSelect]);
 
   return (
-    <div className="relative px-5">
+    <div className="relative">
       <Map
         ref={mapRef}
         initialViewState={ZUG_CENTER}

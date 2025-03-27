@@ -11,7 +11,7 @@
     "components": {
         "reportFlow": {
             "takePhotoOrChooseImage": "Take a photo or choose an image",
-            "uploading": "Uploading...",
+            "uploading": "Report is being processed...",
             "uploadImage": "Upload image",
             "filesSelected": "{count} file selected",
             "filesSelectedPlural": "{count} files selected",
@@ -20,6 +20,9 @@
             "selectLocation": "Select Location",
             "selectedLocation": "Selected location: {address}",
             "selectIncidentType": "Select Incident Type",
+            "selectIncidentSubtype": "Select Incident Subtype",
+            "selectedIncidentType": "Selected incident type:",
+            "selectedIncidentSubtype": "Selected incident subtype:",
             "addDescription": "Add Description",
             "descriptionPlaceholder": "Describe the incident...",
             "charactersLeft": "{count} characters left",
@@ -30,6 +33,23 @@
                 "respectful": "Stay respectful",
                 "noOffensive": "No offensive content"
             },
+            "userData": {
+                "title": "Your Contact Information"
+            },
+            "summary": {
+                "title": "Summary",
+                "images": "Images",
+                "location": "Location",
+                "incidentType": "Incident Type",
+                "description": "Description",
+                "contactInfo": "Contact Information",
+                "reporter": "Reporter",
+                "reporterEmail": "Reporter Email",
+                "reporterPhone": "Reporter Phone"
+            },
+            "next": "Next",
+            "back": "Back",
+            "submit": "Submit",
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
                 "uploadFailed": "Upload failed",
