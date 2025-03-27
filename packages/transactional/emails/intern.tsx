@@ -15,12 +15,12 @@ import { ReportOverview } from "./report-overview";
 const defaultProps: EmailProps = {
   imageCount: 0,
   locale: "de",
+  reportId: "",
 };
 
 export const ReportEmail = ({
   imageCount = defaultProps.imageCount,
-
-  locale = "de",
+  locale = defaultProps.locale,
 }: EmailProps) => {
   return (
     <Html>

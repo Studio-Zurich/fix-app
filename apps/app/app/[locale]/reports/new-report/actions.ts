@@ -41,11 +41,11 @@ async function sendEmailWithRetry(params: EmailSendParams, maxRetries = 3) {
 export async function submitReport(
   formData: FormData
 ): Promise<FileUploadResponse> {
-  try {
-    const supabase = await createClient();
-    const timestamp = getCETTimestamp();
-    const t = await getTranslations();
+  const supabase = await createClient();
+  const timestamp = getCETTimestamp();
+  const t = await getTranslations();
 
+  try {
     // Get and validate form data
     const files = formData.getAll("files") as File[];
     const locale = formData.get("locale") as "de" | "en";
@@ -81,7 +81,10 @@ export async function submitReport(
       console.error("Error creating report:", reportError);
       return {
         success: false,
-        error: t("components.reportFlow.errors.uploadFailed"),
+        error: {
+          code: "UPLOAD_FAILED",
+          message: t("components.reportFlow.errors.uploadFailed"),
+        },
       };
     }
 
@@ -162,8 +165,10 @@ export async function submitReport(
     console.error("Error in submitReport:", error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      error: {
+        code: "UPLOAD_FAILED",
+        message: t("components.reportFlow.errors.uploadFailed"),
+      },
     };
   }
 }

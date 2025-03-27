@@ -1,15 +1,6 @@
 import { z } from "zod";
 import { FILE_CONSTANTS } from "./constants";
 
-// File upload constants
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-export const ALLOWED_FILE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-] as const;
-export const ALLOWED_FILE_EXTENSIONS = ["jpg", "jpeg", "png", "gif"] as const;
-
 // File upload validation
 export const fileUploadSchema = z.object({
   files: z.array(

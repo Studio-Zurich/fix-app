@@ -1,4 +1,5 @@
 "use client";
+import { FILE_CONSTANTS } from "@/lib/constants";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -17,8 +18,10 @@ const ReportFlow = () => {
     // Add client-side validation
     const invalidFiles = selectedFiles.filter(
       (file) =>
-        file.size > 5 * 1024 * 1024 ||
-        !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+        file.size > FILE_CONSTANTS.MAX_SIZE ||
+        !FILE_CONSTANTS.ALLOWED_TYPES.includes(
+          file.type as (typeof FILE_CONSTANTS.ALLOWED_TYPES)[number]
+        )
     );
 
     if (invalidFiles.length > 0) {
@@ -43,7 +46,7 @@ const ReportFlow = () => {
 
       const result = await submitReport(formData);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new Error(result.error?.message);
       }
 
       // Clear files after successful upload

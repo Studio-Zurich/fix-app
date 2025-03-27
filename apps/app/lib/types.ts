@@ -44,9 +44,20 @@ export type EmailMessages = {
   };
 };
 
-export type EmailProps = {
+// Base email props
+export type BaseEmailProps = {
   imageCount: number;
   locale: "de" | "en";
+};
+
+// Extended email props for internal emails
+export type EmailProps = BaseEmailProps & {
+  reportId?: string;
+  reporterName?: string; // Make optional since we don't have it yet
+  reporterEmail?: string; // Make optional since we don't have it yet
+  location?: string; // Make optional since we don't have it yet
+  description?: string; // Make optional since we don't have it yet
+  incidentType?: IncidentType; // Make optional since we don't have it yet
 };
 
 // Report related types
@@ -71,26 +82,20 @@ export type IncidentType = {
 };
 
 // File upload related types
+export type ReportError = {
+  code: "FILE_TOO_LARGE" | "INVALID_FILE_TYPE" | "UPLOAD_FAILED" | "UNKNOWN";
+  message: string;
+};
+
 export type FileUploadResponse = {
   success: boolean;
-  error?: string;
+  error?: ReportError;
   reportId?: string;
 };
 
 export type FileAttachment = {
   filename: string;
   content: Buffer;
-};
-
-export type InternalEmailProps = {
-  reportId: string;
-  reporterName: string;
-  reporterEmail: string;
-  location: string;
-  description: string;
-  imageCount: number;
-  incidentType: IncidentType;
-  locale: "de" | "en";
 };
 
 // Email sending related types
