@@ -17,6 +17,7 @@
     "components": {
         "reportFlow": {
             "locationMap": {
+                "moveMap": "Move the map to change the location",
                 "locationDialog": {
                     "title": "Location found",
                     "description": "We have detected a location in your image. Do you want to use this location?",

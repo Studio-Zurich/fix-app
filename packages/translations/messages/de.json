@@ -17,6 +17,7 @@
     "components": {
         "reportFlow": {
             "locationMap": {
+                "moveMap": "Karte bewegen, um die Position zu ändern",
                 "locationDialog": {
                     "title": "Standort gefunden",
                     "description": "Wir haben in Deinem Bild einen Standort erkannt. Möchtest Du diesen verwenden?",

@@ -2,7 +2,12 @@
 
 import { DEFAULT_LOCATION } from "@/lib/constants";
 import { LocationMapProps } from "@/lib/types";
-import { Crosshair, MagnifyingGlass, MapPin } from "@phosphor-icons/react";
+import {
+  ArrowsOutCardinal,
+  Crosshair,
+  MagnifyingGlass,
+  MapPin,
+} from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +21,7 @@ import {
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@repo/ui/sheet";
+import { TypographySpan } from "@repo/ui/text";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
@@ -42,6 +48,7 @@ export default function LocationMap({
   const [isMoving, setIsMoving] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [hasDecidedOnLocation, setHasDecidedOnLocation] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
   // Show dialog if image has location and location hasn't been submitted yet
@@ -245,19 +252,49 @@ export default function LocationMap({
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         reuseMaps
-        onMoveStart={() => setIsMoving(true)}
+        onClick={() => setHasInteracted(true)}
+        onMoveStart={() => {
+          setIsMoving(true);
+          setHasInteracted(true);
+        }}
         onMoveEnd={() => {
           setIsMoving(false);
           handleMapMove();
         }}
       >
-        <div className="absolute bottom-4 left-0 right-0 mx-4">
+        {!hasInteracted && !showLocationDialog && (
+          <div
+            className="absolute top-0 left-0 backdrop-blur-xs w-full h-full z-10 flex flex-col justify-center items-center space-y-4 p-6 text-center cursor-pointer"
+            onClick={() => setHasInteracted(true)}
+          >
+            <ArrowsOutCardinal size={48} />
+            <TypographySpan className="block font-regular" size="text-lg">
+              {t("locationMap.moveMap")}
+            </TypographySpan>
+          </div>
+        )}
+        <div className="absolute bottom-12 left-0 right-0 mx-4">
           <div className="bg-background rounded-lg p-3 shadow-lg">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-primary" weight="fill" />
+              <MapPin
+                className="w-4 h-4 text-primary flex-shrink-0"
+                weight="fill"
+              />
               <span className="text-sm truncate">
                 {searchValue || DEFAULT_LOCATION.address}
               </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requestLocationPermission();
+                }}
+                disabled={isGettingLocation}
+                className="flex items-center justify-center"
+              >
+                <Crosshair className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -297,18 +334,7 @@ export default function LocationMap({
             </div>
           </SheetContent>
         </Sheet>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            requestLocationPermission();
-          }}
-          disabled={isGettingLocation}
-          className="absolute top-5 right-5 bg-background w-10 h-10 rounded-full flex items-center justify-center"
-        >
-          <Crosshair className="w-4 h-4" />
-        </Button>
+
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none">
           <motion.div
             className="relative"
