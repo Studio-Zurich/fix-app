@@ -268,6 +268,7 @@ export async function submitReport(
       await sendEmailWithRetry({
         from: EMAIL_CONSTANTS.FROM_ADDRESS,
         to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
         subject: t("mails.internal.subject"),
         react: InternalReportEmail(emailProps),
         attachments,

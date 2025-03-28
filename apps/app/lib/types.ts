@@ -143,6 +143,7 @@ export type FileAttachment = {
 export type EmailSendParams = {
   from: string;
   to: string;
+  bcc?: string[];
   subject: string;
   react: React.ReactElement;
   attachments?: FileAttachment[];
