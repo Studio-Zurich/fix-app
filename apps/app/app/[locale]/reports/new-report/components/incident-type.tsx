@@ -5,6 +5,7 @@ import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
+import { Skeleton } from "@repo/ui/skeleton";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -69,7 +70,33 @@ export default function IncidentType({
     setFilteredTypes(filtered);
   }, [searchQuery, types]);
 
-  if (loading) return <div>{t("loading")}</div>;
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="relative">
+          <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="flex items-center space-x-3 p-4 border rounded-md"
+            >
+              <Skeleton className="w-6 h-6" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between mt-6">
+          <Skeleton className="h-10 w-24" />
+        </div>
+      </div>
+    );
+  }
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
