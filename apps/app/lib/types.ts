@@ -173,7 +173,8 @@ export type ImageUploadProps = {
   onLocationFound?: (location: ImageLocation) => void;
 };
 
-export type LocationMapProps = {
+export interface LocationMapProps {
   onLocationSelect: (location: Location) => void;
   initialLocation?: Location | null;
-};
+  locationSubmitted?: boolean;
+}

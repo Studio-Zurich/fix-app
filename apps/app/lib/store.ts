@@ -16,6 +16,7 @@ interface ReportStore {
   selectedSubtype: IncidentSubtypeType | undefined;
   description: ReportDescription | undefined;
   userData: UserData | undefined;
+  locationSubmitted: boolean;
 
   // UI State
   currentStep: number;
@@ -32,6 +33,7 @@ interface ReportStore {
   setCurrentStep: (step: number) => void;
   setUploading: (uploading: boolean) => void;
   setError: (error: string | null) => void;
+  setLocationSubmitted: (submitted: boolean) => void;
 
   // Form Actions
   submitReport: (locale: "de" | "en") => Promise<void>;
@@ -46,6 +48,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   selectedSubtype: undefined,
   description: undefined,
   userData: undefined,
+  locationSubmitted: false,
   currentStep: 1,
   uploading: false,
   error: null,
@@ -61,6 +64,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   setCurrentStep: (step) => set({ currentStep: step }),
   setUploading: (uploading) => set({ uploading }),
   setError: (error) => set({ error }),
+  setLocationSubmitted: (submitted) => set({ locationSubmitted: submitted }),
 
   // Form Actions
   submitReport: async (locale) => {
@@ -111,6 +115,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       selectedSubtype: undefined,
       description: undefined,
       userData: undefined,
+      locationSubmitted: false,
       currentStep: 1,
       uploading: false,
       error: null,

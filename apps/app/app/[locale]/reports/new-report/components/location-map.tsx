@@ -32,6 +32,7 @@ interface Suggestion {
 export default function LocationMap({
   onLocationSelect,
   initialLocation,
+  locationSubmitted = false,
 }: LocationMapProps) {
   const t = useTranslations("components.reportFlow");
   const [isOpen, setIsOpen] = useState(false);
@@ -43,12 +44,20 @@ export default function LocationMap({
   const [hasDecidedOnLocation, setHasDecidedOnLocation] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
-  // Show dialog if image has location
+  // Show dialog if image has location and location hasn't been submitted yet
   useEffect(() => {
-    if (initialLocation && !hasDecidedOnLocation) {
+    if (initialLocation && !hasDecidedOnLocation && !locationSubmitted) {
       setShowLocationDialog(true);
     }
-  }, [initialLocation, hasDecidedOnLocation]);
+  }, [initialLocation, hasDecidedOnLocation, locationSubmitted]);
+
+  // Set searchValue from initialLocation when locationSubmitted is true
+  useEffect(() => {
+    if (locationSubmitted && initialLocation) {
+      setSearchValue(initialLocation.address);
+      setHasDecidedOnLocation(true);
+    }
+  }, [locationSubmitted, initialLocation]);
 
   const handleLocationConfirm = () => {
     if (initialLocation) {
@@ -211,8 +220,14 @@ export default function LocationMap({
       <Map
         ref={mapRef}
         initialViewState={{
-          latitude: DEFAULT_LOCATION.latitude,
-          longitude: DEFAULT_LOCATION.longitude,
+          latitude:
+            locationSubmitted && initialLocation
+              ? initialLocation.lat
+              : DEFAULT_LOCATION.latitude,
+          longitude:
+            locationSubmitted && initialLocation
+              ? initialLocation.lng
+              : DEFAULT_LOCATION.longitude,
           zoom: DEFAULT_LOCATION.zoom,
         }}
         style={{

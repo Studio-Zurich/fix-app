@@ -27,6 +27,7 @@ const ReportFlow = () => {
     currentStep,
     uploading,
     error,
+    locationSubmitted,
     setFiles,
     setLocation,
     setSelectedType,
@@ -35,6 +36,7 @@ const ReportFlow = () => {
     setUserData,
     setCurrentStep,
     setError,
+    setLocationSubmitted,
     submitReport,
   } = useReportStore();
 
@@ -74,6 +76,9 @@ const ReportFlow = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === 2) {
+      setLocationSubmitted(true);
+    }
     setCurrentStep(currentStep + 1);
   };
 
@@ -84,14 +89,6 @@ const ReportFlow = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitReport(locale as "de" | "en");
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const renderStep = () => {
@@ -116,6 +113,7 @@ const ReportFlow = () => {
             <LocationMap
               onLocationSelect={setLocation}
               initialLocation={location}
+              locationSubmitted={locationSubmitted}
             />
 
             <div className="flex justify-between">
