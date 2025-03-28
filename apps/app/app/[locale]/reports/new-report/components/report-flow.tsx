@@ -11,6 +11,7 @@ import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { submitReport } from "../actions";
+import ImageUpload from "./image-upload";
 import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
 import IncidentType from "./incident-type";
@@ -154,89 +155,12 @@ const ReportFlow = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4">
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/gif"
-                multiple
-                onChange={handleFileChange}
-                disabled={uploading}
-                aria-label={t("takePhotoOrChooseImage")}
-                aria-describedby={error ? "file-error" : undefined}
-                className="hidden"
-                id="file-input"
-              />
-              <label
-                htmlFor="file-input"
-                className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                  uploading
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-gray-50"
-                }`}
-              >
-                {files.length > 0 ? (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span>
-                        {files.length === 1
-                          ? t("filesSelected", { count: files.length })
-                          : t("filesSelectedPlural", { count: files.length })}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          clearFiles();
-                        }}
-                        disabled={uploading}
-                      >
-                        {t("clearAll")}
-                      </Button>
-                    </div>
-                    <div className="text-sm text-gray-500 space-y-1">
-                      {files.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center group"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span>{file.name}</span>
-                            <span className="text-gray-400">
-                              ({formatFileSize(file.size)})
-                            </span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              removeFile(index);
-                            }}
-                            disabled={uploading}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            {t("remove")}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <span>{t("takePhotoOrChooseImage")}</span>
-                )}
-              </label>
-            </div>
-
-            <div className="flex justify-end">
-              <Button onClick={handleNext} disabled={uploading}>
-                {t("next")}
-              </Button>
-            </div>
-          </div>
+          <ImageUpload
+            onNext={handleNext}
+            isUploading={uploading}
+            files={files}
+            setFiles={setFiles}
+          />
         );
 
       case 2:
