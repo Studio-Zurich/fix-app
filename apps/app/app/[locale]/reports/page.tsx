@@ -12,7 +12,7 @@ export default function ReportsPage() {
 
   return (
     <>
-      <div className="container mx-auto py-8">
+      <div>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{t("title")}</h1>
           <Link

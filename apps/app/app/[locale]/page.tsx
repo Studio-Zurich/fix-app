@@ -9,7 +9,7 @@ export default async function DashboardPage() {
     <>
       <Greeting />
 
-      <div className="container mx-auto py-8">
+      <div>
         <div className="flex justify-between items-center mb-6">
           <Link href="/reports/new-report">
             <Button>{t("ui.newReportButton")}</Button>

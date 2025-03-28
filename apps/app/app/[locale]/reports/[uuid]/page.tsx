@@ -23,7 +23,7 @@ export default function ReportPage({ params }: ReportPageProps) {
   // If report not found, redirect to 404 -> then show that we do not have a report, yet
 
   return (
-    <div className="container mx-auto py-8">
+    <div>
       <h1 className="text-3xl font-bold mb-6">{t("reportDetails")}</h1>
       <div className="text-sm text-gray-500 mb-4">
         {t("reportId")}: {params.uuid}
