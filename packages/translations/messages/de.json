@@ -1,5 +1,8 @@
 {
     "pages": {
+        "dashboard": {
+            "title": "Dashboard"
+        },
         "reports": {
             "title": "Reports"
         },
@@ -7,6 +10,9 @@
             "title": "Neue Meldung",
             "description": "Erstellen Sie eine neue Vorkommensmeldung"
         }
+    },
+    "ui": {
+        "newReportButton": "Neue Meldung"
     },
     "components": {
         "reportFlow": {

@@ -1,6 +1,6 @@
 "use client";
 
-import { IncidentType } from "@/lib/types";
+import { IncidentTypeType } from "@/lib/types";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
@@ -15,8 +15,8 @@ const supabase = createClient(
 );
 
 interface IncidentTypeProps {
-  onSelect: (type: IncidentType) => void;
-  selectedType?: IncidentType;
+  onSelect: (type: IncidentTypeType) => void;
+  selectedType?: IncidentTypeType;
   onNext: () => void;
   onBack?: () => void;
 }
@@ -27,8 +27,8 @@ export default function IncidentType({
   onNext,
   onBack,
 }: IncidentTypeProps) {
-  const [types, setTypes] = useState<IncidentType[]>([]);
-  const [filteredTypes, setFilteredTypes] = useState<IncidentType[]>([]);
+  const [types, setTypes] = useState<IncidentTypeType[]>([]);
+  const [filteredTypes, setFilteredTypes] = useState<IncidentTypeType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
