@@ -97,6 +97,11 @@
                 "lastNameRequired": "Last name is required",
                 "invalidEmail": "Invalid email address"
             }
+        },
+        "greeting": {
+            "morning": "Good morning",
+            "day": "Good day",
+            "night": "Good night"
         }
     },
     "mails": {
