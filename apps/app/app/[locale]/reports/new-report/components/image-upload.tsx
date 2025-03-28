@@ -20,6 +20,27 @@ const ImageUpload = ({
   const [foundLocation, setFoundLocation] = useState<ImageLocation | null>(
     null
   );
+  const [previews, setPreviews] = useState<string[]>([]);
+
+  // Generate previews when files change
+  useEffect(() => {
+    const generatePreviews = async () => {
+      const newPreviews = await Promise.all(
+        files.map((file) => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+          });
+        })
+      );
+      setPreviews(newPreviews);
+    };
+
+    generatePreviews();
+  }, [files]);
 
   // Check for location when files change
   useEffect(() => {
@@ -157,7 +178,7 @@ const ImageUpload = ({
           }`}
         >
           {files.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span>
                   {files.length === 1
@@ -177,11 +198,38 @@ const ImageUpload = ({
                   {t("clearAll")}
                 </Button>
               </div>
+
+              {/* Image Previews */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {previews.map((preview, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeFile(index);
+                      }}
+                      disabled={isUploading}
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      {t("remove")}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
               <div className="text-sm text-gray-500 space-y-1">
                 {files.map((file, index) => (
                   <div
                     key={index}
-                    className="flex justify-between items-center group"
+                    className="flex justify-between items-center"
                   >
                     <div className="flex items-center gap-2">
                       <span>{file.name}</span>
@@ -189,19 +237,6 @@ const ImageUpload = ({
                         ({formatFileSize(file.size)})
                       </span>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeFile(index);
-                      }}
-                      disabled={isUploading}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {t("remove")}
-                    </Button>
                   </div>
                 ))}
                 {foundLocation && (

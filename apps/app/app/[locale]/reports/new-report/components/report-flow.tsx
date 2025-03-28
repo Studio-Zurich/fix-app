@@ -209,6 +209,11 @@ const ReportFlow = () => {
               onBack={handleBack}
               onSubmit={handleSubmit}
               isSubmitting={uploading}
+              onEditImages={() => setCurrentStep(1)}
+              onEditLocation={() => setCurrentStep(2)}
+              onEditType={() => setCurrentStep(3)}
+              onEditDescription={() => setCurrentStep(5)}
+              onEditUserData={() => setCurrentStep(6)}
             />
           </div>
         );
