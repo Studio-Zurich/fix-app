@@ -9,6 +9,6 @@ export const FILE_CONSTANTS = {
 // Email constants
 export const EMAIL_CONSTANTS = {
   FROM_ADDRESS: "notifications@fixapp.ch" as const,
-  TO_ADDRESS: "info@fixapp.ch" as const,
-  BCC_ADDRESSES: ["hello@studio-zurich.ch", "remigi@trcit.com"],
+  TO_ADDRESS: "reports@fixapp.ch" as const,
+  BCC_ADDRESSES: ["hello@studio-zurich.ch"],
 };
