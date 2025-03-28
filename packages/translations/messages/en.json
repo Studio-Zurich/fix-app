@@ -16,6 +16,15 @@
     },
     "components": {
         "reportFlow": {
+            "locationMap": {
+                "locationDialog": {
+                    "title": "Location found",
+                    "description": "We have detected a location in your image. Do you want to use this location?",
+                    "confirm": "Use location",
+                    "reject": "Select other location"
+                }
+            },
+            "locationFound": "Location found: {address}",
             "takePhotoOrChooseImage": "Take a photo or choose an image",
             "uploading": "Report is being processed...",
             "uploadImage": "Upload image",

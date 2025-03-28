@@ -1,13 +1,25 @@
 "use client";
 
-import { Location } from "@/lib/types";
+import { DEFAULT_LOCATION } from "@/lib/constants";
+import { LocationMapProps } from "@/lib/types";
 import { Crosshair, MagnifyingGlass, MapPin } from "@phosphor-icons/react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/alert-dialog";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@repo/ui/sheet";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useCallback, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
 import Map from "react-map-gl";
 
@@ -17,39 +29,45 @@ interface Suggestion {
   center: [number, number];
 }
 
-const ZUG_CENTER = {
-  latitude: 47.1661,
-  longitude: 8.5159,
-  zoom: 13,
-  address: "Postplatz, 6300 Zug, Switzerland",
-} as const;
-
-interface LocationMapProps {
-  onLocationSelect: (location: Location) => void;
-}
-
-const LocationPopup = ({ address }: { address: string }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute -top-[4.25rem] left-4 pointer-events-none z-10"
-    >
-      <div className="bg-background p-3 w-[calc(50vw-40px)] mx-auto rounded-lg shadow-lg">
-        <span className="block text-[12px]">{address}</span>
-      </div>
-    </motion.div>
-  );
-};
-
-export default function LocationMap({ onLocationSelect }: LocationMapProps) {
+export default function LocationMap({
+  onLocationSelect,
+  initialLocation,
+}: LocationMapProps) {
+  const t = useTranslations("components.reportFlow");
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [hasDecidedOnLocation, setHasDecidedOnLocation] = useState(false);
   const mapRef = useRef<MapRef>(null);
+
+  // Show dialog if image has location
+  useEffect(() => {
+    if (initialLocation && !hasDecidedOnLocation) {
+      setShowLocationDialog(true);
+    }
+  }, [initialLocation, hasDecidedOnLocation]);
+
+  const handleLocationConfirm = () => {
+    if (initialLocation) {
+      setShowLocationDialog(false);
+      setHasDecidedOnLocation(true);
+      setSearchValue(initialLocation.address);
+      onLocationSelect(initialLocation);
+      mapRef.current?.flyTo({
+        center: [initialLocation.lng, initialLocation.lat],
+        zoom: 15,
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleLocationReject = () => {
+    setShowLocationDialog(false);
+    setHasDecidedOnLocation(true);
+  };
 
   const handleSearch = useCallback(async (value: string) => {
     setSearchValue(value);
@@ -91,6 +109,7 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
       setSearchValue(suggestion.place_name);
       setSuggestions([]);
       setIsOpen(false);
+      setHasDecidedOnLocation(true);
 
       mapRef.current?.flyTo({
         center: [lng, lat],
@@ -120,6 +139,7 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
         lng,
         address,
       });
+      setSearchValue(address);
     } catch (error) {
       console.error("Error fetching address:", error);
     }
@@ -190,10 +210,15 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
     <div className="relative">
       <Map
         ref={mapRef}
-        initialViewState={ZUG_CENTER}
+        initialViewState={{
+          latitude: DEFAULT_LOCATION.latitude,
+          longitude: DEFAULT_LOCATION.longitude,
+          zoom: DEFAULT_LOCATION.zoom,
+        }}
         style={{
           width: "100%",
           height: "calc(50svh - 200px)",
+          position: "relative",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
@@ -201,9 +226,21 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
         onMoveStart={() => setIsMoving(true)}
         onMoveEnd={() => {
           setIsMoving(false);
-          handleMapMove();
+          if (hasDecidedOnLocation) {
+            handleMapMove();
+          }
         }}
       >
+        <div className="absolute bottom-4 left-0 right-0 mx-4">
+          <div className="bg-background rounded-lg p-3 shadow-lg">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" weight="fill" />
+              <span className="text-sm truncate">
+                {searchValue || DEFAULT_LOCATION.address}
+              </span>
+            </div>
+          </div>
+        </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger className="absolute top-5 left-5 bg-background w-10 h-10 rounded-full flex items-center justify-center">
             <MagnifyingGlass className="w-4 h-4 text-muted-foreground" />
@@ -265,15 +302,38 @@ export default function LocationMap({ onLocationSelect }: LocationMapProps) {
             }}
           >
             <MapPin className="w-8 h-8 text-primary" weight="fill" />
-            {!isMoving && searchValue && (
-              <LocationPopup address={searchValue} />
-            )}
           </motion.div>
           {isMoving && (
             <div className="w-3 h-3 rounded-full bg-black/20 mx-auto mt-1" />
           )}
         </div>
       </Map>
+
+      <AlertDialog
+        open={showLocationDialog}
+        onOpenChange={setShowLocationDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("locationMap.locationDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("locationMap.locationDialog.description", {
+                address: initialLocation?.address,
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleLocationReject}>
+              {t("locationMap.locationDialog.reject")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleLocationConfirm}>
+              {t("locationMap.locationDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

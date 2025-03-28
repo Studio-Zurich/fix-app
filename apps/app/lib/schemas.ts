@@ -67,3 +67,10 @@ export const reportSubmissionSchema = z.object({
   description: reportDescriptionSchema.optional(),
   userData: userDataSchema,
 });
+
+// Image location validation
+export const imageLocationSchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+  address: z.string().min(1, "Address is required"),
+});

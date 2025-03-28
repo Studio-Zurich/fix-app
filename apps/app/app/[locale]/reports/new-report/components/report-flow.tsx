@@ -1,6 +1,7 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { useReportStore } from "@/lib/store";
+import { ImageLocation } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import ImageUpload from "./image-upload";
@@ -36,6 +37,12 @@ const ReportFlow = () => {
     setError,
     submitReport,
   } = useReportStore();
+
+  const handleLocationFound = (location: ImageLocation) => {
+    // Just pass the detected location to location-map component
+    // It will handle showing the dialog and setting the location if confirmed
+    setLocation(location);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -96,6 +103,7 @@ const ReportFlow = () => {
             isUploading={uploading}
             files={files}
             setFiles={setFiles}
+            onLocationFound={handleLocationFound}
           />
         );
 
@@ -105,12 +113,11 @@ const ReportFlow = () => {
             <h2 className="text-lg font-semibold mb-4">
               {t("selectLocation")}
             </h2>
-            <LocationMap onLocationSelect={setLocation} />
-            {location && (
-              <p className="mt-2 text-sm text-gray-500">
-                {t("selectedLocation", { address: location.address })}
-              </p>
-            )}
+            <LocationMap
+              onLocationSelect={setLocation}
+              initialLocation={location}
+            />
+
             <div className="flex justify-between">
               <Button variant="outline" onClick={handleBack}>
                 {t("back")}

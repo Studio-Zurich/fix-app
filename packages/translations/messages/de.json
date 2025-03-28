@@ -16,6 +16,15 @@
     },
     "components": {
         "reportFlow": {
+            "locationMap": {
+                "locationDialog": {
+                    "title": "Standort gefunden",
+                    "description": "Wir haben in Deinem Bild einen Standort erkannt. Möchtest Du diesen verwenden?",
+                    "confirm": "Standort verwenden",
+                    "reject": "Anderen Standort wählen"
+                }
+            },
+            "locationFound": "Standort gefunden: {address}",
             "takePhotoOrChooseImage": "Foto aufnehmen oder Bild auswählen",
             "uploading": "Report wird verarbeitet...",
             "uploadImage": "Bild hochladen",

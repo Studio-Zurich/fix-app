@@ -156,3 +156,24 @@ export type UserData = {
   email: string;
   phone?: string;
 };
+
+// Image location related types
+export type ImageLocation = {
+  lat: number;
+  lng: number;
+  address: string;
+};
+
+// Component props types
+export type ImageUploadProps = {
+  onNext: () => void;
+  isUploading: boolean;
+  files: File[];
+  setFiles: (files: File[]) => void;
+  onLocationFound?: (location: ImageLocation) => void;
+};
+
+export type LocationMapProps = {
+  onLocationSelect: (location: Location) => void;
+  initialLocation?: Location | null;
+};

@@ -1,15 +1,10 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
+import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
+import exifr from "exifr";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-
-interface ImageUploadProps {
-  onNext: () => void;
-  isUploading: boolean;
-  files: File[];
-  setFiles: (files: File[]) => void;
-}
+import { useEffect, useState } from "react";
 
 const MAX_FILES = 5;
 
@@ -18,11 +13,93 @@ const ImageUpload = ({
   isUploading,
   files,
   setFiles,
+  onLocationFound,
 }: ImageUploadProps) => {
   const t = useTranslations("components.reportFlow");
   const [error, setError] = useState<string | null>(null);
+  const [foundLocation, setFoundLocation] = useState<ImageLocation | null>(
+    null
+  );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Check for location when files change
+  useEffect(() => {
+    const checkLocation = async () => {
+      if (files.length > 0 && onLocationFound) {
+        const firstFile = files[0];
+        if (firstFile) {
+          try {
+            const location = await readImageLocation(firstFile);
+            if (location) {
+              setFoundLocation(location);
+              onLocationFound(location);
+            } else {
+              setFoundLocation(null);
+            }
+          } catch (error) {
+            console.error("Error checking location:", error);
+            setFoundLocation(null);
+          }
+        }
+      } else {
+        setFoundLocation(null);
+      }
+    };
+
+    checkLocation();
+  }, [files, onLocationFound]);
+
+  const readImageLocation = async (
+    file: File
+  ): Promise<ImageLocation | null> => {
+    try {
+      const exif = await exifr.parse(file);
+
+      if (!exif?.GPSLatitude || !exif?.GPSLongitude) {
+        return null;
+      }
+
+      // Convert GPS coordinates from degrees/minutes/seconds to decimal degrees
+      const lat = convertDMSToDD(
+        exif.GPSLatitude,
+        exif.GPSLatitudeRef === "S" ? -1 : 1
+      );
+      const lng = convertDMSToDD(
+        exif.GPSLongitude,
+        exif.GPSLongitudeRef === "W" ? -1 : 1
+      );
+
+      // Get address from coordinates using reverse geocoding
+      try {
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
+        );
+        const data = await response.json();
+        const address = data.features[0]?.place_name || "Unknown location";
+
+        return {
+          lat,
+          lng,
+          address,
+        };
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error reading EXIF data:", error);
+      return null;
+    }
+  };
+
+  const convertDMSToDD = (
+    dms: [number, number, number],
+    ref: number
+  ): number => {
+    const [degrees, minutes, seconds] = dms;
+    return ref * (degrees + minutes / 60 + seconds / 3600);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
 
     if (selectedFiles.length > MAX_FILES) {
@@ -127,6 +204,11 @@ const ImageUpload = ({
                     </Button>
                   </div>
                 ))}
+                {foundLocation && (
+                  <div className="mt-2 text-sm text-primary">
+                    {t("locationFound", { address: foundLocation.address })}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
