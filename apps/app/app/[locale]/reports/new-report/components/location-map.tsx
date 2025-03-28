@@ -239,7 +239,7 @@ export default function LocationMap({
         }}
         style={{
           width: "100%",
-          height: "calc(50svh - 200px)",
+          height: "calc(100svh - 190px)",
           position: "relative",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
