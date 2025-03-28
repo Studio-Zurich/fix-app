@@ -74,3 +74,14 @@ export const imageLocationSchema = z.object({
   lng: z.number(),
   address: z.string().min(1, "Address is required"),
 });
+
+// Mapbox API schemas
+export const mapboxFeatureSchema = z.object({
+  id: z.string(),
+  place_name: z.string(),
+  center: z.tuple([z.number(), z.number()]),
+});
+
+export const mapboxResponseSchema = z.object({
+  features: z.array(mapboxFeatureSchema),
+});

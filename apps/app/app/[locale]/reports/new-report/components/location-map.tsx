@@ -1,7 +1,12 @@
 "use client";
 
-import { DEFAULT_LOCATION } from "@/lib/constants";
-import { LocationMapProps } from "@/lib/types";
+import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
+import { LocationMapProps, Suggestion } from "@/lib/types";
+import {
+  createLocationFromSuggestion,
+  fetchAddressFromCoordinates,
+  fetchLocationSuggestions,
+} from "@/lib/utils/map";
 import {
   ArrowsOutCardinal,
   Crosshair,
@@ -29,16 +34,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
 import Map from "react-map-gl";
 
-interface Suggestion {
-  id: string;
-  place_name: string;
-  center: [number, number];
-}
-
 export default function LocationMap({
   onLocationSelect,
   initialLocation,
   locationSubmitted = false,
+  hasInteractedWithMap,
+  onMapInteraction,
 }: LocationMapProps) {
   const t = useTranslations("components.reportFlow");
   const [isOpen, setIsOpen] = useState(false);
@@ -47,97 +48,75 @@ export default function LocationMap({
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
-  const [hasDecidedOnLocation, setHasDecidedOnLocation] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [hasLocationFromImage, setHasLocationFromImage] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
-  // Show dialog if image has location and location hasn't been submitted yet
+  // Set hasLocationFromImage when initialLocation changes
   useEffect(() => {
-    if (initialLocation && !hasDecidedOnLocation && !locationSubmitted) {
+    setHasLocationFromImage(!!initialLocation);
+  }, [initialLocation]);
+
+  // Show dialog only if we have a location from an image and haven't interacted yet
+  useEffect(() => {
+    if (hasLocationFromImage && !hasInteractedWithMap && !locationSubmitted) {
       setShowLocationDialog(true);
     }
-  }, [initialLocation, hasDecidedOnLocation, locationSubmitted]);
+  }, [hasLocationFromImage, hasInteractedWithMap, locationSubmitted]);
 
   // Set searchValue from initialLocation when locationSubmitted is true
   useEffect(() => {
     if (locationSubmitted && initialLocation) {
       setSearchValue(initialLocation.address);
-      setHasDecidedOnLocation(true);
     }
   }, [locationSubmitted, initialLocation]);
-
-  // Set hasDecidedOnLocation to true if no initial location is provided
-  useEffect(() => {
-    if (!initialLocation) {
-      setHasDecidedOnLocation(true);
-    }
-  }, [initialLocation]);
 
   const handleLocationConfirm = () => {
     if (initialLocation) {
       setShowLocationDialog(false);
-      setHasDecidedOnLocation(true);
       setSearchValue(initialLocation.address);
       onLocationSelect(initialLocation);
       mapRef.current?.flyTo({
         center: [initialLocation.lng, initialLocation.lat],
-        zoom: 15,
-        duration: 2000,
+        zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
+        duration: MAP_CONSTANTS.FLY_TO_DURATION,
       });
     }
   };
 
   const handleLocationReject = () => {
     setShowLocationDialog(false);
-    setHasDecidedOnLocation(true);
+  };
+
+  const handleMapInteraction = () => {
+    if (!hasInteractedWithMap) {
+      onMapInteraction();
+    }
   };
 
   const handleSearch = useCallback(async (value: string) => {
     setSearchValue(value);
 
-    if (value.length < 3) {
+    if (value.length < MAP_CONSTANTS.MIN_SEARCH_LENGTH) {
       setSuggestions([]);
       return;
     }
 
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          value
-        )}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&country=CH`
-      );
-      const data = await response.json();
-      setSuggestions(
-        data.features.map((feature: any) => ({
-          id: feature.id,
-          place_name: feature.place_name,
-          center: feature.center,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      setSuggestions([]);
-    }
+    const suggestions = await fetchLocationSuggestions(value);
+    setSuggestions(suggestions);
   }, []);
 
   const handleLocationSelect = useCallback(
     async (suggestion: Suggestion) => {
-      const [lng, lat] = suggestion.center;
-
-      onLocationSelect({
-        lat,
-        lng,
-        address: suggestion.place_name,
-      });
+      const location = createLocationFromSuggestion(suggestion);
+      onLocationSelect(location);
       setSearchValue(suggestion.place_name);
       setSuggestions([]);
       setIsOpen(false);
-      setHasDecidedOnLocation(true);
 
       mapRef.current?.flyTo({
-        center: [lng, lat],
-        zoom: 15,
-        duration: 2000,
+        center: [location.lng, location.lat],
+        zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
+        duration: MAP_CONSTANTS.FLY_TO_DURATION,
       });
     },
     [onLocationSelect]
@@ -147,25 +126,14 @@ export default function LocationMap({
     if (!mapRef.current) return;
 
     const center = mapRef.current.getCenter();
-    const lng = center.lng;
-    const lat = center.lat;
+    const address = await fetchAddressFromCoordinates(center.lng, center.lat);
 
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-      );
-      const data = await response.json();
-      const address = data.features[0]?.place_name || "Unknown location";
-
-      onLocationSelect({
-        lat,
-        lng,
-        address,
-      });
-      setSearchValue(address);
-    } catch (error) {
-      console.error("Error fetching address:", error);
-    }
+    onLocationSelect({
+      lat: center.lat,
+      lng: center.lng,
+      address,
+    });
+    setSearchValue(address);
   }, [onLocationSelect]);
 
   const requestLocationPermission = useCallback(async () => {
@@ -183,28 +151,19 @@ export default function LocationMap({
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude: lat, longitude: lng } = position.coords;
+          const address = await fetchAddressFromCoordinates(lng, lat);
 
-          try {
-            const response = await fetch(
-              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-            );
-            const data = await response.json();
-            const address = data.features[0]?.place_name || "Unknown location";
+          onLocationSelect({
+            lat,
+            lng,
+            address,
+          });
 
-            onLocationSelect({
-              lat,
-              lng,
-              address,
-            });
-
-            mapRef.current?.flyTo({
-              center: [lng, lat],
-              zoom: 15,
-              duration: 2000,
-            });
-          } catch (error) {
-            console.error("Error fetching address:", error);
-          }
+          mapRef.current?.flyTo({
+            center: [lng, lat],
+            zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
+            duration: MAP_CONSTANTS.FLY_TO_DURATION,
+          });
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -216,11 +175,7 @@ export default function LocationMap({
             alert("Unable to get your location. Please try again.");
           }
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        }
+        MAP_CONSTANTS.GEOLOCATION_OPTIONS
       );
     } catch (error) {
       console.error("Error requesting location permission:", error);
@@ -252,20 +207,20 @@ export default function LocationMap({
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         reuseMaps
-        onClick={() => setHasInteracted(true)}
+        onClick={handleMapInteraction}
         onMoveStart={() => {
           setIsMoving(true);
-          setHasInteracted(true);
+          handleMapInteraction();
         }}
         onMoveEnd={() => {
           setIsMoving(false);
           handleMapMove();
         }}
       >
-        {!hasInteracted && !showLocationDialog && (
+        {!hasInteractedWithMap && !showLocationDialog && (
           <div
             className="absolute top-0 left-0 backdrop-blur-xs w-full h-full z-10 flex flex-col justify-center items-center space-y-4 p-6 text-center cursor-pointer"
-            onClick={() => setHasInteracted(true)}
+            onClick={handleMapInteraction}
           >
             <ArrowsOutCardinal size={48} />
             <TypographySpan className="block font-regular" size="text-lg">

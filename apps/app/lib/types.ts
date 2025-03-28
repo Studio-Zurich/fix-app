@@ -164,6 +164,13 @@ export type ImageLocation = {
   address: string;
 };
 
+// Map related types
+export type Suggestion = {
+  id: string;
+  place_name: string;
+  center: [number, number];
+};
+
 // Component props types
 export type ImageUploadProps = {
   onNext: () => void;
@@ -174,7 +181,9 @@ export type ImageUploadProps = {
 };
 
 export interface LocationMapProps {
-  onLocationSelect: (location: Location) => void;
-  initialLocation?: Location | null;
+  onLocationSelect: (location: ImageLocation) => void;
+  initialLocation?: ImageLocation | null;
   locationSubmitted?: boolean;
+  hasInteractedWithMap: boolean;
+  onMapInteraction: () => void;
 }

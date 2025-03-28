@@ -17,6 +17,7 @@ interface ReportStore {
   description: ReportDescription | undefined;
   userData: UserData | undefined;
   locationSubmitted: boolean;
+  hasInteractedWithMap: boolean;
 
   // UI State
   currentStep: number;
@@ -25,7 +26,7 @@ interface ReportStore {
 
   // Actions
   setFiles: (files: File[]) => void;
-  setLocation: (location: Location) => void;
+  setLocation: (location: Location | null) => void;
   setSelectedType: (type: IncidentTypeType) => void;
   setSelectedSubtype: (subtype: IncidentSubtypeType) => void;
   setDescription: (description: ReportDescription) => void;
@@ -34,6 +35,7 @@ interface ReportStore {
   setUploading: (uploading: boolean) => void;
   setError: (error: string | null) => void;
   setLocationSubmitted: (submitted: boolean) => void;
+  setHasInteractedWithMap: (hasInteracted: boolean) => void;
 
   // Form Actions
   submitReport: (locale: "de" | "en") => Promise<void>;
@@ -49,6 +51,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   description: undefined,
   userData: undefined,
   locationSubmitted: false,
+  hasInteractedWithMap: false,
   currentStep: 1,
   uploading: false,
   error: null,
@@ -65,6 +68,8 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   setUploading: (uploading) => set({ uploading }),
   setError: (error) => set({ error }),
   setLocationSubmitted: (submitted) => set({ locationSubmitted: submitted }),
+  setHasInteractedWithMap: (hasInteracted) =>
+    set({ hasInteractedWithMap: hasInteracted }),
 
   // Form Actions
   submitReport: async (locale) => {
@@ -116,6 +121,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       description: undefined,
       userData: undefined,
       locationSubmitted: false,
+      hasInteractedWithMap: false,
       currentStep: 1,
       uploading: false,
       error: null,

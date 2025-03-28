@@ -29,6 +29,7 @@ const ReportFlow = () => {
     uploading,
     error,
     locationSubmitted,
+    hasInteractedWithMap,
     setFiles,
     setLocation,
     setSelectedType,
@@ -38,6 +39,7 @@ const ReportFlow = () => {
     setCurrentStep,
     setError,
     setLocationSubmitted,
+    setHasInteractedWithMap,
     submitReport,
   } = useReportStore();
 
@@ -76,15 +78,20 @@ const ReportFlow = () => {
     setError(null);
   };
 
+  const handleBack = () => {
+    if (currentStep === 2) {
+      // Reset location and map interaction when going back from location step
+      setLocation(null);
+      setHasInteractedWithMap(false);
+    }
+    setCurrentStep(currentStep - 1);
+  };
+
   const handleNext = () => {
     if (currentStep === 2) {
       setLocationSubmitted(true);
     }
     setCurrentStep(currentStep + 1);
-  };
-
-  const handleBack = () => {
-    setCurrentStep(currentStep - 1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,6 +123,8 @@ const ReportFlow = () => {
               onLocationSelect={setLocation}
               initialLocation={location}
               locationSubmitted={locationSubmitted}
+              hasInteractedWithMap={hasInteractedWithMap}
+              onMapInteraction={() => setHasInteractedWithMap(true)}
             />
 
             <div className="flex justify-between">

@@ -1,6 +1,7 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
+import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
 import { Button } from "@repo/ui/button";
 import exifr from "exifr";
 import { useTranslations } from "next-intl";
@@ -90,34 +91,17 @@ const ImageUpload = ({
       );
 
       // Get address from coordinates using reverse geocoding
-      try {
-        const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-        );
-        const data = await response.json();
-        const address = data.features[0]?.place_name || "Unknown location";
+      const address = await fetchAddressFromCoordinates(lng, lat);
 
-        return {
-          lat,
-          lng,
-          address,
-        };
-      } catch (error) {
-        console.error("Error fetching address:", error);
-        return null;
-      }
+      return {
+        lat,
+        lng,
+        address,
+      };
     } catch (error) {
       console.error("Error reading EXIF data:", error);
       return null;
     }
-  };
-
-  const convertDMSToDD = (
-    dms: [number, number, number],
-    ref: number
-  ): number => {
-    const [degrees, minutes, seconds] = dms;
-    return ref * (degrees + minutes / 60 + seconds / 3600);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
