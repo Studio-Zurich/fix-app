@@ -25,7 +25,7 @@ const Greeting = () => {
   }, [t]);
 
   return (
-    <section className="container">
+    <section>
       <TypographySpan size="text-lg" className="block">
         {greeting}
       </TypographySpan>

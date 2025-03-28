@@ -1,7 +1,7 @@
+import Greeting from "@/components/greeting";
 import { Link } from "@/i18n/routing";
 import { Button } from "@repo/ui/button";
 import { getTranslations } from "next-intl/server";
-import Greeting from "./components/greeting";
 
 export default async function DashboardPage() {
   const t = await getTranslations();

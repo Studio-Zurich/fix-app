@@ -46,7 +46,9 @@ export default async function RootLayout({
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <main className="h-max w-full flex flex-col">{children}</main>
+          <main className="h-max w-full flex flex-col container mx-auto">
+            {children}
+          </main>
         </NextIntlClientProvider>
       </body>
     </html>

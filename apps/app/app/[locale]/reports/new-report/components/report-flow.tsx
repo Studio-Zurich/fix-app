@@ -352,7 +352,7 @@ const ReportFlow = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit}>
       {renderStep()}
       {error && (
         <p id="file-error" role="alert" className="text-red-500">
