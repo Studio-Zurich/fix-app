@@ -18,6 +18,9 @@
         "reportFlow": {
             "locationMap": {
                 "moveMap": "Move the map to change the location",
+                "searchPlaceholder": "Enter address",
+                "noResults": "No results found",
+                "getLocation": "Current Location",
                 "locationDialog": {
                     "title": "Location found",
                     "description": "We have detected a location in your image. Do you want to use this location?",
