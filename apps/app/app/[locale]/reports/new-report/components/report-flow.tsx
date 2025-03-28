@@ -1,16 +1,8 @@
 "use client";
 import { FILE_CONSTANTS } from "@/lib/constants";
-import {
-  IncidentSubtypeType,
-  IncidentTypeType,
-  Location,
-  ReportDescription,
-  UserData as UserDataType,
-} from "@/lib/types";
+import { useReportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
-import { submitReport } from "../actions";
 import ImageUpload from "./image-upload";
 import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
@@ -24,21 +16,26 @@ const MAX_FILES = 5;
 const ReportFlow = () => {
   const t = useTranslations("components.reportFlow");
   const locale = useLocale();
-  const [files, setFiles] = useState<File[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [location, setLocation] = useState<Location | null>(null);
-  const [selectedType, setSelectedType] = useState<
-    IncidentTypeType | undefined
-  >(undefined);
-  const [selectedSubtype, setSelectedSubtype] = useState<
-    IncidentSubtypeType | undefined
-  >(undefined);
-  const [description, setDescription] = useState<ReportDescription | undefined>(
-    undefined
-  );
-  const [currentStep, setCurrentStep] = useState(1);
-  const [userData, setUserData] = useState<UserDataType | undefined>(undefined);
+  const {
+    files,
+    location,
+    selectedType,
+    selectedSubtype,
+    description,
+    userData,
+    currentStep,
+    uploading,
+    error,
+    setFiles,
+    setLocation,
+    setSelectedType,
+    setSelectedSubtype,
+    setDescription,
+    setUserData,
+    setCurrentStep,
+    setError,
+    submitReport,
+  } = useReportStore();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -69,78 +66,17 @@ const ReportFlow = () => {
     setError(null);
   };
 
-  const handleTypeSelect = (type: IncidentTypeType) => {
-    setSelectedType(type);
-    setSelectedSubtype(undefined); // Clear subtype when changing type
-  };
-
-  const handleSubtypeSelect = (subtype: IncidentSubtypeType) => {
-    setSelectedSubtype(subtype);
-  };
-
-  const handleDescriptionChange = (newDescription: ReportDescription) => {
-    setDescription(newDescription);
-  };
-
-  const handleUserDataChange = (data: UserDataType) => {
-    setUserData(data);
-  };
-
   const handleNext = () => {
-    setCurrentStep((prev) => prev + 1);
+    setCurrentStep(currentStep + 1);
   };
 
   const handleBack = () => {
-    setCurrentStep((prev) => prev - 1);
+    setCurrentStep(currentStep - 1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!location || !selectedType || !userData) {
-      setError(t("errors.missingRequiredFields"));
-      return;
-    }
-
-    setUploading(true);
-    setError(null);
-
-    try {
-      const formData = new FormData();
-      files.forEach((file) => formData.append("files", file));
-      formData.append("locale", locale);
-      formData.append("location", JSON.stringify(location));
-      formData.append(
-        "incidentType",
-        JSON.stringify({
-          type: selectedType,
-          subtype: selectedSubtype,
-        })
-      );
-      if (description) {
-        formData.append("description", JSON.stringify(description));
-      }
-      formData.append("userData", JSON.stringify(userData));
-
-      const result = await submitReport(formData);
-      if (!result.success) {
-        setError(result.error?.message || t("errors.uploadFailed"));
-        return;
-      }
-
-      // Clear form after successful upload
-      setFiles([]);
-      setLocation(null);
-      setSelectedType(undefined);
-      setSelectedSubtype(undefined);
-      setDescription(undefined);
-      setUserData(undefined);
-      setCurrentStep(1);
-    } catch (err) {
-      setError(t("errors.uploadFailed"));
-    } finally {
-      setUploading(false);
-    }
+    await submitReport(locale as "de" | "en");
   };
 
   const formatFileSize = (bytes: number) => {
@@ -193,7 +129,7 @@ const ReportFlow = () => {
               {t("selectIncidentType")}
             </h2>
             <IncidentType
-              onSelect={handleTypeSelect}
+              onSelect={setSelectedType}
               selectedType={selectedType}
               onNext={handleNext}
               onBack={handleBack}
@@ -209,7 +145,7 @@ const ReportFlow = () => {
             </h2>
             <IncidentSubtype
               selectedType={selectedType!}
-              onSelect={handleSubtypeSelect}
+              onSelect={setSelectedSubtype}
               selectedSubtype={selectedSubtype}
               onNext={handleNext}
               onBack={handleBack}
@@ -228,7 +164,7 @@ const ReportFlow = () => {
                 type: selectedType!,
                 subtype: selectedSubtype,
               }}
-              onDescriptionChange={handleDescriptionChange}
+              onDescriptionChange={setDescription}
               onNext={handleNext}
               onBack={handleBack}
               initialDescription={description?.text}
@@ -243,7 +179,7 @@ const ReportFlow = () => {
               {t("userData.title")}
             </h2>
             <UserData
-              onDataChange={handleUserDataChange}
+              onDataChange={setUserData}
               onNext={handleNext}
               onBack={handleBack}
               initialData={userData}
