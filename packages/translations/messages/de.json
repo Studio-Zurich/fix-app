@@ -75,6 +75,10 @@
                 "someUploadsFailed": "Einige Uploads fehlgeschlagen",
                 "noLocationSelected": "Bitte wählen Sie einen Standort aus",
                 "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
+            },
+            "success": {
+                "title": "Vielen Dank für deine Meldung",
+                "description": "Du erhältst eine Bestätigung per E-Mail"
             }
         },
         "reportOverview": {

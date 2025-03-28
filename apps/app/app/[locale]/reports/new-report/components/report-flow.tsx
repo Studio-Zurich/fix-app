@@ -9,6 +9,7 @@ import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
 import IncidentType from "./incident-type";
 import LocationMap from "./location-map";
+import ReportSuccess from "./report-success";
 import ReportSummary from "./report-summary";
 import UserData from "./user-data";
 
@@ -89,6 +90,7 @@ const ReportFlow = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitReport(locale as "de" | "en");
+    setCurrentStep(8); // Move to success step after submission
   };
 
   const renderStep = () => {
@@ -215,6 +217,9 @@ const ReportFlow = () => {
             />
           </div>
         );
+
+      case 8:
+        return <ReportSuccess />;
 
       default:
         return null;

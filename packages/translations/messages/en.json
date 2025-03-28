@@ -75,6 +75,10 @@
                 "someUploadsFailed": "Some uploads failed",
                 "noLocationSelected": "Please select a location",
                 "noIncidentTypeSelected": "Please select an incident type"
+            },
+            "success": {
+                "title": "Thank you for your report",
+                "description": "You will receive a confirmation email"
             }
         },
         "reportOverview": {
