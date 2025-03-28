@@ -59,6 +59,13 @@ export default function LocationMap({
     }
   }, [locationSubmitted, initialLocation]);
 
+  // Set hasDecidedOnLocation to true if no initial location is provided
+  useEffect(() => {
+    if (!initialLocation) {
+      setHasDecidedOnLocation(true);
+    }
+  }, [initialLocation]);
+
   const handleLocationConfirm = () => {
     if (initialLocation) {
       setShowLocationDialog(false);
@@ -241,9 +248,7 @@ export default function LocationMap({
         onMoveStart={() => setIsMoving(true)}
         onMoveEnd={() => {
           setIsMoving(false);
-          if (hasDecidedOnLocation) {
-            handleMapMove();
-          }
+          handleMapMove();
         }}
       >
         <div className="absolute bottom-4 left-0 right-0 mx-4">
