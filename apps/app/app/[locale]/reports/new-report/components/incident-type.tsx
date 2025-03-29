@@ -18,11 +18,13 @@ const supabase = createClient(
 interface IncidentTypeProps {
   onSelect: (type: IncidentTypeType) => void;
   selectedType?: IncidentTypeType;
+  onSubtypesLoaded?: (hasSubtypes: boolean) => void;
 }
 
 export default function IncidentType({
   onSelect,
   selectedType,
+  onSubtypesLoaded,
 }: IncidentTypeProps) {
   const [types, setTypes] = useState<IncidentTypeType[]>([]);
   const [filteredTypes, setFilteredTypes] = useState<IncidentTypeType[]>([]);
@@ -31,18 +33,39 @@ export default function IncidentType({
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("incidentTypes");
   const tReport = useTranslations("components.reportFlow");
-  // Fetch incident types
+
+  // Fetch incident types and their subtypes
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: typesData, error: typesError } = await supabase
           .from("incident_types")
           .select("*")
           .eq("active", true);
 
-        if (error) throw error;
-        setTypes(data);
-        setFilteredTypes(data);
+        if (typesError) throw typesError;
+
+        // Fetch subtypes for each type
+        const typesWithSubtypes = await Promise.all(
+          typesData.map(async (type) => {
+            const { data: subtypesData, error: subtypesError } = await supabase
+              .from("incident_subtypes")
+              .select("id")
+              .eq("incident_type_id", type.id)
+              .eq("active", true)
+              .limit(1);
+
+            if (subtypesError) throw subtypesError;
+
+            return {
+              ...type,
+              has_subtypes: subtypesData && subtypesData.length > 0,
+            };
+          })
+        );
+
+        setTypes(typesWithSubtypes);
+        setFilteredTypes(typesWithSubtypes);
       } catch (err) {
         setError(t("errors.loadFailed"));
         console.error(err);
@@ -53,6 +76,13 @@ export default function IncidentType({
 
     fetchTypes();
   }, [t]);
+
+  // Notify parent about subtypes when a type is selected
+  useEffect(() => {
+    if (selectedType && onSubtypesLoaded) {
+      onSubtypesLoaded(selectedType.has_subtypes);
+    }
+  }, [selectedType, onSubtypesLoaded]);
 
   // Handle search
   useEffect(() => {

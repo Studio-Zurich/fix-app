@@ -85,12 +85,26 @@ const ReportFlow = () => {
       setLocation(null);
       setHasInteractedWithMap(false);
     }
+    if (currentStep === 5) {
+      // Skip subtype step (4) if the selected type has no subtypes
+      if (!selectedType?.has_subtypes) {
+        setCurrentStep(3);
+        return;
+      }
+    }
     setCurrentStep(currentStep - 1);
   };
 
   const handleNext = () => {
     if (currentStep === 2) {
       setLocationSubmitted(true);
+    }
+    if (currentStep === 3) {
+      // Skip to description step (5) if the selected type has no subtypes
+      if (!selectedType?.has_subtypes) {
+        setCurrentStep(5);
+        return;
+      }
     }
     setCurrentStep(currentStep + 1);
   };

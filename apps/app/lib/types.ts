@@ -94,6 +94,7 @@ export type IncidentTypeType = {
   name: string;
   description: string | null;
   active: boolean;
+  has_subtypes: boolean;
 };
 
 export type IncidentSubtypeType = {
