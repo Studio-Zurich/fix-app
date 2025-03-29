@@ -241,7 +241,10 @@ const ReportFlow = () => {
 
   return (
     <section className="grid gap-4">
-      <Progress value={currentStep} max={8} />
+      <Progress
+        value={((currentStep === 7 ? 8 : currentStep) * 100) / 8}
+        max={100}
+      />
       <form onSubmit={handleSubmit}>
         {renderStep()}
         {error && (
