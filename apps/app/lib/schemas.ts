@@ -60,7 +60,7 @@ export const userDataSchema = z.object({
 
 // Report submission validation
 export const reportSubmissionSchema = z.object({
-  files: z.array(fileSchema),
+  files: z.array(fileSchema).optional(),
   locale: z.enum(["de", "en"]),
   location: locationSchema,
   incidentType: selectedIncidentTypeSchema,

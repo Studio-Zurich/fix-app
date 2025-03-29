@@ -53,7 +53,7 @@ export const ReportOverview = ({
   return (
     <Section style={section}>
       <Text style={text}>
-        {imageCount === 1 ? t.image : t.images} {t.imagesUploaded}
+        {imageCount} {imageCount === 1 ? t.imageUploaded : t.imagesUploaded}
       </Text>
       {location && (
         <Text style={text}>

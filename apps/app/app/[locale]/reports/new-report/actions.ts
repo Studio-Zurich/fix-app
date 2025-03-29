@@ -77,17 +77,7 @@ export async function submitReport(
     const userDataJson = formData.get("userData") as string;
     const userData = JSON.parse(userDataJson) as UserData;
 
-    // Validate file count
-    if (files.length === 0) {
-      return {
-        success: false,
-        error: {
-          code: "NO_FILES",
-          message: t("components.reportFlow.errors.noFilesSelected"),
-        },
-      };
-    }
-
+    // Validate file count if files are provided
     if (files.length > 5) {
       return {
         success: false,
@@ -100,7 +90,7 @@ export async function submitReport(
 
     // Validate submission data
     const validatedData = reportSubmissionSchema.parse({
-      files,
+      files: files.length > 0 ? files : undefined,
       locale,
       location,
       incidentType,
@@ -144,143 +134,146 @@ export async function submitReport(
       };
     }
 
-    // Upload files to Supabase storage
-    const uploadPromises = files.map(async (file) => {
-      const fileExt = file.name.split(".").pop()?.toLowerCase();
-      if (
-        !fileExt ||
-        !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
-          fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
-        )
-      ) {
-        return {
-          success: false,
-          error: {
-            code: "INVALID_FILE_TYPE",
-            message: t("components.reportFlow.errors.invalidFileType"),
-          },
-        };
-      }
+    // Only proceed with file upload if files are provided
+    if (files.length > 0) {
+      // Upload files to Supabase storage
+      const uploadPromises = files.map(async (file) => {
+        const fileExt = file.name.split(".").pop()?.toLowerCase();
+        if (
+          !fileExt ||
+          !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
+            fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
+          )
+        ) {
+          return {
+            success: false,
+            error: {
+              code: "INVALID_FILE_TYPE",
+              message: t("components.reportFlow.errors.invalidFileType"),
+            },
+          };
+        }
 
-      const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${fileName}`;
+        const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("report-images")
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from("report-images")
+          .upload(filePath, file);
 
-      if (uploadError) {
-        console.error("Error uploading file:", {
-          error: uploadError,
-          fileName,
-          fileSize: file.size,
-          fileType: file.type,
+        if (uploadError) {
+          console.error("Error uploading file:", {
+            error: uploadError,
+            fileName,
+            fileSize: file.size,
+            fileType: file.type,
+          });
+          return {
+            success: false,
+            error: {
+              code: "UPLOAD_FAILED",
+              message: t("components.reportFlow.errors.uploadFailed"),
+            },
+          };
+        }
+
+        uploadedFiles.push(filePath);
+
+        // Create report_images record
+        const { error: imageError } = await supabase
+          .from("report_images")
+          .insert({
+            report_id: report.id,
+            storage_path: filePath,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            created_at: timestamp,
+          });
+
+        if (imageError) {
+          console.error("Error creating report image record:", {
+            error: imageError,
+            filePath,
+            reportId: report.id,
+          });
+          // Try to clean up the uploaded file
+          await supabase.storage.from("report-images").remove([filePath]);
+          uploadedFiles = uploadedFiles.filter((f) => f !== filePath);
+          return {
+            success: false,
+            error: {
+              code: "DATABASE_ERROR",
+              message: t("components.reportFlow.errors.databaseError"),
+            },
+          };
+        }
+
+        return { success: true, filePath };
+      });
+
+      // Wait for all uploads to complete
+      const uploadResults = await Promise.all(uploadPromises);
+      const failedUploads = uploadResults.filter((result) => !result.success);
+
+      if (failedUploads.length > 0) {
+        // Clean up any successfully uploaded files
+        if (uploadedFiles.length > 0) {
+          await supabase.storage.from("report-images").remove(uploadedFiles);
+        }
+
+        console.error("Some uploads failed:", {
+          totalFiles: files.length,
+          failedCount: failedUploads.length,
+          errors: failedUploads.map((u) => u.error),
         });
+
         return {
           success: false,
           error: {
             code: "UPLOAD_FAILED",
-            message: t("components.reportFlow.errors.uploadFailed"),
+            message: t("components.reportFlow.errors.someUploadsFailed"),
           },
         };
       }
 
-      uploadedFiles.push(filePath);
+      // Prepare attachments for internal email
+      const attachments = await Promise.all(
+        files.map(async (file) => ({
+          filename: file.name,
+          content: Buffer.from(await file.arrayBuffer()),
+        }))
+      );
 
-      // Create report_images record
-      const { error: imageError } = await supabase
-        .from("report_images")
-        .insert({
-          report_id: report.id,
-          storage_path: filePath,
-          file_name: file.name,
-          file_type: file.type,
-          file_size: file.size,
-          created_at: timestamp,
-        });
-
-      if (imageError) {
-        console.error("Error creating report image record:", {
-          error: imageError,
-          filePath,
-          reportId: report.id,
-        });
-        // Try to clean up the uploaded file
-        await supabase.storage.from("report-images").remove([filePath]);
-        uploadedFiles = uploadedFiles.filter((f) => f !== filePath);
-        return {
-          success: false,
-          error: {
-            code: "DATABASE_ERROR",
-            message: t("components.reportFlow.errors.databaseError"),
-          },
-        };
-      }
-
-      return { success: true, filePath };
-    });
-
-    // Wait for all uploads to complete
-    const uploadResults = await Promise.all(uploadPromises);
-    const failedUploads = uploadResults.filter((result) => !result.success);
-
-    if (failedUploads.length > 0) {
-      // Clean up any successfully uploaded files
-      if (uploadedFiles.length > 0) {
-        await supabase.storage.from("report-images").remove(uploadedFiles);
-      }
-
-      console.error("Some uploads failed:", {
-        totalFiles: files.length,
-        failedCount: failedUploads.length,
-        errors: failedUploads.map((u) => u.error),
-      });
-
-      return {
-        success: false,
-        error: {
-          code: "UPLOAD_FAILED",
-          message: t("components.reportFlow.errors.someUploadsFailed"),
-        },
-      };
-    }
-
-    // Prepare attachments for internal email
-    const attachments = await Promise.all(
-      files.map(async (file) => ({
-        filename: file.name,
-        content: Buffer.from(await file.arrayBuffer()),
-      }))
-    );
-
-    // Send internal notification email with simplified data
-    const emailProps: EmailProps = {
-      imageCount: files.length,
-      locale: validatedData.locale,
-      reportId: report.id,
-      location: validatedData.location.address,
-      incidentType: validatedData.incidentType,
-      description: validatedData.description?.text,
-      userData: validatedData.userData,
-    };
-
-    try {
-      await sendEmailWithRetry({
-        from: EMAIL_CONSTANTS.FROM_ADDRESS,
-        to: EMAIL_CONSTANTS.TO_ADDRESS,
-        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-        subject: t("mails.internal.subject"),
-        react: InternalReportEmail(emailProps),
-        attachments,
-      });
-    } catch (error) {
-      console.error("Error sending internal email:", {
-        error,
+      // Send internal notification email with simplified data
+      const emailProps: EmailProps = {
+        imageCount: files.length,
+        locale: validatedData.locale,
         reportId: report.id,
-        fileCount: files.length,
-      });
-      // Log the error but don't fail the whole process
-      // The files are already uploaded and the report is created
+        location: validatedData.location.address,
+        incidentType: validatedData.incidentType,
+        description: validatedData.description?.text,
+        userData: validatedData.userData,
+      };
+
+      try {
+        await sendEmailWithRetry({
+          from: EMAIL_CONSTANTS.FROM_ADDRESS,
+          to: EMAIL_CONSTANTS.TO_ADDRESS,
+          bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+          subject: t("mails.internal.subject"),
+          react: InternalReportEmail(emailProps),
+          attachments,
+        });
+      } catch (error) {
+        console.error("Error sending internal email:", {
+          error,
+          reportId: report.id,
+          fileCount: files.length,
+        });
+        // Log the error but don't fail the whole process
+        // The files are already uploaded and the report is created
+      }
     }
 
     return { success: true, reportId: report.id };

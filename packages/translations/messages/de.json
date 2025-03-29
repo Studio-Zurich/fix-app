@@ -104,6 +104,7 @@
             }
         },
         "reportOverview": {
+            "imageUploaded": "Bild hochgeladen",
             "imagesUploaded": "Bilder hochgeladen",
             "image": "Bild",
             "images": "Bilder",
