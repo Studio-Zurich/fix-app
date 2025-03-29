@@ -21,6 +21,8 @@
                 "description": "Foto aufnehmen oder Bild auswählen"
             },
             "locationMap": {
+                "step": "Standort auswählen",
+                "description": "Karte bewegen, um die Position zu ändern",
                 "moveMap": "Karte bewegen, um die Position zu ändern",
                 "searchPlaceholder": "Adresse eingeben",
                 "noResults": "Keine Ergebnisse gefunden",
@@ -31,6 +33,32 @@
                     "confirm": "Standort verwenden",
                     "reject": "Anderen Standort wählen"
                 }
+            },
+            "incidentType": {
+                "step": "Vorfalltyp auswählen",
+                "description": "Wähle den passenden Vorfalltyp aus"
+            },
+            "incidentSubtype": {
+                "step": "Vorfalluntertyp auswählen",
+                "description": "Wähle den passenden Vorfalluntertyp aus"
+            },
+            "incidentDescription": {
+                "step": "Beschreibung hinzufügen",
+                "description": "Beschreiben Sie den Vorfall..."
+            },
+            "userData": {
+                "title": "Ihre Kontaktinformationen"
+            },
+            "summary": {
+                "title": "Zusammenfassung",
+                "images": "Bilder",
+                "location": "Standort",
+                "incidentType": "Vorfallstyp",
+                "description": "Beschreibung",
+                "contactInfo": "Kontaktinformationen",
+                "reporter": "Reporter",
+                "reporterEmail": "Reporter Email",
+                "reporterPhone": "Reporter Phone"
             },
             "locationFound": "Standort gefunden: {address}",
             "takePhotoOrChooseImage": "Foto aufnehmen oder Bild auswählen",
@@ -55,20 +83,6 @@
                 "noPersonalInfo": "Keine persönlichen Informationen",
                 "respectful": "Bleiben Sie respektvoll",
                 "noOffensive": "Keine anstößigen Inhalte"
-            },
-            "userData": {
-                "title": "Ihre Kontaktinformationen"
-            },
-            "summary": {
-                "title": "Zusammenfassung",
-                "images": "Bilder",
-                "location": "Standort",
-                "incidentType": "Vorfallstyp",
-                "description": "Beschreibung",
-                "contactInfo": "Kontaktinformationen",
-                "reporter": "Reporter",
-                "reporterEmail": "Reporter Email",
-                "reporterPhone": "Reporter Phone"
             },
             "next": "Weiter",
             "back": "Zurück",

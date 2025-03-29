@@ -171,6 +171,11 @@ export type Suggestion = {
   center: [number, number];
 };
 
+export type MapOverlayProps = {
+  onInteraction: () => void;
+  text: string;
+};
+
 // Component props types
 export type ImageUploadProps = {
   onNext: () => void;

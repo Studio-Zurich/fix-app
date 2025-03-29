@@ -21,6 +21,8 @@
                 "description": "Take a photo or choose an image"
             },
             "locationMap": {
+                "step": "Select location",
+                "description": "Move the map to change the location",
                 "moveMap": "Move the map to change the location",
                 "searchPlaceholder": "Enter address",
                 "noResults": "No results found",
@@ -31,6 +33,32 @@
                     "confirm": "Use location",
                     "reject": "Select other location"
                 }
+            },
+            "incidentType": {
+                "step": "Select incident type",
+                "description": "Select the appropriate incident type"
+            },
+            "incidentSubtype": {
+                "step": "Select incident subtype",
+                "description": "Select the appropriate incident subtype"
+            },
+            "incidentDescription": {
+                "step": "Add description",
+                "description": "Describe the incident..."
+            },
+            "userData": {
+                "title": "Your Contact Information"
+            },
+            "summary": {
+                "title": "Summary",
+                "images": "Images",
+                "location": "Location",
+                "incidentType": "Incident Type",
+                "description": "Description",
+                "contactInfo": "Contact Information",
+                "reporter": "Reporter",
+                "reporterEmail": "Reporter Email",
+                "reporterPhone": "Reporter Phone"
             },
             "locationFound": "Location found: {address}",
             "takePhotoOrChooseImage": "Take a photo or choose an image",
@@ -55,20 +83,6 @@
                 "noPersonalInfo": "No personal information",
                 "respectful": "Stay respectful",
                 "noOffensive": "No offensive content"
-            },
-            "userData": {
-                "title": "Your Contact Information"
-            },
-            "summary": {
-                "title": "Summary",
-                "images": "Images",
-                "location": "Location",
-                "incidentType": "Incident Type",
-                "description": "Description",
-                "contactInfo": "Contact Information",
-                "reporter": "Reporter",
-                "reporterEmail": "Reporter Email",
-                "reporterPhone": "Reporter Phone"
             },
             "next": "Next",
             "back": "Back",

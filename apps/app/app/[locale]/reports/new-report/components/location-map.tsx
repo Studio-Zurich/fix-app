@@ -7,7 +7,7 @@ import {
   fetchAddressFromCoordinates,
   fetchLocationSuggestions,
 } from "@/lib/utils/map";
-import { ArrowsOutCardinal, Crosshair, MapPin } from "@phosphor-icons/react";
+import { Crosshair, MapPin } from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +27,13 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/command";
-import { TypographySpan } from "@repo/ui/text";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
 import Map from "react-map-gl";
+import MapOverlay from "./map-overlay";
 
 export default function LocationMap({
   onLocationSelect,
@@ -227,15 +227,10 @@ export default function LocationMap({
         }}
       >
         {!hasInteractedWithMap && !showLocationDialog && (
-          <div
-            className="absolute top-0 left-0 backdrop-blur-xs w-full h-full z-10 flex flex-col justify-center items-center space-y-4 p-6 text-center cursor-pointer"
-            onClick={handleMapInteraction}
-          >
-            <ArrowsOutCardinal size={48} />
-            <TypographySpan className="block font-regular" size="text-lg">
-              {t("locationMap.moveMap")}
-            </TypographySpan>
-          </div>
+          <MapOverlay
+            onInteraction={handleMapInteraction}
+            text={t("locationMap.moveMap")}
+          />
         )}
         <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2">
           <Command shouldFilter={false}>

@@ -19,6 +19,24 @@
     },
     "components": {
         "reportFlow": {
+            "imageUpload": {
+                "step": "Upload image",
+                "description": "Take a photo or choose an image"
+            },
+            "locationMap": {
+                "step": "Select location",
+                "description": "Move the map to change the position",
+                "moveMap": "Move the map to change the position",
+                "searchPlaceholder": "Enter address",
+                "noResults": "No results found",
+                "getLocation": "Current location",
+                "locationDialog": {
+                    "title": "Location found",
+                    "description": "We detected a location in your image. Would you like to use this location?",
+                    "confirm": "Use location",
+                    "reject": "Choose different location"
+                }
+            },
             "takePhotoOrChooseImage": "Take a photo or choose an image",
             "uploading": "Uploading...",
             "uploadImage": "Upload image",

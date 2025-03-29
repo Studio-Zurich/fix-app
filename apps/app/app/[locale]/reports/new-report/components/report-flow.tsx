@@ -12,6 +12,7 @@ import IncidentType from "./incident-type";
 import LocationMap from "./location-map";
 import ReportSuccess from "./report-success";
 import ReportSummary from "./report-summary";
+import StepHeader from "./step-header";
 import UserData from "./user-data";
 
 const MAX_FILES = 5;
@@ -117,9 +118,10 @@ const ReportFlow = () => {
       case 2:
         return (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4">
-              {t("selectLocation")}
-            </h2>
+            <StepHeader
+              step={t("locationMap.step")}
+              description={t("locationMap.description")}
+            />
             <LocationMap
               onLocationSelect={setLocation}
               initialLocation={location}
