@@ -193,105 +193,129 @@ const ImageUpload = ({
         step={t("imageUpload.step")}
         description={t("imageUpload.description")}
       />
-      <div className="relative">
+      <div className="relative space-y-4">
+        {/* Camera input */}
         <input
           type="file"
           accept="image/jpeg,image/png,image/gif"
           multiple
           onChange={handleFileChange}
           disabled={isUploading}
-          aria-label={t("takePhotoOrChooseImage")}
+          aria-label={t("takePhoto")}
           aria-describedby={error ? "file-error" : undefined}
           className="hidden"
-          id="file-input"
+          id="camera-input"
           capture="environment"
         />
-        <label
-          htmlFor="file-input"
-          className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors ${
-            isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-          }`}
-        >
-          {files.length > 0 ? (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span>
-                  {files.length === 1
-                    ? t("filesSelected", { count: files.length })
-                    : t("filesSelectedPlural", { count: files.length })}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    clearFiles();
-                  }}
-                  disabled={isUploading}
-                >
-                  {t("clearAll")}
-                </Button>
-              </div>
-
-              {/* Image Previews */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {previews.map((preview, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeFile(index);
-                      }}
-                      disabled={isUploading}
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {t("remove")}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-sm text-gray-500 space-y-1">
-                {files.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{file.name}</span>
-                      <span className="text-gray-400">
-                        ({formatFileSize(file.size)})
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                {foundLocation && (
-                  <div className="mt-2 text-sm text-primary">
-                    {t("locationFound", { address: foundLocation.address })}
-                  </div>
-                )}
-                {isGettingLocation && (
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    {t("gettingLocation")}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
+        {/* Photo library input */}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/gif"
+          multiple
+          onChange={handleFileChange}
+          disabled={isUploading}
+          aria-label={t("chooseFromLibrary")}
+          aria-describedby={error ? "file-error" : undefined}
+          className="hidden"
+          id="library-input"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Camera button */}
+          <label
+            htmlFor="camera-input"
+            className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors md:hidden ${
+              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+            }`}
+          >
             <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
-              {t("takePhotoOrChooseImage")}
+              {t("takePhoto")}
             </span>
-          )}
-        </label>
+          </label>
+          {/* Photo library button */}
+          <label
+            htmlFor="library-input"
+            className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors ${
+              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+            }`}
+          >
+            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-backgrond text-foreground border-foreground border shadow hover:bg-foreground hover:text-background md:bg-foreground md:text-background md:hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
+              {t("chooseFromLibrary")}
+            </span>
+          </label>
+        </div>
+
+        {files.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span>
+                {files.length === 1
+                  ? t("filesSelected", { count: files.length })
+                  : t("filesSelectedPlural", { count: files.length })}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  clearFiles();
+                }}
+                disabled={isUploading}
+              >
+                {t("clearAll")}
+              </Button>
+            </div>
+
+            {/* Image Previews */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {previews.map((preview, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      removeFile(index);
+                    }}
+                    disabled={isUploading}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {t("remove")}
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-sm text-gray-500 space-y-1">
+              {files.map((file, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span>{file.name}</span>
+                    <span className="text-gray-400">
+                      ({formatFileSize(file.size)})
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {foundLocation && (
+                <div className="mt-2 text-sm text-primary">
+                  {t("locationFound", { address: foundLocation.address })}
+                </div>
+              )}
+              {isGettingLocation && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  {t("gettingLocation")}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       {error && (
         <p id="file-error" role="alert" className="text-red-500">

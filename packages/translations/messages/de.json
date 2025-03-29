@@ -7,7 +7,7 @@
             "title": "Reports"
         },
         "newReport": {
-            "title": "Neue Meldung",
+            "title": "Neue Meldung (beta)",
             "description": "Erstellen Sie eine neue Vorkommensmeldung"
         }
     },
@@ -67,7 +67,8 @@
                 "button": "Neue Meldung erstellen"
             },
             "locationFound": "Standort gefunden: {address}",
-            "takePhotoOrChooseImage": "Foto hinzufügen",
+            "takePhoto": "Foto aufnehmen",
+            "chooseFromLibrary": "Aus Bibliothek wählen",
             "uploading": "Absenden...",
             "uploadImage": "Bild hochladen",
             "filesSelected": "{count} Datei ausgewählt",
