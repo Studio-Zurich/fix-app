@@ -177,13 +177,12 @@ export type MapOverlayProps = {
 };
 
 // Component props types
-export type ImageUploadProps = {
-  onNext: () => void;
-  isUploading: boolean;
+export interface ImageUploadProps {
   files: File[];
   setFiles: (files: File[]) => void;
-  onLocationFound?: (location: ImageLocation) => void;
-};
+  onLocationFound: (location: ImageLocation) => void;
+  isUploading: boolean;
+}
 
 export interface LocationMapProps {
   onLocationSelect: (location: ImageLocation) => void;

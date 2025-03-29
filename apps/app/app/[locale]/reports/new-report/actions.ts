@@ -237,13 +237,16 @@ export async function submitReport(
         };
       }
 
-      // Prepare attachments for internal email
-      const attachments = await Promise.all(
-        files.map(async (file) => ({
-          filename: file.name,
-          content: Buffer.from(await file.arrayBuffer()),
-        }))
-      );
+      // Prepare attachments for internal email if files exist
+      const attachments =
+        files.length > 0
+          ? await Promise.all(
+              files.map(async (file) => ({
+                filename: file.name,
+                content: Buffer.from(await file.arrayBuffer()),
+              }))
+            )
+          : [];
 
       // Send internal notification email with simplified data
       const emailProps: EmailProps = {

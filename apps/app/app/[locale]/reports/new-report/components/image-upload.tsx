@@ -10,11 +10,10 @@ import StepHeader from "./step-header";
 const MAX_FILES = 5;
 
 const ImageUpload = ({
-  onNext,
-  isUploading,
   files,
   setFiles,
   onLocationFound,
+  isUploading,
 }: ImageUploadProps) => {
   const t = useTranslations("components.reportFlow");
   const [error, setError] = useState<string | null>(null);
@@ -167,7 +166,7 @@ const ImageUpload = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-1 h-full">
       <StepHeader
         step={t("imageUpload.step")}
         description={t("imageUpload.description")}
@@ -263,12 +262,6 @@ const ImageUpload = ({
             <span>{t("takePhotoOrChooseImage")}</span>
           )}
         </label>
-      </div>
-
-      <div className="flex justify-end">
-        <Button onClick={onNext} disabled={isUploading}>
-          {t("next")}
-        </Button>
       </div>
       {error && (
         <p id="file-error" role="alert" className="text-red-500">

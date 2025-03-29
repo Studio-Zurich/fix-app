@@ -56,7 +56,7 @@ export default async function RootLayout({
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} ${brockmannSemiBold.variable} ${brockmannBold.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <main className="h-max w-full flex flex-col container mx-auto gap-8">
+          <main className="h-full min-h-svh w-full flex flex-col container mx-auto gap-8">
             {children}
           </main>
         </NextIntlClientProvider>

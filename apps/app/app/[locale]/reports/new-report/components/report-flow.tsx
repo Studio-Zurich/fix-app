@@ -99,20 +99,30 @@ const ReportFlow = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitReport(locale as "de" | "en");
-    setCurrentStep(8); // Move to success step after submission
+    setCurrentStep(8);
   };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <ImageUpload
-            onNext={handleNext}
-            isUploading={uploading}
-            files={files}
-            setFiles={setFiles}
-            onLocationFound={handleLocationFound}
-          />
+          <>
+            <ImageUpload
+              files={files}
+              setFiles={setFiles}
+              onLocationFound={handleLocationFound}
+              isUploading={uploading}
+            />
+            <div className="p-2 bg-green-300/50 w-full flex justify-between">
+              <Button
+                onClick={handleNext}
+                disabled={uploading}
+                className="ml-auto"
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </>
         );
 
       case 2:
@@ -240,18 +250,25 @@ const ReportFlow = () => {
   };
 
   return (
-    <section className="grid gap-4">
+    <section className="flex flex-col flex-1 gap-4">
       <Progress
         value={((currentStep === 7 ? 8 : currentStep) * 100) / 8}
         max={100}
       />
-      <form onSubmit={handleSubmit}>
-        {renderStep()}
-        {error && (
-          <p id="file-error" role="alert" className="text-red-500">
-            {error}
-          </p>
-        )}
+      <form
+        onSubmit={handleSubmit}
+        className="relative flex flex-col flex-1 overflow-hidden bg-amber-200"
+      >
+        <div className="flex flex-col flex-1">
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            {renderStep()}
+            {error && (
+              <p id="file-error" role="alert" className="text-red-500">
+                {error}
+              </p>
+            )}
+          </div>
+        </div>
       </form>
     </section>
   );
