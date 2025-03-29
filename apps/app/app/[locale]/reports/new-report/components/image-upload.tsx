@@ -21,6 +21,7 @@ const ImageUpload = ({
     null
   );
   const [previews, setPreviews] = useState<string[]>([]);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   // Generate previews when files change
   useEffect(() => {
@@ -107,6 +108,32 @@ const ImageUpload = ({
     }
   };
 
+  const getLocationFromDevice = async (): Promise<ImageLocation | null> => {
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          });
+        }
+      );
+
+      const { latitude: lat, longitude: lng } = position.coords;
+      const address = await fetchAddressFromCoordinates(lng, lat);
+
+      return {
+        lat,
+        lng,
+        address,
+      };
+    } catch (error) {
+      console.error("Error getting location from device:", error);
+      return null;
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
 
@@ -121,6 +148,22 @@ const ImageUpload = ({
     if (oversizedFiles.length > 0) {
       setError(t("errors.fileTooLarge"));
       return;
+    }
+
+    // If this is a new photo being taken (not from library)
+    if (e.target.capture === "environment") {
+      setIsGettingLocation(true);
+      try {
+        const location = await getLocationFromDevice();
+        if (location) {
+          setFoundLocation(location);
+          onLocationFound(location);
+        }
+      } catch (error) {
+        console.error("Error getting location:", error);
+      } finally {
+        setIsGettingLocation(false);
+      }
     }
 
     setFiles(selectedFiles);
@@ -161,6 +204,7 @@ const ImageUpload = ({
           aria-describedby={error ? "file-error" : undefined}
           className="hidden"
           id="file-input"
+          capture="environment"
         />
         <label
           htmlFor="file-input"
@@ -233,6 +277,11 @@ const ImageUpload = ({
                 {foundLocation && (
                   <div className="mt-2 text-sm text-primary">
                     {t("locationFound", { address: foundLocation.address })}
+                  </div>
+                )}
+                {isGettingLocation && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {t("gettingLocation")}
                   </div>
                 )}
               </div>

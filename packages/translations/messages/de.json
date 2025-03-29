@@ -103,7 +103,8 @@
                 "someUploadsFailed": "Einige Uploads fehlgeschlagen",
                 "noLocationSelected": "Bitte wählen Sie einen Standort aus",
                 "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
-            }
+            },
+            "gettingLocation": "Standort wird vom Gerät abgerufen..."
         },
         "reportOverview": {
             "imageUploaded": "Bild hochgeladen",

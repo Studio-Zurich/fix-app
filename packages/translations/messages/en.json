@@ -103,7 +103,8 @@
                 "someUploadsFailed": "Some uploads failed",
                 "noLocationSelected": "Please select a location",
                 "noIncidentTypeSelected": "Please select an incident type"
-            }
+            },
+            "gettingLocation": "Getting location from device..."
         },
         "reportOverview": {
             "imageUploaded": "Image uploaded",
