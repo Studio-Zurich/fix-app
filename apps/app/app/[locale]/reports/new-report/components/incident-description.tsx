@@ -1,14 +1,11 @@
 "use client";
 
 import { ReportDescription, SelectedIncidentTypeType } from "@/lib/types";
-import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-
+import StepHeader from "./step-header";
 interface IncidentDescriptionProps {
-  onNext: () => void;
-  onBack: () => void;
   selectedType: SelectedIncidentTypeType;
   onDescriptionChange: (description: ReportDescription) => void;
   initialDescription?: string;
@@ -17,8 +14,6 @@ interface IncidentDescriptionProps {
 const MAX_CHARS = 500;
 
 export default function IncidentDescription({
-  onNext,
-  onBack,
   selectedType,
   onDescriptionChange,
   initialDescription = "",
@@ -43,23 +38,27 @@ export default function IncidentDescription({
   const charactersLeft = MAX_CHARS - description.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-1">
+      <StepHeader
+        step={t("incidentDescription.step")}
+        description={t("incidentDescription.description")}
+      />
       {selectedType && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">
-              {t("selectedIncidentType")}{" "}
               {tIncident(`${selectedType.type.name}.name`)}
+              {selectedType.subtype && (
+                <>
+                  {" "}
+                  –{" "}
+                  {tIncident(
+                    `${selectedType.type.name}.subtypes.${selectedType.subtype.name}.name`
+                  )}
+                </>
+              )}
             </h3>
           </div>
-          {selectedType.subtype && (
-            <p className="text-sm text-muted-foreground">
-              {t("selectedIncidentSubtype")}{" "}
-              {tIncident(
-                `${selectedType.type.name}.subtypes.${selectedType.subtype.name}.name`
-              )}
-            </p>
-          )}
         </div>
       )}
 
@@ -84,13 +83,6 @@ export default function IncidentDescription({
           <li>{t("descriptionGuidelines.respectful")}</li>
           <li>{t("descriptionGuidelines.noOffensive")}</li>
         </ul>
-      </div>
-
-      <div className="flex justify-between mt-4">
-        <Button variant="outline" onClick={onBack}>
-          {t("back")}
-        </Button>
-        <Button onClick={onNext}>{t("next")}</Button>
       </div>
     </div>
   );

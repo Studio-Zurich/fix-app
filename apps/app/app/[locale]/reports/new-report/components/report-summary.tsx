@@ -11,13 +11,13 @@ import { Button } from "@repo/ui/button";
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import StepHeader from "./step-header";
 
 interface ReportSummaryProps {
   files: File[];
   location: Location;
   selectedType: SelectedIncidentTypeType;
   description?: ReportDescription;
-  onBack: () => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
   userData: UserData;
@@ -33,7 +33,6 @@ export default function ReportSummary({
   location,
   selectedType,
   description,
-  onBack,
   onSubmit,
   isSubmitting,
   userData,
@@ -75,11 +74,14 @@ export default function ReportSummary({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">{t("summary.title")}</h3>
+    <div className="space-y-4 flex-1">
+      <StepHeader
+        step={t("summary.step")}
+        description={t("summary.description")}
+      />
 
-        {/* Images Summary */}
+      {/* Images Summary */}
+      {files.length > 0 && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h4 className="font-medium">{t("summary.images")}</h4>
@@ -109,105 +111,89 @@ export default function ReportSummary({
             ))}
           </div>
         </div>
+      )}
 
-        {/* Location Summary */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <h4 className="font-medium">{t("summary.location")}</h4>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onEditLocation}
-              className="h-8 w-8 p-0"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground">{location.address}</p>
+      {/* Location Summary */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <h4 className="font-medium">{t("summary.location")}</h4>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onEditLocation}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         </div>
+        <p className="text-sm text-muted-foreground">{location.address}</p>
+      </div>
 
-        {/* Incident Type Summary */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <h4 className="font-medium">{t("summary.incidentType")}</h4>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onEditType}
-              className="h-8 w-8 p-0"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            <p>{selectedType.type.name}</p>
-            {selectedType.subtype && (
-              <p className="mt-1">{selectedType.subtype.name}</p>
-            )}
-          </div>
+      {/* Incident Type Summary */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <h4 className="font-medium">{t("summary.incidentType")}</h4>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onEditType}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         </div>
-
-        {/* Description Summary */}
-        {description && (
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h4 className="font-medium">{t("summary.description")}</h4>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={onEditDescription}
-                className="h-8 w-8 p-0"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {description.text}
-            </p>
-          </div>
-        )}
-
-        {/* User Data Summary */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <h4 className="font-medium">{t("summary.contactInfo")}</h4>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onEditUserData}
-              className="h-8 w-8 p-0"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p>
-              {userData.firstName} {userData.lastName}
-            </p>
-            <p>{userData.email}</p>
-            {userData.phone && <p>{userData.phone}</p>}
-          </div>
+        <div className="text-sm text-muted-foreground">
+          <p>{selectedType.type.name}</p>
+          {selectedType.subtype && (
+            <p className="mt-1">{selectedType.subtype.name}</p>
+          )}
         </div>
       </div>
 
-      <div className="flex justify-between mt-6">
-        <Button type="button" variant="outline" onClick={onBack}>
-          {t("back")}
-        </Button>
-        <Button type="submit" onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t("uploading")}
-            </div>
-          ) : (
-            t("submit")
-          )}
-        </Button>
+      {/* Description Summary */}
+      {description && (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <h4 className="font-medium">{t("summary.description")}</h4>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onEditDescription}
+              className="h-8 w-8 p-0"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground line-clamp-3">
+            {description.text}
+          </p>
+        </div>
+      )}
+
+      {/* User Data Summary */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <h4 className="font-medium">{t("summary.contactInfo")}</h4>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onEditUserData}
+            className="h-8 w-8 p-0"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p>
+            {userData.firstName} {userData.lastName}
+          </p>
+          <p>{userData.email}</p>
+          {userData.phone && <p>{userData.phone}</p>}
+        </div>
       </div>
     </div>
   );

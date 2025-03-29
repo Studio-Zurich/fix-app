@@ -1,13 +1,12 @@
 "use client";
 
 import { IncidentSubtypeType, IncidentTypeType } from "@/lib/types";
-import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Skeleton } from "@repo/ui/skeleton";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-
+import StepHeader from "./step-header";
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,16 +16,12 @@ interface IncidentSubtypeProps {
   selectedType: IncidentTypeType;
   onSelect: (subtype: IncidentSubtypeType) => void;
   selectedSubtype?: IncidentSubtypeType;
-  onNext: () => void;
-  onBack: () => void;
 }
 
 export default function IncidentSubtype({
   selectedType,
   onSelect,
   selectedSubtype,
-  onNext,
-  onBack,
 }: IncidentSubtypeProps) {
   const [subtypes, setSubtypes] = useState<IncidentSubtypeType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,11 +41,6 @@ export default function IncidentSubtype({
 
         if (error) throw error;
         setSubtypes(data || []);
-
-        // If there are no subtypes, automatically proceed to next step
-        if (!data || data.length === 0) {
-          onNext();
-        }
       } catch (err) {
         setError(t("errors.loadFailed"));
         console.error(err);
@@ -60,7 +50,7 @@ export default function IncidentSubtype({
     };
 
     fetchSubtypes();
-  }, [selectedType.id, t, onNext]);
+  }, [selectedType.id, t]);
 
   if (loading) {
     return (
@@ -80,9 +70,6 @@ export default function IncidentSubtype({
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-6">
-          <Skeleton className="h-10 w-24" />
-        </div>
       </div>
     );
   }
@@ -94,9 +81,13 @@ export default function IncidentSubtype({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-1">
+      <StepHeader
+        step={tReport("incidentSubtype.step")}
+        description={tReport("incidentSubtype.description")}
+      />
       <div className="text-sm text-muted-foreground">
-        {tReport("selectedIncidentType")} {t(`${selectedType.name}.name`)}
+        {t(`${selectedType.name}.name`)}
       </div>
 
       <div className="space-y-2">
@@ -128,15 +119,6 @@ export default function IncidentSubtype({
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex justify-between mt-6">
-        <Button variant="outline" onClick={onBack}>
-          {tReport("back")}
-        </Button>
-        <Button onClick={onNext} disabled={!selectedSubtype}>
-          {tReport("next")}
-        </Button>
       </div>
     </div>
   );

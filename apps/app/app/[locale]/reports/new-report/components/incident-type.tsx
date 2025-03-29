@@ -2,13 +2,13 @@
 
 import { IncidentTypeType } from "@/lib/types";
 import { MagnifyingGlass } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
 import { Skeleton } from "@repo/ui/skeleton";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import StepHeader from "./step-header";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,15 +18,11 @@ const supabase = createClient(
 interface IncidentTypeProps {
   onSelect: (type: IncidentTypeType) => void;
   selectedType?: IncidentTypeType;
-  onNext: () => void;
-  onBack?: () => void;
 }
 
 export default function IncidentType({
   onSelect,
   selectedType,
-  onNext,
-  onBack,
 }: IncidentTypeProps) {
   const [types, setTypes] = useState<IncidentTypeType[]>([]);
   const [filteredTypes, setFilteredTypes] = useState<IncidentTypeType[]>([]);
@@ -35,7 +31,6 @@ export default function IncidentType({
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("incidentTypes");
   const tReport = useTranslations("components.reportFlow");
-
   // Fetch incident types
   useEffect(() => {
     const fetchTypes = async () => {
@@ -91,9 +86,6 @@ export default function IncidentType({
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-6">
-          <Skeleton className="h-10 w-24" />
-        </div>
       </div>
     );
   }
@@ -101,6 +93,10 @@ export default function IncidentType({
 
   return (
     <div className="space-y-4">
+      <StepHeader
+        step={tReport("incidentType.step")}
+        description={tReport("incidentType.description")}
+      />
       <div className="relative">
         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -111,7 +107,7 @@ export default function IncidentType({
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 h-[calc(100svh-258px)] overflow-y-auto pb-[33px]">
         {filteredTypes.map((type) => (
           <div
             key={type.id}
@@ -138,17 +134,6 @@ export default function IncidentType({
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex justify-between mt-6">
-        {onBack && (
-          <Button variant="outline" onClick={onBack}>
-            {tReport("back")}
-          </Button>
-        )}
-        <Button onClick={onNext} disabled={!selectedType}>
-          {tReport("next")}
-        </Button>
       </div>
     </div>
   );

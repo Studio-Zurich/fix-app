@@ -18,7 +18,7 @@
         "reportFlow": {
             "imageUpload": {
                 "step": "Bild hochladen",
-                "description": "Foto aufnehmen oder Bild auswählen"
+                "description": "Foto hinzufügen"
             },
             "locationMap": {
                 "step": "Standort auswählen",
@@ -47,22 +47,28 @@
                 "description": "Beschreiben Sie den Vorfall..."
             },
             "userData": {
-                "title": "Ihre Kontaktinformationen"
+                "step": "Kontaktinformationen",
+                "description": "Ihre Kontaktinformationen"
             },
             "summary": {
-                "title": "Zusammenfassung",
+                "step": "Zusammenfassung",
+                "description": "Zusammenfassung der Meldung",
                 "images": "Bilder",
                 "location": "Standort",
                 "incidentType": "Vorfallstyp",
-                "description": "Beschreibung",
                 "contactInfo": "Kontaktinformationen",
                 "reporter": "Reporter",
                 "reporterEmail": "Reporter Email",
                 "reporterPhone": "Reporter Phone"
             },
+            "success": {
+                "step": "Vielen Dank für deine Meldung",
+                "description": "Du erhältst eine Bestätigung per E-Mail",
+                "button": "Neue Meldung erstellen"
+            },
             "locationFound": "Standort gefunden: {address}",
-            "takePhotoOrChooseImage": "Foto aufnehmen oder Bild auswählen",
-            "uploading": "Report wird verarbeitet...",
+            "takePhotoOrChooseImage": "Foto hinzufügen",
+            "uploading": "Absenden...",
             "uploadImage": "Bild hochladen",
             "filesSelected": "{count} Datei ausgewählt",
             "filesSelectedPlural": "{count} Dateien ausgewählt",
@@ -97,10 +103,6 @@
                 "someUploadsFailed": "Einige Uploads fehlgeschlagen",
                 "noLocationSelected": "Bitte wählen Sie einen Standort aus",
                 "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
-            },
-            "success": {
-                "title": "Vielen Dank für deine Meldung",
-                "description": "Du erhältst eine Bestätigung per E-Mail"
             }
         },
         "reportOverview": {

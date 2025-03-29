@@ -2,28 +2,20 @@
 
 import { userDataSchema } from "@/lib/schemas";
 import { UserData as UserDataType } from "@/lib/types";
-import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import StepHeader from "./step-header";
 
 interface UserDataProps {
   onDataChange: (data: UserDataType) => void;
-  onNext: () => void;
-  onBack: () => void;
   initialData?: UserDataType;
 }
 
-export default function UserData({
-  onDataChange,
-  onNext,
-  onBack,
-  initialData,
-}: UserDataProps) {
+export default function UserData({ onDataChange, initialData }: UserDataProps) {
   const t = useTranslations("components.userData");
   const tReport = useTranslations("components.reportFlow");
-
   const [formData, setFormData] = useState<UserDataType>(
     initialData || {
       firstName: "",
@@ -70,53 +62,55 @@ export default function UserData({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Input
-            placeholder={t("firstName")}
-            value={formData.firstName}
-            onChange={handleChange("firstName")}
-            onBlur={handleBlur("firstName")}
-          />
-          {errors.firstName && (
-            <p className="text-sm text-destructive">{errors.firstName}</p>
-          )}
-        </div>
+    <div className="space-y-4 flex-1">
+      <StepHeader
+        step={tReport("userData.step")}
+        description={tReport("userData.description")}
+      />
+      <div className="space-y-2">
+        <Input
+          placeholder={t("firstName")}
+          value={formData.firstName}
+          onChange={handleChange("firstName")}
+          onBlur={handleBlur("firstName")}
+        />
+        {errors.firstName && (
+          <p className="text-sm text-destructive">{errors.firstName}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Input
-            placeholder={t("lastName")}
-            value={formData.lastName}
-            onChange={handleChange("lastName")}
-            onBlur={handleBlur("lastName")}
-          />
-          {errors.lastName && (
-            <p className="text-sm text-destructive">{errors.lastName}</p>
-          )}
-        </div>
+      <div className="space-y-2">
+        <Input
+          placeholder={t("lastName")}
+          value={formData.lastName}
+          onChange={handleChange("lastName")}
+          onBlur={handleBlur("lastName")}
+        />
+        {errors.lastName && (
+          <p className="text-sm text-destructive">{errors.lastName}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Input
-            type="email"
-            placeholder={t("email")}
-            value={formData.email}
-            onChange={handleChange("email")}
-            onBlur={handleBlur("email")}
-          />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email}</p>
-          )}
-        </div>
+      <div className="space-y-2">
+        <Input
+          type="email"
+          placeholder={t("email")}
+          value={formData.email}
+          onChange={handleChange("email")}
+          onBlur={handleBlur("email")}
+        />
+        {errors.email && (
+          <p className="text-sm text-destructive">{errors.email}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Input
-            type="tel"
-            placeholder={t("phone")}
-            value={formData.phone}
-            onChange={handleChange("phone")}
-          />
-        </div>
+      <div className="space-y-2">
+        <Input
+          type="tel"
+          placeholder={t("phone")}
+          value={formData.phone}
+          onChange={handleChange("phone")}
+        />
       </div>
 
       <div className="text-sm text-muted-foreground space-y-1">
@@ -127,15 +121,6 @@ export default function UserData({
           <li>{t("reasons.confirmation")}</li>
         </ul>
         <p className="text-xs mt-2">{t("requiredFields")}</p>
-      </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
-          {tReport("back")}
-        </Button>
-        <Button onClick={onNext} disabled={!isValid}>
-          {tReport("next")}
-        </Button>
       </div>
     </div>
   );

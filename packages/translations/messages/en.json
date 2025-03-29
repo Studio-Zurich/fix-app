@@ -18,7 +18,7 @@
         "reportFlow": {
             "imageUpload": {
                 "step": "Upload images",
-                "description": "Take a photo or choose an image"
+                "description": "Add a photo"
             },
             "locationMap": {
                 "step": "Select location",
@@ -47,22 +47,28 @@
                 "description": "Describe the incident..."
             },
             "userData": {
-                "title": "Your Contact Information"
+                "step": "Contact Information",
+                "description": "Your contact information"
             },
             "summary": {
-                "title": "Summary",
+                "step": "Summary",
+                "description": "Summary of the report",
                 "images": "Images",
                 "location": "Location",
                 "incidentType": "Incident Type",
-                "description": "Description",
                 "contactInfo": "Contact Information",
                 "reporter": "Reporter",
                 "reporterEmail": "Reporter Email",
                 "reporterPhone": "Reporter Phone"
             },
+            "success": {
+                "step": "Thank you for your report",
+                "description": "You will receive a confirmation email",
+                "button": "Create new report"
+            },
             "locationFound": "Location found: {address}",
-            "takePhotoOrChooseImage": "Take a photo or choose an image",
-            "uploading": "Report is being processed...",
+            "takePhotoOrChooseImage": "Add a photo",
+            "uploading": "Sending...",
             "uploadImage": "Upload image",
             "filesSelected": "{count} file selected",
             "filesSelectedPlural": "{count} files selected",
@@ -97,10 +103,6 @@
                 "someUploadsFailed": "Some uploads failed",
                 "noLocationSelected": "Please select a location",
                 "noIncidentTypeSelected": "Please select an incident type"
-            },
-            "success": {
-                "title": "Thank you for your report",
-                "description": "You will receive a confirmation email"
             }
         },
         "reportOverview": {

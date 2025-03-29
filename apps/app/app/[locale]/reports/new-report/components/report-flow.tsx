@@ -112,7 +112,7 @@ const ReportFlow = () => {
               onLocationFound={handleLocationFound}
               isUploading={uploading}
             />
-            <div className="p-2 bg-green-300/50 w-full flex justify-between">
+            <div className="py-2  w-full flex justify-between">
               <Button type="button" disabled variant="outline">
                 {t("back")}
               </Button>
@@ -140,7 +140,7 @@ const ReportFlow = () => {
               setHasInteractedWithMap={setHasInteractedWithMap}
             />
 
-            <div className="p-2 bg-green-300/50 w-full flex justify-between">
+            <div className="py-2  w-full flex justify-between">
               <Button variant="outline" type="button" onClick={handleBack}>
                 {t("back")}
               </Button>
@@ -153,72 +153,109 @@ const ReportFlow = () => {
 
       case 3:
         return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4">
-              {t("selectIncidentType")}
-            </h2>
+          <>
             <IncidentType
               onSelect={setSelectedType}
               selectedType={selectedType}
-              onNext={handleNext}
-              onBack={handleBack}
             />
-          </div>
+
+            <div className="py-2  w-full flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBack}>
+                {t("back")}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!selectedType}
+                className="ml-auto"
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </>
         );
 
       case 4:
         return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4">
-              {t("selectIncidentSubtype")}
-            </h2>
+          <>
             <IncidentSubtype
               selectedType={selectedType!}
               onSelect={setSelectedSubtype}
               selectedSubtype={selectedSubtype}
-              onNext={handleNext}
-              onBack={handleBack}
             />
-          </div>
+
+            <div className="py-2  w-full flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBack}>
+                {t("back")}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!selectedSubtype}
+                className="ml-auto"
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </>
         );
 
       case 5:
         return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4">
-              {t("addDescription")}
-            </h2>
+          <>
             <IncidentDescription
               selectedType={{
                 type: selectedType!,
                 subtype: selectedSubtype,
               }}
               onDescriptionChange={setDescription}
-              onNext={handleNext}
-              onBack={handleBack}
               initialDescription={description?.text}
             />
-          </div>
+
+            <div className="py-2  w-full flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBack}>
+                {t("back")}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!description?.text}
+                className="ml-auto"
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </>
         );
 
       case 6:
         return (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold mb-4">
-              {t("userData.title")}
-            </h2>
-            <UserData
-              onDataChange={setUserData}
-              onNext={handleNext}
-              onBack={handleBack}
-              initialData={userData}
-            />
-          </div>
+          <>
+            <UserData onDataChange={setUserData} initialData={userData} />
+
+            <div className="py-2  w-full flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBack}>
+                {t("back")}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={
+                  !userData?.firstName ||
+                  !userData?.lastName ||
+                  !userData?.email
+                }
+                className="ml-auto"
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </>
         );
 
       case 7:
         return (
-          <div className="space-y-4">
+          <>
             <ReportSummary
               files={files}
               location={location!}
@@ -228,7 +265,6 @@ const ReportFlow = () => {
               }}
               description={description}
               userData={userData!}
-              onBack={handleBack}
               onSubmit={handleSubmit}
               isSubmitting={uploading}
               onEditImages={() => setCurrentStep(1)}
@@ -237,7 +273,25 @@ const ReportFlow = () => {
               onEditDescription={() => setCurrentStep(5)}
               onEditUserData={() => setCurrentStep(6)}
             />
-          </div>
+
+            <div className="py-2  w-full">
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={uploading}
+                className="w-full"
+              >
+                {uploading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {t("uploading")}
+                  </div>
+                ) : (
+                  t("submit")
+                )}
+              </Button>
+            </div>
+          </>
         );
 
       case 8:
@@ -256,7 +310,7 @@ const ReportFlow = () => {
       />
       <form
         onSubmit={handleSubmit}
-        className="relative flex flex-col flex-1 overflow-hidden bg-amber-200"
+        className="relative flex flex-col flex-1 overflow-hidden"
       >
         <div className="flex flex-col flex-1">
           <div className="flex-1 overflow-y-auto flex flex-col">

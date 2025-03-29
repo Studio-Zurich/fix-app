@@ -73,7 +73,7 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      // First try to get location from EXIF data
+      // Get location from EXIF data
       const exif = await exifr.parse(file);
 
       if (exif?.GPSLatitude && exif?.GPSLongitude) {
@@ -97,30 +97,9 @@ const ImageUpload = ({
         };
       }
 
-      // If no EXIF data, try to get location from browser
-      try {
-        const position = await new Promise<GeolocationPosition>(
-          (resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0,
-            });
-          }
-        );
-
-        const { latitude: lat, longitude: lng } = position.coords;
-        const address = await fetchAddressFromCoordinates(lng, lat);
-
-        return {
-          lat,
-          lng,
-          address,
-        };
-      } catch (geoError) {
-        console.log("Could not get location from browser:", geoError);
-      }
-
+      // Note: On iOS, EXIF data might not be available due to privacy settings.
+      // In such cases, the location will be null and the user should be informed
+      // that they need to enable location metadata in their camera settings.
       return null;
     } catch (error) {
       console.error("Error reading image location:", error);
@@ -185,7 +164,7 @@ const ImageUpload = ({
         />
         <label
           htmlFor="file-input"
-          className={`block w-full p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+          className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors ${
             isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
           }`}
         >
@@ -259,7 +238,9 @@ const ImageUpload = ({
               </div>
             </div>
           ) : (
-            <span>{t("takePhotoOrChooseImage")}</span>
+            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
+              {t("takePhotoOrChooseImage")}
+            </span>
           )}
         </label>
       </div>
