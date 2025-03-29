@@ -283,6 +283,7 @@ export async function submitReport(
           to: validatedData.userData.email,
           subject: t("mails.external.subject"),
           react: ExternalReportEmail(emailProps),
+          attachments,
         });
       } catch (error) {
         console.error("Error sending emails:", {
