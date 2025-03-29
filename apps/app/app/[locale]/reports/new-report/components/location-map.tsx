@@ -27,6 +27,7 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/command";
+import { TypographyParagraph } from "@repo/ui/text";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
@@ -41,6 +42,7 @@ export default function LocationMap({
   locationSubmitted = false,
   hasInteractedWithMap,
   onMapInteraction,
+  setHasInteractedWithMap,
 }: LocationMapProps) {
   const t = useTranslations("components.reportFlow");
   const [isOpen, setIsOpen] = useState(false);
@@ -55,15 +57,14 @@ export default function LocationMap({
 
   // Set hasLocationFromImage when initialLocation changes
   useEffect(() => {
-    setHasLocationFromImage(!!initialLocation);
-  }, [initialLocation]);
-
-  // Show dialog only if we have a location from an image and haven't interacted yet
-  useEffect(() => {
-    if (hasLocationFromImage && !hasInteractedWithMap && !locationSubmitted) {
+    if (initialLocation && !hasInteractedWithMap && !locationSubmitted) {
+      setHasLocationFromImage(true);
       setShowLocationDialog(true);
+    } else {
+      setHasLocationFromImage(false);
+      setShowLocationDialog(false);
     }
-  }, [hasLocationFromImage, hasInteractedWithMap, locationSubmitted]);
+  }, [initialLocation, hasInteractedWithMap, locationSubmitted]);
 
   // Set searchValue from initialLocation when locationSubmitted is true
   useEffect(() => {
@@ -75,6 +76,8 @@ export default function LocationMap({
   const handleLocationConfirm = () => {
     if (initialLocation) {
       setShowLocationDialog(false);
+      setHasLocationFromImage(false);
+      setHasInteractedWithMap(true);
       setSearchValue(initialLocation.address);
       onLocationSelect(initialLocation);
       mapRef.current?.flyTo({
@@ -87,6 +90,8 @@ export default function LocationMap({
 
   const handleLocationReject = () => {
     setShowLocationDialog(false);
+    setHasLocationFromImage(false);
+    setHasInteractedWithMap(true);
   };
 
   const handleMapInteraction = () => {
@@ -349,9 +354,12 @@ export default function LocationMap({
               {t("locationMap.locationDialog.title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("locationMap.locationDialog.description", {
-                address: initialLocation?.address,
-              })}
+              {t("locationMap.locationDialog.description")}
+              {initialLocation?.address && (
+                <TypographyParagraph className="mt-2 block">
+                  {initialLocation.address}
+                </TypographyParagraph>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

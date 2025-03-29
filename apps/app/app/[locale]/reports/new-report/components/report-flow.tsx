@@ -128,6 +128,7 @@ const ReportFlow = () => {
               locationSubmitted={locationSubmitted}
               hasInteractedWithMap={hasInteractedWithMap}
               onMapInteraction={() => setHasInteractedWithMap(true)}
+              setHasInteractedWithMap={setHasInteractedWithMap}
             />
 
             <div className="flex justify-between">

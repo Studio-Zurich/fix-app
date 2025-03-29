@@ -74,32 +74,57 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
+      // First try to get location from EXIF data
       const exif = await exifr.parse(file);
 
-      if (!exif?.GPSLatitude || !exif?.GPSLongitude) {
-        return null;
+      if (exif?.GPSLatitude && exif?.GPSLongitude) {
+        // Convert GPS coordinates from degrees/minutes/seconds to decimal degrees
+        const lat = convertDMSToDD(
+          exif.GPSLatitude,
+          exif.GPSLatitudeRef === "S" ? -1 : 1
+        );
+        const lng = convertDMSToDD(
+          exif.GPSLongitude,
+          exif.GPSLongitudeRef === "W" ? -1 : 1
+        );
+
+        // Get address from coordinates using reverse geocoding
+        const address = await fetchAddressFromCoordinates(lng, lat);
+
+        return {
+          lat,
+          lng,
+          address,
+        };
       }
 
-      // Convert GPS coordinates from degrees/minutes/seconds to decimal degrees
-      const lat = convertDMSToDD(
-        exif.GPSLatitude,
-        exif.GPSLatitudeRef === "S" ? -1 : 1
-      );
-      const lng = convertDMSToDD(
-        exif.GPSLongitude,
-        exif.GPSLongitudeRef === "W" ? -1 : 1
-      );
+      // If no EXIF data, try to get location from browser
+      try {
+        const position = await new Promise<GeolocationPosition>(
+          (resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
+            });
+          }
+        );
 
-      // Get address from coordinates using reverse geocoding
-      const address = await fetchAddressFromCoordinates(lng, lat);
+        const { latitude: lat, longitude: lng } = position.coords;
+        const address = await fetchAddressFromCoordinates(lng, lat);
 
-      return {
-        lat,
-        lng,
-        address,
-      };
+        return {
+          lat,
+          lng,
+          address,
+        };
+      } catch (geoError) {
+        console.log("Could not get location from browser:", geoError);
+      }
+
+      return null;
     } catch (error) {
-      console.error("Error reading EXIF data:", error);
+      console.error("Error reading image location:", error);
       return null;
     }
   };

@@ -191,6 +191,7 @@ export interface LocationMapProps {
   locationSubmitted?: boolean;
   hasInteractedWithMap: boolean;
   onMapInteraction: () => void;
+  setHasInteractedWithMap: (hasInteracted: boolean) => void;
 }
 
 export interface StepHeaderProps {
