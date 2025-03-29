@@ -35,7 +35,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapRef } from "react-map-gl";
 import Map from "react-map-gl";
 import MapOverlay from "./map-overlay";
-
+import StepHeader from "./step-header";
 export default function LocationMap({
   onLocationSelect,
   initialLocation,
@@ -45,7 +45,7 @@ export default function LocationMap({
   setHasInteractedWithMap,
 }: LocationMapProps) {
   const t = useTranslations("components.reportFlow");
-  const [isOpen, setIsOpen] = useState(false);
+
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -199,7 +199,11 @@ export default function LocationMap({
   }, [onLocationSelect]);
 
   return (
-    <div className="relative">
+    <div className="relative flex-1 h-full space-y-4">
+      <StepHeader
+        step={t("locationMap.step")}
+        description={t("locationMap.description")}
+      />
       <Map
         ref={mapRef}
         initialViewState={{
@@ -215,7 +219,7 @@ export default function LocationMap({
         }}
         style={{
           width: "100%",
-          height: "calc(100svh - 190px)",
+          height: "calc(100svh - 206px)",
           position: "relative",
         }}
         mapStyle="mapbox://styles/mapbox/streets-v11"

@@ -12,7 +12,6 @@ import IncidentType from "./incident-type";
 import LocationMap from "./location-map";
 import ReportSuccess from "./report-success";
 import ReportSummary from "./report-summary";
-import StepHeader from "./step-header";
 import UserData from "./user-data";
 
 const MAX_FILES = 5;
@@ -114,7 +113,11 @@ const ReportFlow = () => {
               isUploading={uploading}
             />
             <div className="p-2 bg-green-300/50 w-full flex justify-between">
+              <Button type="button" disabled variant="outline">
+                {t("back")}
+              </Button>
               <Button
+                type="button"
                 onClick={handleNext}
                 disabled={uploading}
                 className="ml-auto"
@@ -127,11 +130,7 @@ const ReportFlow = () => {
 
       case 2:
         return (
-          <div className="space-y-4">
-            <StepHeader
-              step={t("locationMap.step")}
-              description={t("locationMap.description")}
-            />
+          <>
             <LocationMap
               onLocationSelect={setLocation}
               initialLocation={location}
@@ -141,15 +140,15 @@ const ReportFlow = () => {
               setHasInteractedWithMap={setHasInteractedWithMap}
             />
 
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={handleBack}>
+            <div className="p-2 bg-green-300/50 w-full flex justify-between">
+              <Button variant="outline" type="button" onClick={handleBack}>
                 {t("back")}
               </Button>
-              <Button onClick={handleNext} disabled={!location}>
+              <Button type="button" onClick={handleNext} disabled={!location}>
                 {t("next")}
               </Button>
             </div>
-          </div>
+          </>
         );
 
       case 3:
