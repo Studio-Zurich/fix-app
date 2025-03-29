@@ -5,14 +5,14 @@ import * as React from "react";
 const headlineVariants = cva("", {
   variants: {
     weight: {
-      normal: "font-normal",
+      regular: "font-regular",
       medium: "font-medium",
       semibold: "font-semibold",
       bold: "font-bold",
     },
   },
   defaultVariants: {
-    weight: "normal",
+    weight: "semibold",
   },
 });
 

@@ -17,6 +17,16 @@ const brockmannMedium = localFont({
   variable: "--font-brockmann-medium",
 });
 
+const brockmannSemiBold = localFont({
+  src: "./../fonts/brockmann-semibold.woff2",
+  variable: "--font-brockmann-semibold",
+});
+
+const brockmannBold = localFont({
+  src: "./../fonts/brockmann-bold.woff2",
+  variable: "--font-brockmann-bold",
+});
+
 export const metadata: Metadata = {
   title: "Fix App",
   description: "Deine Stadt, Deine Initiative",
@@ -43,10 +53,10 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Fix App" />
       </head>
       <body
-        className={`${brockmannRegular.variable} ${brockmannMedium.variable} antialiased`}
+        className={`${brockmannRegular.variable} ${brockmannMedium.variable} ${brockmannSemiBold.variable} ${brockmannBold.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <main className="h-max w-full flex flex-col container mx-auto">
+          <main className="h-max w-full flex flex-col container mx-auto gap-8">
             {children}
           </main>
         </NextIntlClientProvider>

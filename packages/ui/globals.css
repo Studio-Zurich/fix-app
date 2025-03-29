@@ -122,6 +122,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-medium: var(--font-brockmann-medium), sans-serif;
   --font-regular: var(--font-brockmann-regular), sans-serif;
+  --font-semibold: var(--font-brockmann-semibold), sans-serif;
+  --font-bold: var(--font-brockmann-bold), sans-serif;
 }
 
 @layer base {

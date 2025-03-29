@@ -6,7 +6,7 @@ import { Button } from "@repo/ui/button";
 import exifr from "exifr";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-
+import StepHeader from "./step-header";
 const MAX_FILES = 5;
 
 const ImageUpload = ({
@@ -143,6 +143,10 @@ const ImageUpload = ({
 
   return (
     <div className="space-y-4">
+      <StepHeader
+        step={t("imageUpload.step")}
+        description={t("imageUpload.description")}
+      />
       <div className="relative">
         <input
           type="file"

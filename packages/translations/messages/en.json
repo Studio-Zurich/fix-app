@@ -16,6 +16,10 @@
     },
     "components": {
         "reportFlow": {
+            "imageUpload": {
+                "step": "Upload images",
+                "description": "Take a photo or choose an image"
+            },
             "locationMap": {
                 "moveMap": "Move the map to change the location",
                 "searchPlaceholder": "Enter address",

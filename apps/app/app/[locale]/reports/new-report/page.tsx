@@ -1,3 +1,4 @@
+import PageHeader from "@/components/page-header";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import ReportFlow from "./components/report-flow";
@@ -11,9 +12,9 @@ export default async function NewReportPage() {
   const t = await getTranslations("pages.newReport");
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">{t("title")}</h1>
+    <>
+      <PageHeader variant="flow" title={t("title")} />
       <ReportFlow />
-    </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { FILE_CONSTANTS } from "@/lib/constants";
 import { useReportStore } from "@/lib/store";
 import { ImageLocation } from "@/lib/types";
 import { Button } from "@repo/ui/button";
+import { Progress } from "@repo/ui/progress";
 import { useLocale, useTranslations } from "next-intl";
 import ImageUpload from "./image-upload";
 import IncidentDescription from "./incident-description";
@@ -236,14 +237,17 @@ const ReportFlow = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {renderStep()}
-      {error && (
-        <p id="file-error" role="alert" className="text-red-500">
-          {error}
-        </p>
-      )}
-    </form>
+    <section className="grid gap-4">
+      <Progress value={currentStep} max={8} />
+      <form onSubmit={handleSubmit}>
+        {renderStep()}
+        {error && (
+          <p id="file-error" role="alert" className="text-red-500">
+            {error}
+          </p>
+        )}
+      </form>
+    </section>
   );
 };
 

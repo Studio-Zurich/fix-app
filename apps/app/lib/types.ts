@@ -187,3 +187,8 @@ export interface LocationMapProps {
   hasInteractedWithMap: boolean;
   onMapInteraction: () => void;
 }
+
+export interface StepHeaderProps {
+  step: string;
+  description: string;
+}

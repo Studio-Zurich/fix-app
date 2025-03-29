@@ -16,6 +16,10 @@
     },
     "components": {
         "reportFlow": {
+            "imageUpload": {
+                "step": "Bild hochladen",
+                "description": "Foto aufnehmen oder Bild auswählen"
+            },
             "locationMap": {
                 "moveMap": "Karte bewegen, um die Position zu ändern",
                 "searchPlaceholder": "Adresse eingeben",
