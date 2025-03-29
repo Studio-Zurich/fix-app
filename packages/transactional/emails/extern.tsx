@@ -27,7 +27,7 @@ export const ReportEmail = ({
   description,
   userData,
 }: EmailProps) => {
-  const t = messages[locale].mails.internal;
+  const t = messages[locale].mails.external;
 
   return (
     <Html>
@@ -41,7 +41,10 @@ export const ReportEmail = ({
               <br />
               {t.newReport}
             </Heading>
-
+            <Section style={section}>
+              <Text style={text}>{t.thankYou}</Text>
+              <Text style={text}>{t.confirmation}</Text>
+            </Section>
             <Section style={section}>
               <ReportOverview
                 imageCount={imageCount}

@@ -147,6 +147,13 @@
             "title": "Fixapp.ch",
             "newReport": "New Report",
             "subject": "New Report Submitted"
+        },
+        "external": {
+            "title": "Fixapp.ch",
+            "newReport": "New Report",
+            "subject": "New Report Submitted",
+            "thankYou": "Thank you for your commitment to the community",
+            "confirmation": "We have forwarded your report to the responsible department and will get back to you"
         }
     },
     "incidentTypes": {

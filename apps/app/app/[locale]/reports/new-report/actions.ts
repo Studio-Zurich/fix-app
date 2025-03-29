@@ -12,6 +12,7 @@ import {
   SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
+import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
 import { Resend } from "resend";
@@ -254,12 +255,19 @@ export async function submitReport(
         locale: validatedData.locale,
         reportId: report.id,
         location: validatedData.location.address,
-        incidentType: validatedData.incidentType,
+        incidentType: {
+          type: {
+            ...validatedData.incidentType.type,
+            has_subtypes: Boolean(validatedData.incidentType.subtype),
+          },
+          subtype: validatedData.incidentType.subtype,
+        },
         description: validatedData.description?.text,
         userData: validatedData.userData,
       };
 
       try {
+        // Send internal email
         await sendEmailWithRetry({
           from: EMAIL_CONSTANTS.FROM_ADDRESS,
           to: EMAIL_CONSTANTS.TO_ADDRESS,
@@ -268,8 +276,16 @@ export async function submitReport(
           react: InternalReportEmail(emailProps),
           attachments,
         });
+
+        // Send external email to the reporter
+        await sendEmailWithRetry({
+          from: EMAIL_CONSTANTS.FROM_ADDRESS,
+          to: validatedData.userData.email,
+          subject: t("mails.external.subject"),
+          react: ExternalReportEmail(emailProps),
+        });
       } catch (error) {
-        console.error("Error sending internal email:", {
+        console.error("Error sending emails:", {
           error,
           reportId: report.id,
           fileCount: files.length,

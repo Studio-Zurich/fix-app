@@ -147,6 +147,13 @@
             "title": "Fixapp.ch",
             "newReport": "Neue Meldung",
             "subject": "Neue Meldung eingereicht"
+        },
+        "external": {
+            "title": "Fixapp.ch",
+            "newReport": "Neue Meldung",
+            "subject": "Neue Meldung eingereicht",
+            "thankYou": "Danke für Deinen Einsatz für die Community",
+            "confirmation": "Wir haben Deine Meldung an das zuständige Department weitergeleitet und melden uns wieder bei Dir"
         }
     },
     "incidentTypes": {
