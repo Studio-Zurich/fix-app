@@ -230,7 +230,7 @@ const ImageUpload = ({
           multiple
           onChange={handleFileChange}
           disabled={isUploading}
-          aria-label={t("chooseFromLibrary")}
+          aria-label={t("takePhoto")}
           aria-describedby={error ? "file-error" : undefined}
           className="hidden"
           id="file-input"
@@ -244,7 +244,7 @@ const ImageUpload = ({
           }`}
         >
           <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
-            {t("chooseFromLibrary")}
+            {t("takePhoto")}
           </span>
         </label>
 

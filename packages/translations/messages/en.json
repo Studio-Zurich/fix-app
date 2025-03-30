@@ -17,8 +17,8 @@
     "components": {
         "reportFlow": {
             "imageUpload": {
-                "step": "Upload images",
-                "description": "Add a photo"
+                "step": "Add a photo",
+                "description": "Help us identify the incident by adding a photo."
             },
             "locationMap": {
                 "step": "Select location",
@@ -31,7 +31,7 @@
                     "title": "Location found",
                     "description": "We have detected a location in your image. Do you want to use this location?",
                     "confirm": "Use location",
-                    "reject": "Select other location"
+                    "reject": "Select different location"
                 }
             },
             "incidentType": {
@@ -52,10 +52,12 @@
             },
             "summary": {
                 "step": "Summary",
-                "description": "Summary of the report",
+                "description": "Report summary",
                 "images": "Images",
                 "location": "Location",
                 "incidentType": "Incident Type",
+                "incidentSubtype": "Incident Subtype",
+                "incidentDescription": "Description",
                 "contactInfo": "Contact Information",
                 "reporter": "Reporter",
                 "reporterEmail": "Reporter Email",

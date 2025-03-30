@@ -141,7 +141,8 @@ export default function IncidentType({
         {filteredTypes.map((type) => (
           <div
             key={type.id}
-            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={() => onSelect(type)}
           >
             <Checkbox
               id={type.id}
@@ -152,7 +153,7 @@ export default function IncidentType({
             <div className="flex-1">
               <label
                 htmlFor={type.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
               >
                 {t(`${type.name}.name`)}
               </label>

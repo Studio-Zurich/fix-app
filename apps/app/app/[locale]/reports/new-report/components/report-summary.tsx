@@ -43,6 +43,7 @@ export default function ReportSummary({
   onEditUserData,
 }: ReportSummaryProps) {
   const t = useTranslations("components.reportFlow");
+  const tTypes = useTranslations("incidentTypes");
   const [previews, setPreviews] = useState<string[]>([]);
 
   // Generate previews when files change
@@ -71,6 +72,14 @@ export default function ReportSummary({
     const sizes = ["Bytes", "KB", "MB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  const getIncidentTypeName = (typeName: string) => {
+    return tTypes(`${typeName}.name`);
+  };
+
+  const getIncidentSubtypeName = (typeName: string, subtypeName: string) => {
+    return tTypes(`${typeName}.subtypes.${subtypeName}.name`);
   };
 
   return (
@@ -141,9 +150,14 @@ export default function ReportSummary({
           </Button>
         </div>
         <div className="text-sm text-muted-foreground">
-          <p>{selectedType.type.name}</p>
+          <p>{getIncidentTypeName(selectedType.type.name)}</p>
           {selectedType.subtype && (
-            <p className="mt-1">{selectedType.subtype.name}</p>
+            <p className="mt-1">
+              {getIncidentSubtypeName(
+                selectedType.type.name,
+                selectedType.subtype.name
+              )}
+            </p>
           )}
         </div>
       </div>
@@ -152,7 +166,7 @@ export default function ReportSummary({
       {description && (
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <h4 className="font-medium">{t("summary.description")}</h4>
+            <h4 className="font-medium">{t("summary.incidentDescription")}</h4>
             <Button
               type="button"
               variant="ghost"

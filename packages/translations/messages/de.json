@@ -17,8 +17,8 @@
     "components": {
         "reportFlow": {
             "imageUpload": {
-                "step": "Bild hochladen",
-                "description": "Foto hinzufügen"
+                "step": "Foto hinzufügen",
+                "description": "Hilf uns, den Vorfall zu identifizieren, indem Du ein Foto hinzufügst."
             },
             "locationMap": {
                 "step": "Standort auswählen",
@@ -52,10 +52,12 @@
             },
             "summary": {
                 "step": "Zusammenfassung",
-                "description": "Zusammenfassung der Meldung",
+                "description": "Übersicht der gemeldeten Informationen",
                 "images": "Bilder",
                 "location": "Standort",
                 "incidentType": "Vorfallstyp",
+                "incidentSubtype": "Vorfalluntertyp",
+                "incidentDescription": "Beschreibung",
                 "contactInfo": "Kontaktinformationen",
                 "reporter": "Reporter",
                 "reporterEmail": "Reporter Email",

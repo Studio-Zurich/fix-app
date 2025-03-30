@@ -94,7 +94,8 @@ export default function IncidentSubtype({
         {subtypes.map((subtype) => (
           <div
             key={subtype.id}
-            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors"
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={() => onSelect(subtype)}
           >
             <Checkbox
               id={subtype.id}
@@ -105,7 +106,7 @@ export default function IncidentSubtype({
             <div className="flex-1">
               <label
                 htmlFor={subtype.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
               >
                 {t(`${selectedType.name}.subtypes.${subtype.name}.name`)}
               </label>
