@@ -181,8 +181,10 @@ export type MapOverlayProps = {
 export interface ImageUploadProps {
   files: File[];
   setFiles: (files: File[]) => void;
-  onLocationFound: (location: ImageLocation) => void;
+  onLocationFound: (location: ImageLocation | null) => void;
   isUploading: boolean;
+  locationSubmitted: boolean;
+  detectedLocation?: ImageLocation | null;
 }
 
 export interface LocationMapProps {

@@ -12,6 +12,7 @@ interface ReportStore {
   // Form Data
   files: File[];
   location: Location | null;
+  detectedLocation: Location | null; // Location from image
   selectedType: IncidentTypeType | undefined;
   selectedSubtype: IncidentSubtypeType | undefined;
   description: ReportDescription | undefined;
@@ -27,6 +28,7 @@ interface ReportStore {
   // Actions
   setFiles: (files: File[]) => void;
   setLocation: (location: Location | null) => void;
+  setDetectedLocation: (location: Location | null) => void;
   setSelectedType: (type: IncidentTypeType) => void;
   setSelectedSubtype: (subtype: IncidentSubtypeType) => void;
   setDescription: (description: ReportDescription) => void;
@@ -46,6 +48,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   // Initial state
   files: [],
   location: null,
+  detectedLocation: null,
   selectedType: undefined,
   selectedSubtype: undefined,
   description: undefined,
@@ -59,6 +62,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   // Actions
   setFiles: (files) => set({ files }),
   setLocation: (location) => set({ location }),
+  setDetectedLocation: (location) => set({ detectedLocation: location }),
   setSelectedType: (type) =>
     set({ selectedType: type, selectedSubtype: undefined }),
   setSelectedSubtype: (subtype) => set({ selectedSubtype: subtype }),
@@ -116,6 +120,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
     set({
       files: [],
       location: null,
+      detectedLocation: null,
       selectedType: undefined,
       selectedSubtype: undefined,
       description: undefined,

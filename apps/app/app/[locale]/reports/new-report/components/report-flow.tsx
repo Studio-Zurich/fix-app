@@ -22,6 +22,7 @@ const ReportFlow = () => {
   const {
     files,
     location,
+    detectedLocation,
     selectedType,
     selectedSubtype,
     description,
@@ -33,6 +34,7 @@ const ReportFlow = () => {
     hasInteractedWithMap,
     setFiles,
     setLocation,
+    setDetectedLocation,
     setSelectedType,
     setSelectedSubtype,
     setDescription,
@@ -44,10 +46,16 @@ const ReportFlow = () => {
     submitReport,
   } = useReportStore();
 
-  const handleLocationFound = (location: ImageLocation) => {
-    // Just pass the detected location to location-map component
-    // It will handle showing the dialog and setting the location if confirmed
-    setLocation(location);
+  const handleLocationFound = (location: ImageLocation | null) => {
+    setDetectedLocation(location);
+    if (location) {
+      setLocation(location);
+      setLocationSubmitted(true);
+    } else {
+      setLocation(null);
+      setLocationSubmitted(false);
+      setHasInteractedWithMap(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +75,7 @@ const ReportFlow = () => {
     }
 
     setFiles(selectedFiles);
+    setDetectedLocation(null);
     setError(null);
   };
 
@@ -81,8 +90,7 @@ const ReportFlow = () => {
 
   const handleBack = () => {
     if (currentStep === 2) {
-      // Reset location and map interaction when going back from location step
-      setLocation(null);
+      // Only reset map interaction when going back from location step
       setHasInteractedWithMap(false);
     }
     if (currentStep === 5) {
@@ -125,8 +133,10 @@ const ReportFlow = () => {
               setFiles={setFiles}
               onLocationFound={handleLocationFound}
               isUploading={uploading}
+              locationSubmitted={locationSubmitted}
+              detectedLocation={detectedLocation}
             />
-            <div className="py-2  w-full flex justify-between">
+            <div className="py-2 w-full flex justify-between">
               <Button type="button" disabled variant="outline">
                 {t("back")}
               </Button>
@@ -154,7 +164,7 @@ const ReportFlow = () => {
               setHasInteractedWithMap={setHasInteractedWithMap}
             />
 
-            <div className="py-2  w-full flex justify-between">
+            <div className="py-2 w-full flex justify-between">
               <Button variant="outline" type="button" onClick={handleBack}>
                 {t("back")}
               </Button>

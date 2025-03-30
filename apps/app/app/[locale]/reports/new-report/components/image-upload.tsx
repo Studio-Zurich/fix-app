@@ -2,7 +2,18 @@
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/alert-dialog";
 import { Button } from "@repo/ui/button";
+import { TypographyParagraph } from "@repo/ui/text";
 import exifr from "exifr";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -14,6 +25,8 @@ const ImageUpload = ({
   setFiles,
   onLocationFound,
   isUploading,
+  locationSubmitted,
+  detectedLocation,
 }: ImageUploadProps) => {
   const t = useTranslations("components.reportFlow");
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +35,7 @@ const ImageUpload = ({
   );
   const [previews, setPreviews] = useState<string[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
 
   // Generate previews when files change
   useEffect(() => {
@@ -46,14 +60,14 @@ const ImageUpload = ({
   // Check for location when files change
   useEffect(() => {
     const checkLocation = async () => {
-      if (files.length > 0 && onLocationFound) {
+      if (files.length > 0 && !locationSubmitted) {
         const firstFile = files[0];
         if (firstFile) {
           try {
             const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
-              onLocationFound(location);
+              setShowLocationDialog(true);
             } else {
               setFoundLocation(null);
             }
@@ -68,7 +82,7 @@ const ImageUpload = ({
     };
 
     checkLocation();
-  }, [files, onLocationFound]);
+  }, [files, locationSubmitted]);
 
   const readImageLocation = async (
     file: File
@@ -157,7 +171,7 @@ const ImageUpload = ({
         const location = await getLocationFromDevice();
         if (location) {
           setFoundLocation(location);
-          onLocationFound(location);
+          setShowLocationDialog(true);
         }
       } catch (error) {
         console.error("Error getting location:", error);
@@ -168,6 +182,7 @@ const ImageUpload = ({
 
     setFiles(selectedFiles);
     setError(null);
+    onLocationFound(null); // Reset detected location when files change
   };
 
   const removeFile = (index: number) => {
@@ -177,6 +192,7 @@ const ImageUpload = ({
   const clearFiles = () => {
     setFiles([]);
     setError(null);
+    setFoundLocation(null);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -187,6 +203,18 @@ const ImageUpload = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const handleLocationConfirm = () => {
+    if (foundLocation) {
+      setShowLocationDialog(false);
+      onLocationFound(foundLocation);
+    }
+  };
+
+  const handleLocationReject = () => {
+    setShowLocationDialog(false);
+    setFoundLocation(null);
+  };
+
   return (
     <div className="space-y-4 flex-1 h-full">
       <StepHeader
@@ -194,20 +222,7 @@ const ImageUpload = ({
         description={t("imageUpload.description")}
       />
       <div className="relative space-y-4">
-        {/* Camera input */}
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/gif"
-          multiple
-          onChange={handleFileChange}
-          disabled={isUploading}
-          aria-label={t("takePhoto")}
-          aria-describedby={error ? "file-error" : undefined}
-          className="hidden"
-          id="camera-input"
-          capture="environment"
-        />
-        {/* Photo library input */}
+        {/* Single input for both camera and library */}
         <input
           type="file"
           accept="image/jpeg,image/png,image/gif"
@@ -217,32 +232,20 @@ const ImageUpload = ({
           aria-label={t("chooseFromLibrary")}
           aria-describedby={error ? "file-error" : undefined}
           className="hidden"
-          id="library-input"
+          id="file-input"
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Camera button */}
-          <label
-            htmlFor="camera-input"
-            className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors md:hidden ${
-              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-            }`}
-          >
-            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
-              {t("takePhoto")}
-            </span>
-          </label>
-          {/* Photo library button */}
-          <label
-            htmlFor="library-input"
-            className={`block w-full p-4 bg-muted rounded-lg cursor-pointer transition-colors ${
-              isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-            }`}
-          >
-            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-backgrond text-foreground border-foreground border shadow hover:bg-foreground hover:text-background md:bg-foreground md:text-background md:hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
-              {t("chooseFromLibrary")}
-            </span>
-          </label>
-        </div>
+
+        {/* Single button for both camera and library */}
+        <label
+          htmlFor="file-input"
+          className={`block w-full cursor-pointer transition-colors ${
+            isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+          }`}
+        >
+          <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
+            {t("chooseFromLibrary")}
+          </span>
+        </label>
 
         {files.length > 0 && (
           <div className="space-y-4">
@@ -293,19 +296,9 @@ const ImageUpload = ({
             </div>
 
             <div className="text-sm text-gray-500 space-y-1">
-              {/* {files.map((file, index) => (
-                <div key={index} className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span>{file.name}</span>
-                    <span className="text-gray-400">
-                      ({formatFileSize(file.size)})
-                    </span>
-                  </div>
-                </div>
-              ))} */}
-              {foundLocation && (
+              {detectedLocation && (
                 <div className="mt-2 text-sm text-primary">
-                  {t("locationFound", { address: foundLocation.address })}
+                  {t("locationFound", { address: detectedLocation.address })}
                 </div>
               )}
               {isGettingLocation && (
@@ -322,6 +315,35 @@ const ImageUpload = ({
           {error}
         </p>
       )}
+
+      <AlertDialog
+        open={showLocationDialog}
+        onOpenChange={setShowLocationDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("locationMap.locationDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("locationMap.locationDialog.description")}
+              {foundLocation?.address && (
+                <TypographyParagraph className="mt-2 block text-foreground font-semibold underline underline-offset-4">
+                  {foundLocation.address}
+                </TypographyParagraph>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleLocationReject}>
+              {t("locationMap.locationDialog.reject")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleLocationConfirm}>
+              {t("locationMap.locationDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

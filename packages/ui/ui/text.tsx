@@ -31,7 +31,7 @@ const TypographyParagraph = React.forwardRef<
     <p
       className={cn(
         textVariants({ weight, className }),
-        size ? size : "text-sm"
+        size ? size : "text-base"
       )}
       ref={ref}
       {...props}
