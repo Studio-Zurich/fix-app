@@ -90,8 +90,10 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
+      // First try to parse EXIF data
       const exif = await exifr.parse(file);
 
+      // Check if we have valid GPS coordinates in EXIF
       if (exif?.GPSLatitude && exif?.GPSLongitude) {
         const lat = convertDMSToDD(
           exif.GPSLatitude,
@@ -101,15 +103,26 @@ const ImageUpload = ({
           exif.GPSLongitude,
           exif.GPSLongitudeRef === "W" ? -1 : 1
         );
-        const address = await fetchAddressFromCoordinates(lng, lat);
-        return { lat, lng, address };
+
+        // Validate coordinates are within reasonable bounds
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+          const address = await fetchAddressFromCoordinates(lng, lat);
+          return { lat, lng, address };
+        }
       }
 
-      // If EXIF fails, try device location
+      // If we get here, either:
+      // 1. No EXIF data was found
+      // 2. No GPS coordinates in EXIF
+      // 3. Invalid GPS coordinates
+      console.log(
+        "No valid EXIF GPS data found, falling back to device location"
+      );
       setIsPrivacyPromptNeeded(true);
       return await getLocationFromDevice();
     } catch (error) {
       console.error("Error reading image location:", error);
+      // Only fall back to device location if EXIF parsing actually failed
       setIsPrivacyPromptNeeded(true);
       return await getLocationFromDevice();
     }
@@ -300,11 +313,6 @@ const ImageUpload = ({
                 <div className="mt-2 text-sm text-muted-foreground">
                   {t("gettingLocation")}
                 </div>
-              )}
-              {isPrivacyPromptNeeded && (
-                <TypographyParagraph className="text-sm text-muted-foreground">
-                  {t("locationPrivacyPrompt")}
-                </TypographyParagraph>
               )}
             </div>
           </div>

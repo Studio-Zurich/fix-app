@@ -69,7 +69,7 @@
                 "button": "Create new report"
             },
             "locationFound": "Location found: {address}",
-            "takePhoto": "Take a photo",
+            "takePhoto": "Add photo",
             "chooseFromLibrary": "Choose from library",
             "uploading": "Sending...",
             "uploadImage": "Upload image",

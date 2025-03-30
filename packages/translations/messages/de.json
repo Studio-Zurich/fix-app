@@ -69,7 +69,7 @@
                 "button": "Neue Meldung erstellen"
             },
             "locationFound": "Standort gefunden: {address}",
-            "takePhoto": "Foto aufnehmen",
+            "takePhoto": "Foto hinzufügen",
             "chooseFromLibrary": "Aus Bibliothek wählen",
             "uploading": "Absenden...",
             "uploadImage": "Bild hochladen",
