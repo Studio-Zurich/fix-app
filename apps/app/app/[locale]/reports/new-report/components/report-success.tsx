@@ -1,9 +1,7 @@
 "use client";
 
-import { Link } from "@/i18n/routing";
 import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
-import { buttonVariants } from "@repo/ui/button";
-import { cn } from "@repo/ui/lib/utils";
+import { Button } from "@repo/ui/button";
 import { useTranslations } from "next-intl";
 import StepHeader from "./step-header";
 
@@ -21,12 +19,10 @@ const ReportSuccess = () => {
         step={t("success.step")}
         description={t("success.description")}
       />
-      <Link
-        href="/reports/new-report"
-        className={cn(buttonVariants({ variant: "default" }), "w-full")}
-      >
+
+      <Button type="button" onClick={() => window.location.reload()}>
         {t("success.button")}
-      </Link>
+      </Button>
     </div>
   );
 };

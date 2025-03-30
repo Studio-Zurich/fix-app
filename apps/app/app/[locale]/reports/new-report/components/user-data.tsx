@@ -3,6 +3,7 @@
 import { userDataSchema } from "@/lib/schemas";
 import { UserData as UserDataType } from "@/lib/types";
 import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -67,7 +68,8 @@ export default function UserData({ onDataChange, initialData }: UserDataProps) {
         step={tReport("userData.step")}
         description={tReport("userData.description")}
       />
-      <div className="space-y-2">
+      <div className="grid gap-1.5">
+        <Label htmlFor="firstName">{t("firstName")}*</Label>
         <Input
           placeholder={t("firstName")}
           value={formData.firstName}
@@ -79,7 +81,8 @@ export default function UserData({ onDataChange, initialData }: UserDataProps) {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="grid gap-1.5">
+        <Label htmlFor="lastName">{t("lastName")}*</Label>
         <Input
           placeholder={t("lastName")}
           value={formData.lastName}
@@ -91,7 +94,8 @@ export default function UserData({ onDataChange, initialData }: UserDataProps) {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="grid gap-1.5">
+        <Label htmlFor="email">{t("email")}*</Label>
         <Input
           type="email"
           placeholder={t("email")}
@@ -104,7 +108,8 @@ export default function UserData({ onDataChange, initialData }: UserDataProps) {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="grid gap-1.5">
+        <Label htmlFor="phone">{t("phone")}</Label>
         <Input
           type="tel"
           placeholder={t("phone")}

@@ -109,12 +109,12 @@ export const ReportOverview = ({
 const heading = {
   fontSize: "14px",
   lineHeight: "20px",
-  margin: "0 0 10px",
+  margin: "1rem 0",
   fontWeight: "bold",
 };
 
 const text = {
   fontSize: "14px",
   lineHeight: "20px",
-  margin: "0 0 10px",
+  margin: "0",
 };

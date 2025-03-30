@@ -2,6 +2,7 @@
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
+import { MapPin } from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -295,10 +296,13 @@ const ImageUpload = ({
               ))}
             </div>
 
-            <div className="text-sm text-gray-500 space-y-1">
+            <div className="space-y-1">
               {detectedLocation && (
-                <div className="mt-2 text-sm text-primary">
-                  {t("locationFound", { address: detectedLocation.address })}
+                <div className="mt-2 flex items-center gap-2">
+                  <MapPin size={16} className="flex-shrink-0" />
+                  <TypographyParagraph>
+                    {detectedLocation.address}
+                  </TypographyParagraph>
                 </div>
               )}
               {isGettingLocation && (
@@ -328,7 +332,7 @@ const ImageUpload = ({
             <AlertDialogDescription>
               {t("locationMap.locationDialog.description")}
               {foundLocation?.address && (
-                <TypographyParagraph className="mt-2 block text-foreground font-semibold underline underline-offset-4">
+                <TypographyParagraph className="mt-2 block text-foreground font-medium">
                   {foundLocation.address}
                 </TypographyParagraph>
               )}

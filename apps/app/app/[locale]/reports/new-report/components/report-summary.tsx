@@ -74,7 +74,7 @@ export default function ReportSummary({
   };
 
   return (
-    <div className="space-y-4 flex-1">
+    <div className="space-y-4 flex-1 pb-8">
       <StepHeader
         step={t("summary.step")}
         description={t("summary.description")}
@@ -103,10 +103,6 @@ export default function ReportSummary({
                   alt={`Preview ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg"
                 />
-                <div className="mt-1 text-sm text-muted-foreground">
-                  {files[index]?.name} (
-                  {formatFileSize(files[index]?.size || 0)})
-                </div>
               </div>
             ))}
           </div>
