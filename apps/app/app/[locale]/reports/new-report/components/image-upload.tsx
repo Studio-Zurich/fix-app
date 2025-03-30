@@ -293,7 +293,7 @@ const ImageUpload = ({
             </div>
 
             <div className="text-sm text-gray-500 space-y-1">
-              {files.map((file, index) => (
+              {/* {files.map((file, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span>{file.name}</span>
@@ -302,7 +302,7 @@ const ImageUpload = ({
                     </span>
                   </div>
                 </div>
-              ))}
+              ))} */}
               {foundLocation && (
                 <div className="mt-2 text-sm text-primary">
                   {t("locationFound", { address: foundLocation.address })}
