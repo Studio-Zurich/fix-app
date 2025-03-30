@@ -37,6 +37,7 @@ const ImageUpload = ({
   const [previews, setPreviews] = useState<string[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [isPrivacyPromptNeeded, setIsPrivacyPromptNeeded] = useState(false);
 
   // Generate previews when files change
   useEffect(() => {
@@ -89,11 +90,9 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      // Get location from EXIF data
       const exif = await exifr.parse(file);
 
       if (exif?.GPSLatitude && exif?.GPSLongitude) {
-        // Convert GPS coordinates from degrees/minutes/seconds to decimal degrees
         const lat = convertDMSToDD(
           exif.GPSLatitude,
           exif.GPSLatitudeRef === "S" ? -1 : 1
@@ -102,24 +101,17 @@ const ImageUpload = ({
           exif.GPSLongitude,
           exif.GPSLongitudeRef === "W" ? -1 : 1
         );
-
-        // Get address from coordinates using reverse geocoding
         const address = await fetchAddressFromCoordinates(lng, lat);
-
-        return {
-          lat,
-          lng,
-          address,
-        };
+        return { lat, lng, address };
       }
 
-      // Note: On iOS, EXIF data might not be available due to privacy settings.
-      // In such cases, the location will be null and the user should be informed
-      // that they need to enable location metadata in their camera settings.
-      return null;
+      // If EXIF fails, try device location
+      setIsPrivacyPromptNeeded(true);
+      return await getLocationFromDevice();
     } catch (error) {
       console.error("Error reading image location:", error);
-      return null;
+      setIsPrivacyPromptNeeded(true);
+      return await getLocationFromDevice();
     }
   };
 
@@ -165,25 +157,24 @@ const ImageUpload = ({
       return;
     }
 
-    // If this is a new photo being taken (not from library)
-    if (e.target.capture === "environment") {
-      setIsGettingLocation(true);
-      try {
-        const location = await getLocationFromDevice();
-        if (location) {
-          setFoundLocation(location);
-          setShowLocationDialog(true);
-        }
-      } catch (error) {
-        console.error("Error getting location:", error);
-      } finally {
-        setIsGettingLocation(false);
+    setIsGettingLocation(true);
+    try {
+      // Always try to get location when files are selected
+      const location = await getLocationFromDevice();
+      if (location) {
+        setFoundLocation(location);
+        setShowLocationDialog(true);
       }
+    } catch (error) {
+      console.error("Error getting location:", error);
+      setIsPrivacyPromptNeeded(true);
+    } finally {
+      setIsGettingLocation(false);
     }
 
     setFiles(selectedFiles);
     setError(null);
-    onLocationFound(null); // Reset detected location when files change
+    onLocationFound(null);
   };
 
   const removeFile = (index: number) => {
@@ -309,6 +300,11 @@ const ImageUpload = ({
                 <div className="mt-2 text-sm text-muted-foreground">
                   {t("gettingLocation")}
                 </div>
+              )}
+              {isPrivacyPromptNeeded && (
+                <TypographyParagraph className="text-sm text-muted-foreground">
+                  {t("locationPrivacyPrompt")}
+                </TypographyParagraph>
               )}
             </div>
           </div>

@@ -107,7 +107,8 @@
                 "noLocationSelected": "Please select a location",
                 "noIncidentTypeSelected": "Please select an incident type"
             },
-            "gettingLocation": "Getting location from device..."
+            "gettingLocation": "Getting location from device...",
+            "locationPrivacyPrompt": "Please allow location access to accurately locate your report. This helps us process your report more efficiently."
         },
         "reportOverview": {
             "imageUploaded": "Image uploaded",

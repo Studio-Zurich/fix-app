@@ -107,7 +107,8 @@
                 "noLocationSelected": "Bitte wählen Sie einen Standort aus",
                 "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
             },
-            "gettingLocation": "Standort wird vom Gerät abgerufen..."
+            "gettingLocation": "Standort wird vom Gerät abgerufen...",
+            "locationPrivacyPrompt": "Bitte erlaube den Standortzugriff, um deinen Bericht genau zu lokalisieren. Dies hilft uns, deine Meldung effizienter zu bearbeiten."
         },
         "reportOverview": {
             "imageUploaded": "Bild hochgeladen",
