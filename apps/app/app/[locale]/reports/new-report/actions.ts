@@ -137,7 +137,7 @@ export async function submitReport(
 
     // Only proceed with file upload if files are provided
     if (files.length > 0) {
-      // Upload files to Supabase storage
+      // Upload files to Supabase storage in parallel
       const uploadPromises = files.map(async (file) => {
         const fileExt = file.name.split(".").pop()?.toLowerCase();
         if (
@@ -158,17 +158,31 @@ export async function submitReport(
         const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from("report-images")
-          .upload(filePath, file);
+        // Upload file and create database record in parallel
+        const [uploadResult, imageRecord] = await Promise.all([
+          supabase.storage.from("report-images").upload(filePath, file),
+          supabase.from("report_images").insert({
+            report_id: report.id,
+            storage_path: filePath,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+            created_at: timestamp,
+          }),
+        ]);
 
-        if (uploadError) {
-          console.error("Error uploading file:", {
-            error: uploadError,
+        if (uploadResult.error || imageRecord.error) {
+          console.error("Error processing file:", {
+            uploadError: uploadResult.error,
+            imageError: imageRecord.error,
             fileName,
             fileSize: file.size,
             fileType: file.type,
           });
+          // Clean up if needed
+          if (!uploadResult.error) {
+            await supabase.storage.from("report-images").remove([filePath]);
+          }
           return {
             success: false,
             error: {
@@ -179,37 +193,6 @@ export async function submitReport(
         }
 
         uploadedFiles.push(filePath);
-
-        // Create report_images record
-        const { error: imageError } = await supabase
-          .from("report_images")
-          .insert({
-            report_id: report.id,
-            storage_path: filePath,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            created_at: timestamp,
-          });
-
-        if (imageError) {
-          console.error("Error creating report image record:", {
-            error: imageError,
-            filePath,
-            reportId: report.id,
-          });
-          // Try to clean up the uploaded file
-          await supabase.storage.from("report-images").remove([filePath]);
-          uploadedFiles = uploadedFiles.filter((f) => f !== filePath);
-          return {
-            success: false,
-            error: {
-              code: "DATABASE_ERROR",
-              message: t("components.reportFlow.errors.databaseError"),
-            },
-          };
-        }
-
         return { success: true, filePath };
       });
 
@@ -238,18 +221,7 @@ export async function submitReport(
         };
       }
 
-      // Prepare attachments for internal email if files exist
-      const attachments =
-        files.length > 0
-          ? await Promise.all(
-              files.map(async (file) => ({
-                filename: file.name,
-                content: Buffer.from(await file.arrayBuffer()),
-              }))
-            )
-          : [];
-
-      // Send internal notification email with simplified data
+      // Send emails without attachments (since files are already in storage)
       const emailProps: EmailProps = {
         imageCount: files.length,
         locale: validatedData.locale,
@@ -267,24 +239,22 @@ export async function submitReport(
       };
 
       try {
-        // Send internal email
-        await sendEmailWithRetry({
-          from: EMAIL_CONSTANTS.FROM_ADDRESS,
-          to: EMAIL_CONSTANTS.TO_ADDRESS,
-          bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-          subject: t("mails.internal.subject"),
-          react: InternalReportEmail(emailProps),
-          attachments,
-        });
-
-        // Send external email to the reporter
-        await sendEmailWithRetry({
-          from: EMAIL_CONSTANTS.FROM_ADDRESS,
-          to: validatedData.userData.email,
-          subject: t("mails.external.subject"),
-          react: ExternalReportEmail(emailProps),
-          attachments,
-        });
+        // Send emails in parallel
+        await Promise.all([
+          sendEmailWithRetry({
+            from: EMAIL_CONSTANTS.FROM_ADDRESS,
+            to: EMAIL_CONSTANTS.TO_ADDRESS,
+            bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+            subject: t("mails.internal.subject"),
+            react: InternalReportEmail(emailProps),
+          }),
+          sendEmailWithRetry({
+            from: EMAIL_CONSTANTS.FROM_ADDRESS,
+            to: validatedData.userData.email,
+            subject: t("mails.external.subject"),
+            react: ExternalReportEmail(emailProps),
+          }),
+        ]);
       } catch (error) {
         console.error("Error sending emails:", {
           error,
