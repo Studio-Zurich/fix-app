@@ -1,4 +1,4 @@
-import { Section, Text } from "@react-email/components";
+import { Heading, Text } from "@react-email/components";
 import messages from "@repo/translations/messages";
 import { EmailProps } from "../../../apps/app/lib/types";
 
@@ -51,34 +51,46 @@ export const ReportOverview = ({
   };
 
   return (
-    <Section style={section}>
-      <Text style={text}>
-        {imageCount} {imageCount === 1 ? t.imageUploaded : t.imagesUploaded}
-      </Text>
+    <>
+      {imageCount > 0 && (
+        <>
+          <Heading style={heading}>{t.images}</Heading>
+          <Text style={text}>
+            {imageCount} {imageCount === 1 ? t.imageUploaded : t.imagesUploaded}
+          </Text>
+        </>
+      )}
+
       {location && (
-        <Text style={text}>
-          {t.location}: {location}
-        </Text>
+        <>
+          <Heading style={heading}>{t.location}</Heading>
+          <Text style={text}>{location}</Text>
+        </>
       )}
       {incidentType && (
-        <Text style={text}>
-          {t.incidentType}: {getIncidentTypeName(incidentType.type.name)}
-          {incidentType.subtype &&
-            ` - ${getIncidentSubtypeName(
-              incidentType.type.name,
-              incidentType.subtype.name
-            )}`}
-        </Text>
+        <>
+          <Heading style={heading}>{t.incidentType}</Heading>
+          <Text style={text}>
+            {getIncidentTypeName(incidentType.type.name)}
+            {incidentType.subtype &&
+              ` - ${getIncidentSubtypeName(
+                incidentType.type.name,
+                incidentType.subtype.name
+              )}`}
+          </Text>
+        </>
       )}
       {description && (
-        <Text style={text}>
-          {t.description}: {description}
-        </Text>
+        <>
+          <Heading style={heading}>{t.description}</Heading>
+          <Text style={text}>{description}</Text>
+        </>
       )}
       {userData && (
         <>
+          <Heading style={heading}>{t.reporter}</Heading>
           <Text style={text}>
-            {t.reporter}: {userData.firstName} {userData.lastName}
+            {userData.firstName} {userData.lastName}
           </Text>
           <Text style={text}>
             {t.reporterEmail}: {userData.email}
@@ -90,13 +102,15 @@ export const ReportOverview = ({
           )}
         </>
       )}
-    </Section>
+    </>
   );
 };
 
-const section = {
-  padding: "0 20px",
-  marginTop: "20px",
+const heading = {
+  fontSize: "14px",
+  lineHeight: "20px",
+  margin: "0 0 10px",
+  fontWeight: "bold",
 };
 
 const text = {
