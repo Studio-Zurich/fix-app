@@ -90,7 +90,7 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      // First try to parse EXIF data
+      // Try to parse EXIF data
       const exif = await exifr.parse(file);
 
       // Check if we have valid GPS coordinates in EXIF
@@ -115,16 +115,11 @@ const ImageUpload = ({
       // 1. No EXIF data was found
       // 2. No GPS coordinates in EXIF
       // 3. Invalid GPS coordinates
-      console.log(
-        "No valid EXIF GPS data found, falling back to device location"
-      );
-      setIsPrivacyPromptNeeded(true);
-      return await getLocationFromDevice();
+      console.log("No valid EXIF GPS data found");
+      return null;
     } catch (error) {
       console.error("Error reading image location:", error);
-      // Only fall back to device location if EXIF parsing actually failed
-      setIsPrivacyPromptNeeded(true);
-      return await getLocationFromDevice();
+      return null;
     }
   };
 
