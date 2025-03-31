@@ -221,7 +221,7 @@ export async function submitReport(
         };
       }
 
-      // Send emails without attachments (since files are already in storage)
+      // Send emails with attachments
       const emailProps: EmailProps = {
         imageCount: files.length,
         locale: validatedData.locale,
@@ -239,6 +239,17 @@ export async function submitReport(
       };
 
       try {
+        // Convert files to buffers for email attachments
+        const fileBuffers = await Promise.all(
+          files.map(async (file) => {
+            const arrayBuffer = await file.arrayBuffer();
+            return {
+              filename: file.name,
+              content: Buffer.from(arrayBuffer),
+            };
+          })
+        );
+
         // Send emails in parallel
         await Promise.all([
           sendEmailWithRetry({
@@ -247,12 +258,14 @@ export async function submitReport(
             bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
             subject: t("mails.internal.subject"),
             react: InternalReportEmail(emailProps),
+            attachments: fileBuffers,
           }),
           sendEmailWithRetry({
             from: EMAIL_CONSTANTS.FROM_ADDRESS,
             to: validatedData.userData.email,
             subject: t("mails.external.subject"),
             react: ExternalReportEmail(emailProps),
+            attachments: fileBuffers,
           }),
         ]);
       } catch (error) {
