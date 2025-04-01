@@ -37,6 +37,26 @@ const ImageUpload = ({
   );
   const [previews, setPreviews] = useState<string[]>([]);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [currentLocation, setCurrentLocation] =
+    useState<GeolocationCoordinates | null>(null);
+
+  const getLocation = async (): Promise<GeolocationCoordinates | null> => {
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          });
+        }
+      );
+      return position.coords;
+    } catch (err) {
+      console.error("Error getting location:", err);
+      return null;
+    }
+  };
 
   // Generate previews when files change
   useEffect(() => {
@@ -68,7 +88,25 @@ const ImageUpload = ({
             const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
-              setShowLocationDialog(true);
+              // Don't show dialog immediately, let user see the address first
+              setTimeout(() => setShowLocationDialog(true), 1500);
+            } else {
+              // If no EXIF location, try to get current location
+              const coords = await getLocation();
+              if (coords) {
+                setCurrentLocation(coords);
+                const address = await fetchAddressFromCoordinates(
+                  coords.longitude,
+                  coords.latitude
+                );
+                const newLocation = {
+                  lat: coords.latitude,
+                  lng: coords.longitude,
+                  address,
+                };
+                setFoundLocation(newLocation);
+                setTimeout(() => setShowLocationDialog(true), 1500);
+              }
             }
           } catch (error) {
             console.error("Error checking location:", error);
@@ -139,6 +177,7 @@ const ImageUpload = ({
     setFiles([]);
     setError(null);
     setFoundLocation(null);
+    setCurrentLocation(null);
   };
 
   const handleLocationConfirm = () => {
@@ -151,6 +190,7 @@ const ImageUpload = ({
   const handleLocationReject = () => {
     setShowLocationDialog(false);
     setFoundLocation(null);
+    setCurrentLocation(null);
     onLocationFound(null);
   };
 
@@ -232,11 +272,11 @@ const ImageUpload = ({
               ))}
             </div>
 
-            {detectedLocation && (
-              <div className="mt-2 flex items-center gap-2">
+            {foundLocation && (
+              <div className="mt-2 flex items-center gap-2 bg-muted p-3 rounded-lg">
                 <MapPin size={16} className="flex-shrink-0" />
                 <TypographyParagraph>
-                  {detectedLocation.address}
+                  {foundLocation.address}
                 </TypographyParagraph>
               </div>
             )}
