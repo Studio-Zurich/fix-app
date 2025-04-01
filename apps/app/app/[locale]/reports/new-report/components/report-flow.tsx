@@ -164,6 +164,7 @@ const ReportFlow = () => {
               hasInteractedWithMap={hasInteractedWithMap}
               onMapInteraction={() => setHasInteractedWithMap(true)}
               setHasInteractedWithMap={setHasInteractedWithMap}
+              detectedLocation={detectedLocation}
             />
 
             <div className="py-2 w-full flex justify-between">

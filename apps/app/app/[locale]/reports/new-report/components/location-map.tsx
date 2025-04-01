@@ -44,6 +44,7 @@ export default function LocationMap({
   hasInteractedWithMap,
   onMapInteraction,
   setHasInteractedWithMap,
+  detectedLocation,
 }: LocationMapProps) {
   const t = useTranslations("components.reportFlow");
 
@@ -64,18 +65,18 @@ export default function LocationMap({
     }
   }, [initialLocation, locationSubmitted]);
 
-  // Show location dialog when location is found and not submitted
+  // Show location dialog only when location is detected from image and not submitted
   useEffect(() => {
-    if (initialLocation && !locationSubmitted && !hasShownDialog) {
+    if (detectedLocation && !locationSubmitted && !hasShownDialog) {
       console.log("Showing location dialog", {
-        initialLocation,
+        detectedLocation,
         locationSubmitted,
         hasShownDialog,
       });
       setShowLocationDialog(true);
       setHasShownDialog(true);
     }
-  }, [initialLocation, locationSubmitted, hasShownDialog]);
+  }, [detectedLocation, locationSubmitted, hasShownDialog]);
 
   const handleMapInteraction = () => {
     if (!hasInteractedWithMap) {
@@ -139,8 +140,9 @@ export default function LocationMap({
       setSearchValue(suggestion.place_name);
       setSuggestions([]);
       flyToLocation(location);
+      onMapInteraction();
     },
-    [onLocationSelect, flyToLocation]
+    [onLocationSelect, flyToLocation, onMapInteraction]
   );
 
   const handleMapMove = useCallback(async () => {
@@ -149,13 +151,15 @@ export default function LocationMap({
     const center = mapRef.current.getCenter();
     const address = await fetchAddressFromCoordinates(center.lng, center.lat);
 
-    onLocationSelect({
+    const location = {
       lat: center.lat,
       lng: center.lng,
       address,
-    });
+    };
+    onLocationSelect(location);
     setSearchValue(address);
-  }, [onLocationSelect]);
+    onMapInteraction();
+  }, [onLocationSelect, onMapInteraction]);
 
   const requestLocationPermission = useCallback(async () => {
     setIsGettingLocation(true);

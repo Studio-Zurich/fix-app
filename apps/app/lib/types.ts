@@ -194,6 +194,7 @@ export interface LocationMapProps {
   hasInteractedWithMap: boolean;
   onMapInteraction: () => void;
   setHasInteractedWithMap: (hasInteracted: boolean) => void;
+  detectedLocation?: ImageLocation | null;
 }
 
 export interface StepHeaderProps {
