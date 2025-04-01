@@ -85,7 +85,9 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      const exif = await exifr.parse(file);
+      // Read the file as an ArrayBuffer first
+      const buffer = await file.arrayBuffer();
+      const exif = await exifr.parse(buffer);
 
       if (exif?.GPSLatitude && exif?.GPSLongitude) {
         const lat = convertDMSToDD(
