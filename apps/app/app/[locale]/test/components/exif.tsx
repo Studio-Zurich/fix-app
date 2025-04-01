@@ -8,6 +8,25 @@ const Exif = () => {
   const [exifData, setExifData] = useState<any>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<GeolocationCoordinates | null>(null);
+
+  const getLocation = async (): Promise<GeolocationCoordinates | null> => {
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          });
+        }
+      );
+      return position.coords;
+    } catch (err) {
+      console.error("Error getting location:", err);
+      return null;
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -20,10 +39,24 @@ const Exif = () => {
     };
     reader.readAsDataURL(file);
 
-    // Read EXIF data
+    // Read EXIF data and get location if using camera
     try {
       const buffer = await file.arrayBuffer();
       const exif = await exifr.parse(buffer);
+
+      // If this was from camera input (not file selection), get current location
+      if (e.target.id === "camera-input") {
+        const currentLocation = await getLocation();
+        if (currentLocation) {
+          setLocation(currentLocation);
+          // Combine EXIF data with current location
+          exif.GPSLatitude = currentLocation.latitude;
+          exif.GPSLongitude = currentLocation.longitude;
+          exif.GPSAltitude = currentLocation.altitude;
+          exif.GPSAccuracy = currentLocation.accuracy;
+        }
+      }
+
       setExifData(exif);
       setError(null);
     } catch (err) {
@@ -97,6 +130,32 @@ const Exif = () => {
                 <span>{JSON.stringify(value)}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {location && (
+        <div className="space-y-2">
+          <h3 className="font-medium">Current Location</h3>
+          <div className="bg-muted p-4 rounded-lg space-y-1">
+            <div className="text-sm">
+              <span className="font-medium">Latitude:</span>{" "}
+              <span>{location.latitude}</span>
+            </div>
+            <div className="text-sm">
+              <span className="font-medium">Longitude:</span>{" "}
+              <span>{location.longitude}</span>
+            </div>
+            {location.altitude && (
+              <div className="text-sm">
+                <span className="font-medium">Altitude:</span>{" "}
+                <span>{location.altitude}</span>
+              </div>
+            )}
+            <div className="text-sm">
+              <span className="font-medium">Accuracy:</span>{" "}
+              <span>{location.accuracy}m</span>
+            </div>
           </div>
         </div>
       )}
