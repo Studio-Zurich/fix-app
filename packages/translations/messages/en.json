@@ -99,13 +99,14 @@
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
                 "uploadFailed": "Upload failed",
-                "fileTooLarge": "File exceeds maximum size of 5MB",
+                "fileTooLarge": "File exceeds maximum size of 10MB",
                 "tooManyFiles": "Too many files. Maximum is {max}",
                 "noFilesSelected": "No files selected",
                 "databaseError": "Database error",
                 "someUploadsFailed": "Some uploads failed",
                 "noLocationSelected": "Please select a location",
-                "noIncidentTypeSelected": "Please select an incident type"
+                "noIncidentTypeSelected": "Please select an incident type",
+                "processingFailed": "Failed to process image. Please try again or use a different image."
             },
             "gettingLocation": "Getting location from device...",
             "locationPrivacyPrompt": "Please allow location access to accurately locate your report. This helps us process your report more efficiently."

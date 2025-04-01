@@ -12,6 +12,7 @@ import {
   SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
+import { processImageForUpload } from "@/lib/utils/image";
 import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
@@ -137,7 +138,7 @@ export async function submitReport(
 
     // Only proceed with file upload if files are provided
     if (files.length > 0) {
-      // Upload files to Supabase storage in parallel
+      // Process and upload files to Supabase storage in parallel
       const uploadPromises = files.map(async (file) => {
         const fileExt = file.name.split(".").pop()?.toLowerCase();
         if (
@@ -155,45 +156,68 @@ export async function submitReport(
           };
         }
 
-        const fileName = `${report.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${fileName}`;
+        try {
+          // Process and compress the image
+          const { buffer, fileName } = await processImageForUpload(file, {
+            maxWidth: 1920,
+            maxHeight: 1080,
+            quality: 80,
+            format: "jpeg",
+          });
 
-        // Upload file and create database record in parallel
-        const [uploadResult, imageRecord] = await Promise.all([
-          supabase.storage.from("report-images").upload(filePath, file),
-          supabase.from("report_images").insert({
-            report_id: report.id,
-            storage_path: filePath,
-            file_name: file.name,
-            file_type: file.type,
-            file_size: file.size,
-            created_at: timestamp,
-          }),
-        ]);
+          const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`;
 
-        if (uploadResult.error || imageRecord.error) {
-          console.error("Error processing file:", {
-            uploadError: uploadResult.error,
-            imageError: imageRecord.error,
-            fileName,
+          // Upload file and create database record in parallel
+          const [uploadResult, imageRecord] = await Promise.all([
+            supabase.storage.from("report-images").upload(filePath, buffer),
+            supabase.from("report_images").insert({
+              report_id: report.id,
+              storage_path: filePath,
+              file_name: fileName,
+              file_type: "image/jpeg", // Always JPEG after compression
+              file_size: buffer.length,
+              created_at: timestamp,
+            }),
+          ]);
+
+          if (uploadResult.error || imageRecord.error) {
+            console.error("Error processing file:", {
+              uploadError: uploadResult.error,
+              imageError: imageRecord.error,
+              fileName,
+              fileSize: buffer.length,
+              fileType: "image/jpeg",
+            });
+            // Clean up if needed
+            if (!uploadResult.error) {
+              await supabase.storage.from("report-images").remove([filePath]);
+            }
+            return {
+              success: false,
+              error: {
+                code: "UPLOAD_FAILED",
+                message: t("components.reportFlow.errors.uploadFailed"),
+              },
+            };
+          }
+
+          uploadedFiles.push(filePath);
+          return { success: true, filePath };
+        } catch (error) {
+          console.error("Error processing image:", {
+            error,
+            fileName: file.name,
             fileSize: file.size,
             fileType: file.type,
           });
-          // Clean up if needed
-          if (!uploadResult.error) {
-            await supabase.storage.from("report-images").remove([filePath]);
-          }
           return {
             success: false,
             error: {
-              code: "UPLOAD_FAILED",
-              message: t("components.reportFlow.errors.uploadFailed"),
+              code: "PROCESSING_FAILED",
+              message: t("components.reportFlow.errors.processingFailed"),
             },
           };
         }
-
-        uploadedFiles.push(filePath);
-        return { success: true, filePath };
       });
 
       // Wait for all uploads to complete
@@ -221,7 +245,7 @@ export async function submitReport(
         };
       }
 
-      // Send emails with attachments
+      // Send emails with compressed attachments
       const emailProps: EmailProps = {
         imageCount: files.length,
         locale: validatedData.locale,
@@ -239,13 +263,18 @@ export async function submitReport(
       };
 
       try {
-        // Convert files to buffers for email attachments
+        // Process files for email attachments
         const fileBuffers = await Promise.all(
           files.map(async (file) => {
-            const arrayBuffer = await file.arrayBuffer();
+            const { buffer, fileName } = await processImageForUpload(file, {
+              maxWidth: 1920,
+              maxHeight: 1080,
+              quality: 80,
+              format: "jpeg",
+            });
             return {
-              filename: file.name,
-              content: Buffer.from(arrayBuffer),
+              filename: fileName,
+              content: buffer,
             };
           })
         );

@@ -99,13 +99,14 @@
             "errors": {
                 "invalidFileType": "Ungültiger Dateityp. Nur JPEG, PNG und GIF sind erlaubt",
                 "uploadFailed": "Upload fehlgeschlagen",
-                "fileTooLarge": "Datei überschreitet maximale Größe von 5MB",
+                "fileTooLarge": "Datei überschreitet maximale Größe von 10MB",
                 "tooManyFiles": "Zu viele Dateien. Maximum ist {max}",
                 "noFilesSelected": "Keine Dateien ausgewählt",
                 "databaseError": "Datenbankfehler",
                 "someUploadsFailed": "Einige Uploads fehlgeschlagen",
                 "noLocationSelected": "Bitte wählen Sie einen Standort aus",
-                "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus"
+                "noIncidentTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus",
+                "processingFailed": "Bild konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut oder verwenden Sie ein anderes Bild."
             },
             "gettingLocation": "Standort wird vom Gerät abgerufen...",
             "locationPrivacyPrompt": "Bitte erlaube den Standortzugriff, um deinen Bericht genau zu lokalisieren. Dies hilft uns, deine Meldung effizienter zu bearbeiten."
