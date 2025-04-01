@@ -8,6 +8,9 @@ import {
   EmailSendParams,
   FileUploadResponse,
   Location,
+  ProcessedImage,
+  ProcessedImageError,
+  ProcessedImageSuccess,
   ReportDescription,
   SelectedIncidentTypeType,
   UserData,
@@ -100,7 +103,7 @@ export async function submitReport(
       userData,
     });
 
-    // Create a new report record with user data
+    // Step 1: Create report record
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
@@ -136,36 +139,92 @@ export async function submitReport(
       };
     }
 
-    // Only proceed with file upload if files are provided
+    // Step 2: Process and upload files if any
     if (files.length > 0) {
-      // Process and upload files to Supabase storage in parallel
-      const uploadPromises = files.map(async (file) => {
-        const fileExt = file.name.split(".").pop()?.toLowerCase();
-        if (
-          !fileExt ||
-          !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
-            fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
-          )
-        ) {
+      // Process all images first
+      const processedImages = await Promise.all(
+        files.map(async (file): Promise<ProcessedImage> => {
+          const fileExt = file.name.split(".").pop()?.toLowerCase();
+          if (
+            !fileExt ||
+            !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
+              fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
+            )
+          ) {
+            return {
+              success: false,
+              error: {
+                code: "INVALID_FILE_TYPE",
+                message: t("components.reportFlow.errors.invalidFileType"),
+              },
+            };
+          }
+
+          try {
+            // Process and compress the image once
+            const { buffer, fileName } = await processImageForUpload(file, {
+              maxWidth: 1920,
+              maxHeight: 1080,
+              quality: 80,
+              format: "jpeg",
+            });
+
+            return {
+              success: true,
+              buffer,
+              fileName,
+              filePath: `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`,
+            };
+          } catch (error) {
+            console.error("Error processing image:", {
+              error,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+            });
+            return {
+              success: false,
+              error: {
+                code: "PROCESSING_FAILED",
+                message: t("components.reportFlow.errors.processingFailed"),
+              },
+            };
+          }
+        })
+      );
+
+      // Check for any processing failures
+      const processingFailures = processedImages.filter(
+        (result): result is ProcessedImageError => !result.success
+      );
+      if (processingFailures.length > 0) {
+        const firstFailure = processingFailures[0];
+        if (!firstFailure) {
           return {
             success: false,
             error: {
-              code: "INVALID_FILE_TYPE",
-              message: t("components.reportFlow.errors.invalidFileType"),
+              code: "UPLOAD_FAILED",
+              message: t("components.reportFlow.errors.uploadFailed"),
             },
           };
         }
+        return {
+          success: false,
+          error: {
+            code:
+              firstFailure.error.code === "INVALID_FILE_TYPE"
+                ? "INVALID_FILE_TYPE"
+                : "UPLOAD_FAILED",
+            message: firstFailure.error.message,
+          },
+        };
+      }
 
-        try {
-          // Process and compress the image
-          const { buffer, fileName } = await processImageForUpload(file, {
-            maxWidth: 1920,
-            maxHeight: 1080,
-            quality: 80,
-            format: "jpeg",
-          });
-
-          const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`;
+      // Upload files and create database records in parallel
+      const uploadPromises = processedImages
+        .filter((result): result is ProcessedImageSuccess => result.success)
+        .map(async (processedImage) => {
+          const { buffer, fileName, filePath } = processedImage;
 
           // Upload file and create database record in parallel
           const [uploadResult, imageRecord] = await Promise.all([
@@ -174,7 +233,7 @@ export async function submitReport(
               report_id: report.id,
               storage_path: filePath,
               file_name: fileName,
-              file_type: "image/jpeg", // Always JPEG after compression
+              file_type: "image/jpeg",
               file_size: buffer.length,
               created_at: timestamp,
             }),
@@ -203,22 +262,7 @@ export async function submitReport(
 
           uploadedFiles.push(filePath);
           return { success: true, filePath };
-        } catch (error) {
-          console.error("Error processing image:", {
-            error,
-            fileName: file.name,
-            fileSize: file.size,
-            fileType: file.type,
-          });
-          return {
-            success: false,
-            error: {
-              code: "PROCESSING_FAILED",
-              message: t("components.reportFlow.errors.processingFailed"),
-            },
-          };
-        }
-      });
+        });
 
       // Wait for all uploads to complete
       const uploadResults = await Promise.all(uploadPromises);
@@ -245,7 +289,7 @@ export async function submitReport(
         };
       }
 
-      // Send emails with compressed attachments
+      // Prepare email data
       const emailProps: EmailProps = {
         imageCount: files.length,
         locale: validatedData.locale,
@@ -262,41 +306,37 @@ export async function submitReport(
         userData: validatedData.userData,
       };
 
-      try {
-        // Process files for email attachments
-        const fileBuffers = await Promise.all(
-          files.map(async (file) => {
-            const { buffer, fileName } = await processImageForUpload(file, {
-              maxWidth: 1920,
-              maxHeight: 1080,
-              quality: 80,
-              format: "jpeg",
-            });
-            return {
-              filename: fileName,
-              content: buffer,
-            };
-          })
-        );
+      // Prepare email attachments using already processed images
+      const fileBuffers = processedImages
+        .filter(
+          (result): result is ProcessedImage & { success: true } =>
+            result.success
+        )
+        .map((processedImage) => ({
+          filename: processedImage.fileName,
+          content: processedImage.buffer,
+        }));
 
-        // Send emails in parallel
-        await Promise.all([
-          sendEmailWithRetry({
-            from: EMAIL_CONSTANTS.FROM_ADDRESS,
-            to: EMAIL_CONSTANTS.TO_ADDRESS,
-            bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-            subject: t("mails.internal.subject"),
-            react: InternalReportEmail(emailProps),
-            attachments: fileBuffers,
-          }),
-          sendEmailWithRetry({
-            from: EMAIL_CONSTANTS.FROM_ADDRESS,
-            to: validatedData.userData.email,
-            subject: t("mails.external.subject"),
-            react: ExternalReportEmail(emailProps),
-            attachments: fileBuffers,
-          }),
-        ]);
+      // Send emails sequentially to ensure both are sent
+      try {
+        // Send internal email first
+        await sendEmailWithRetry({
+          from: EMAIL_CONSTANTS.FROM_ADDRESS,
+          to: EMAIL_CONSTANTS.TO_ADDRESS,
+          bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+          subject: t("mails.internal.subject"),
+          react: InternalReportEmail(emailProps),
+          attachments: fileBuffers,
+        });
+
+        // Then send external email
+        await sendEmailWithRetry({
+          from: EMAIL_CONSTANTS.FROM_ADDRESS,
+          to: validatedData.userData.email,
+          subject: t("mails.external.subject"),
+          react: ExternalReportEmail(emailProps),
+          attachments: fileBuffers,
+        });
       } catch (error) {
         console.error("Error sending emails:", {
           error,

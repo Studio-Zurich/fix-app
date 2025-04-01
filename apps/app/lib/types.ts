@@ -125,7 +125,8 @@ export type ReportError = {
     | "UNKNOWN"
     | "NO_FILES"
     | "TOO_MANY_FILES"
-    | "DATABASE_ERROR";
+    | "DATABASE_ERROR"
+    | "PROCESSING_FAILED";
   message: string;
 };
 
@@ -139,6 +140,24 @@ export type FileAttachment = {
   filename: string;
   content: Buffer;
 };
+
+// Image processing related types
+export type ProcessedImageSuccess = {
+  success: true;
+  buffer: Buffer;
+  fileName: string;
+  filePath: string;
+};
+
+export type ProcessedImageError = {
+  success: false;
+  error: {
+    code: "INVALID_FILE_TYPE" | "PROCESSING_FAILED";
+    message: string;
+  };
+};
+
+export type ProcessedImage = ProcessedImageSuccess | ProcessedImageError;
 
 // Email sending related types
 export type EmailSendParams = {
