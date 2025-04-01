@@ -19,6 +19,7 @@ import exifr from "exifr";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import StepHeader from "./step-header";
+
 const MAX_FILES = 5;
 
 const ImageUpload = ({
@@ -35,9 +36,7 @@ const ImageUpload = ({
     null
   );
   const [previews, setPreviews] = useState<string[]>([]);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
-  const [isPrivacyPromptNeeded, setIsPrivacyPromptNeeded] = useState(false);
 
   // Generate previews when files change
   useEffect(() => {
@@ -70,16 +69,12 @@ const ImageUpload = ({
             if (location) {
               setFoundLocation(location);
               setShowLocationDialog(true);
-            } else {
-              setFoundLocation(null);
             }
           } catch (error) {
             console.error("Error checking location:", error);
             setFoundLocation(null);
           }
         }
-      } else {
-        setFoundLocation(null);
       }
     };
 
@@ -90,10 +85,8 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      // Try to parse EXIF data
       const exif = await exifr.parse(file);
 
-      // Check if we have valid GPS coordinates in EXIF
       if (exif?.GPSLatitude && exif?.GPSLongitude) {
         const lat = convertDMSToDD(
           exif.GPSLatitude,
@@ -104,47 +97,14 @@ const ImageUpload = ({
           exif.GPSLongitudeRef === "W" ? -1 : 1
         );
 
-        // Validate coordinates are within reasonable bounds
         if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
           const address = await fetchAddressFromCoordinates(lng, lat);
           return { lat, lng, address };
         }
       }
-
-      // If we get here, either:
-      // 1. No EXIF data was found
-      // 2. No GPS coordinates in EXIF
-      // 3. Invalid GPS coordinates
-      console.log("No valid EXIF GPS data found");
       return null;
     } catch (error) {
       console.error("Error reading image location:", error);
-      return null;
-    }
-  };
-
-  const getLocationFromDevice = async (): Promise<ImageLocation | null> => {
-    try {
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          });
-        }
-      );
-
-      const { latitude: lat, longitude: lng } = position.coords;
-      const address = await fetchAddressFromCoordinates(lng, lat);
-
-      return {
-        lat,
-        lng,
-        address,
-      };
-    } catch (error) {
-      console.error("Error getting location from device:", error);
       return null;
     }
   };
@@ -165,21 +125,6 @@ const ImageUpload = ({
       return;
     }
 
-    setIsGettingLocation(true);
-    try {
-      // Always try to get location when files are selected
-      const location = await getLocationFromDevice();
-      if (location) {
-        setFoundLocation(location);
-        setShowLocationDialog(true);
-      }
-    } catch (error) {
-      console.error("Error getting location:", error);
-      setIsPrivacyPromptNeeded(true);
-    } finally {
-      setIsGettingLocation(false);
-    }
-
     setFiles(selectedFiles);
     setError(null);
     onLocationFound(null);
@@ -193,14 +138,6 @@ const ImageUpload = ({
     setFiles([]);
     setError(null);
     setFoundLocation(null);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const handleLocationConfirm = () => {
@@ -222,11 +159,11 @@ const ImageUpload = ({
         description={t("imageUpload.description")}
       />
       <div className="relative space-y-4">
-        {/* Single input for both camera and library */}
         <input
           type="file"
           accept="image/jpeg,image/png,image/gif"
           multiple
+          capture="environment"
           onChange={handleFileChange}
           disabled={isUploading}
           aria-label={t("takePhoto")}
@@ -235,7 +172,6 @@ const ImageUpload = ({
           id="file-input"
         />
 
-        {/* Single button for both camera and library */}
         <label
           htmlFor="file-input"
           className={`block w-full cursor-pointer transition-colors ${
@@ -269,7 +205,6 @@ const ImageUpload = ({
               </Button>
             </div>
 
-            {/* Image Previews */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {previews.map((preview, index) => (
                 <div key={index} className="relative group">
@@ -295,21 +230,14 @@ const ImageUpload = ({
               ))}
             </div>
 
-            <div className="space-y-1">
-              {detectedLocation && (
-                <div className="mt-2 flex items-center gap-2">
-                  <MapPin size={16} className="flex-shrink-0" />
-                  <TypographyParagraph>
-                    {detectedLocation.address}
-                  </TypographyParagraph>
-                </div>
-              )}
-              {isGettingLocation && (
-                <div className="mt-2 text-sm text-muted-foreground">
-                  {t("gettingLocation")}
-                </div>
-              )}
-            </div>
+            {detectedLocation && (
+              <div className="mt-2 flex items-center gap-2">
+                <MapPin size={16} className="flex-shrink-0" />
+                <TypographyParagraph>
+                  {detectedLocation.address}
+                </TypographyParagraph>
+              </div>
+            )}
           </div>
         )}
       </div>
