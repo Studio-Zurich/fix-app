@@ -65,6 +65,8 @@ const ImageUpload = ({
         const firstFile = files[0];
         if (firstFile) {
           try {
+            let location: ImageLocation | null = null;
+
             // On iOS, request location permission first
             if (
               /iPad|iPhone|iPod/.test(navigator.userAgent) &&
@@ -84,8 +86,9 @@ const ImageUpload = ({
               }
             }
 
-            // Now try to read EXIF data
-            const location = await readImageLocation(firstFile);
+            // Try to read EXIF data
+            location = await readImageLocation(firstFile);
+
             if (location) {
               setFoundLocation(location);
               setShowLocationDialog(true);
@@ -172,6 +175,7 @@ const ImageUpload = ({
   const handleLocationReject = () => {
     setShowLocationDialog(false);
     setFoundLocation(null);
+    onLocationFound(null);
   };
 
   return (
