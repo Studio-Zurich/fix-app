@@ -43,30 +43,36 @@ const Exif = () => {
       </div>
 
       <div className="flex gap-2">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-          id="file-input"
-        />
+        <div className="flex-1">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+            id="file-input"
+          />
+          <Button asChild className="w-full">
+            <label htmlFor="file-input" className="cursor-pointer">
+              Choose Photo
+            </label>
+          </Button>
+        </div>
 
-        <label htmlFor="file-input" className="flex-1">
-          <Button className="w-full">Choose Photo</Button>
-        </label>
-
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileSelect}
-          className="hidden"
-          id="camera-input"
-        />
-
-        <label htmlFor="camera-input" className="flex-1">
-          <Button className="w-full">Take Photo</Button>
-        </label>
+        <div className="flex-1">
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileSelect}
+            className="hidden"
+            id="camera-input"
+          />
+          <Button asChild className="w-full">
+            <label htmlFor="camera-input" className="cursor-pointer">
+              Take Photo
+            </label>
+          </Button>
+        </div>
       </div>
 
       {preview && (
