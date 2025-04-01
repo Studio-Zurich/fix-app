@@ -2,7 +2,7 @@
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
-import { MapPin } from "@phosphor-icons/react";
+import { Camera, Image, MapPin } from "@phosphor-icons/react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -201,29 +201,7 @@ const ImageUpload = ({
         description={t("imageUpload.description")}
       />
       <div className="relative space-y-4">
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-              disabled={isUploading}
-              className="hidden"
-              id="library-input"
-            />
-            <Button asChild className="w-full" disabled={isUploading}>
-              <label
-                htmlFor="library-input"
-                className={`cursor-pointer w-full ${
-                  isUploading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {t("chooseFromLibrary")}
-              </label>
-            </Button>
-          </div>
-
+        <div className="grid gap-2">
           <div className="flex-1">
             <input
               type="file"
@@ -242,7 +220,35 @@ const ImageUpload = ({
                   isUploading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
+                <Camera size={24} className="mr-0.5 flex-shrink-0" />
                 {t("takePhoto")}
+              </label>
+            </Button>
+          </div>
+          <div className="flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              disabled={isUploading}
+              className="hidden"
+              id="library-input"
+            />
+            <Button
+              asChild
+              className="w-full"
+              disabled={isUploading}
+              variant="outline"
+            >
+              <label
+                htmlFor="library-input"
+                className={`cursor-pointer w-full ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <Image size={24} className="mr-0.5 flex-shrink-0" />
+                {t("chooseFromLibrary")}
               </label>
             </Button>
           </div>
