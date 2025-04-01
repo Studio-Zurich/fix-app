@@ -65,10 +65,26 @@ const ImageUpload = ({
         const firstFile = files[0];
         if (firstFile) {
           try {
+            // First try to read EXIF directly
             const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
               setShowLocationDialog(true);
+            } else {
+              // If no EXIF data, try requesting location permission
+              if (navigator.permissions && navigator.permissions.query) {
+                const permissionStatus = await navigator.permissions.query({
+                  name: "geolocation" as PermissionName,
+                });
+                if (permissionStatus.state === "granted") {
+                  // Try reading EXIF again after permission granted
+                  const location = await readImageLocation(firstFile);
+                  if (location) {
+                    setFoundLocation(location);
+                    setShowLocationDialog(true);
+                  }
+                }
+              }
             }
           } catch (error) {
             console.error("Error checking location:", error);
