@@ -65,26 +65,31 @@ const ImageUpload = ({
         const firstFile = files[0];
         if (firstFile) {
           try {
-            // First try to read EXIF directly
+            // For iOS Safari, we need to request location permission first
+            if (
+              /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+              !(window as any).MSStream
+            ) {
+              try {
+                // Request location permission
+                await new Promise((resolve, reject) => {
+                  navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0,
+                  });
+                });
+              } catch (error) {
+                console.error("Location permission denied:", error);
+                return;
+              }
+            }
+
+            // Now try to read EXIF data
             const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
               setShowLocationDialog(true);
-            } else {
-              // If no EXIF data, try requesting location permission
-              if (navigator.permissions && navigator.permissions.query) {
-                const permissionStatus = await navigator.permissions.query({
-                  name: "geolocation" as PermissionName,
-                });
-                if (permissionStatus.state === "granted") {
-                  // Try reading EXIF again after permission granted
-                  const location = await readImageLocation(firstFile);
-                  if (location) {
-                    setFoundLocation(location);
-                    setShowLocationDialog(true);
-                  }
-                }
-              }
             }
           } catch (error) {
             console.error("Error checking location:", error);

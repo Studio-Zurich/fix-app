@@ -41,7 +41,7 @@ export const ReportEmail = ({
               <br />
               {t.newReport}
             </Heading>
-            <Section style={section}>
+            <Section style={thankYouSection}>
               <Text style={text}>{t.thankYou}</Text>
               <Text style={text}>{t.confirmation}</Text>
             </Section>
@@ -93,6 +93,12 @@ const header = {
 const section = {
   padding: "0 20px",
   marginTop: "20px",
+};
+
+const thankYouSection = {
+  padding: "0 20px",
+  marginTop: "20px",
+  textAlign: "center" as const,
 };
 
 const sectionHeader = {
