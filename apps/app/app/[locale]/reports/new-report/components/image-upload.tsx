@@ -65,30 +65,7 @@ const ImageUpload = ({
         const firstFile = files[0];
         if (firstFile) {
           try {
-            let location: ImageLocation | null = null;
-
-            // On iOS, request location permission first
-            if (
-              /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-              !(window as any).MSStream
-            ) {
-              try {
-                await new Promise((resolve, reject) => {
-                  navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0,
-                  });
-                });
-              } catch (error) {
-                console.error("Location permission denied:", error);
-                return;
-              }
-            }
-
-            // Try to read EXIF data
-            location = await readImageLocation(firstFile);
-
+            const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
               setShowLocationDialog(true);
@@ -108,7 +85,6 @@ const ImageUpload = ({
     file: File
   ): Promise<ImageLocation | null> => {
     try {
-      // Read the file as an ArrayBuffer first
       const buffer = await file.arrayBuffer();
       const exif = await exifr.parse(buffer);
 
