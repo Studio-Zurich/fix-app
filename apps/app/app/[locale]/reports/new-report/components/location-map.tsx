@@ -8,6 +8,16 @@ import {
   fetchLocationSuggestions,
 } from "@/lib/utils/map";
 import { Crosshair, MapPin } from "@phosphor-icons/react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/alert-dialog";
 import { Button } from "@repo/ui/button";
 import {
   Command,
@@ -17,6 +27,7 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/command";
+import { TypographyParagraph } from "@repo/ui/text";
 import { motion } from "framer-motion";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
@@ -41,19 +52,30 @@ export default function LocationMap({
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [hasShownDialog, setHasShownDialog] = useState(false);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
-  // Set searchValue and fly to location when initialLocation changes
+  // Only set the search value when location is confirmed
   useEffect(() => {
-    if (initialLocation) {
+    if (initialLocation && locationSubmitted) {
       setSearchValue(initialLocation.address);
-      mapRef.current?.flyTo({
-        center: [initialLocation.lng, initialLocation.lat],
-        zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
-        duration: MAP_CONSTANTS.FLY_TO_DURATION,
-      });
     }
-  }, [initialLocation]);
+  }, [initialLocation, locationSubmitted]);
+
+  // Show location dialog when location is found and not submitted
+  useEffect(() => {
+    if (initialLocation && !locationSubmitted && !hasShownDialog) {
+      console.log("Showing location dialog", {
+        initialLocation,
+        locationSubmitted,
+        hasShownDialog,
+      });
+      setShowLocationDialog(true);
+      setHasShownDialog(true);
+    }
+  }, [initialLocation, locationSubmitted, hasShownDialog]);
 
   const handleMapInteraction = () => {
     if (!hasInteractedWithMap) {
@@ -80,21 +102,45 @@ export default function LocationMap({
     }
   }, []);
 
+  const flyToLocation = useCallback(
+    (location: { lng: number; lat: number }) => {
+      if (mapRef.current && isMapLoaded) {
+        mapRef.current.flyTo({
+          center: [location.lng, location.lat],
+          zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
+          duration: MAP_CONSTANTS.FLY_TO_DURATION,
+        });
+      }
+    },
+    [isMapLoaded]
+  );
+
+  const handleLocationConfirm = () => {
+    if (initialLocation) {
+      setShowLocationDialog(false);
+      onMapInteraction();
+      onLocationSelect(initialLocation);
+      // Only fly to location after confirmation
+      flyToLocation(initialLocation);
+    }
+  };
+
+  const handleLocationReject = () => {
+    setShowLocationDialog(false);
+    onLocationSelect(null);
+    setSearchValue("");
+  };
+
   const handleLocationSelect = useCallback(
     async (suggestion: Suggestion) => {
-      console.log("Selected suggestion:", suggestion); // Debug log
+      console.log("Selected suggestion:", suggestion);
       const location = createLocationFromSuggestion(suggestion);
       onLocationSelect(location);
       setSearchValue(suggestion.place_name);
       setSuggestions([]);
-
-      mapRef.current?.flyTo({
-        center: [location.lng, location.lat],
-        zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
-        duration: MAP_CONSTANTS.FLY_TO_DURATION,
-      });
+      flyToLocation(location);
     },
-    [onLocationSelect]
+    [onLocationSelect, flyToLocation]
   );
 
   const handleMapMove = useCallback(async () => {
@@ -128,17 +174,13 @@ export default function LocationMap({
           const { latitude: lat, longitude: lng } = position.coords;
           const address = await fetchAddressFromCoordinates(lng, lat);
 
-          onLocationSelect({
+          const location = {
             lat,
             lng,
             address,
-          });
-
-          mapRef.current?.flyTo({
-            center: [lng, lat],
-            zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
-            duration: MAP_CONSTANTS.FLY_TO_DURATION,
-          });
+          };
+          onLocationSelect(location);
+          flyToLocation(location);
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -157,7 +199,11 @@ export default function LocationMap({
     } finally {
       setIsGettingLocation(false);
     }
-  }, [onLocationSelect]);
+  }, [onLocationSelect, flyToLocation]);
+
+  const handleMapLoad = () => {
+    setIsMapLoaded(true);
+  };
 
   return (
     <div className="relative flex-1 h-full space-y-4">
@@ -168,8 +214,12 @@ export default function LocationMap({
       <Map
         ref={mapRef}
         initialViewState={{
-          latitude: initialLocation?.lat || DEFAULT_LOCATION.latitude,
-          longitude: initialLocation?.lng || DEFAULT_LOCATION.longitude,
+          latitude: locationSubmitted
+            ? initialLocation?.lat || DEFAULT_LOCATION.latitude
+            : DEFAULT_LOCATION.latitude,
+          longitude: locationSubmitted
+            ? initialLocation?.lng || DEFAULT_LOCATION.longitude
+            : DEFAULT_LOCATION.longitude,
           zoom: DEFAULT_LOCATION.zoom,
         }}
         style={{
@@ -181,6 +231,7 @@ export default function LocationMap({
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         reuseMaps
         onClick={handleMapInteraction}
+        onLoad={handleMapLoad}
         onMoveStart={() => {
           setIsMoving(true);
           handleMapInteraction();
@@ -217,7 +268,6 @@ export default function LocationMap({
                   requestLocationPermission();
                 }}
                 disabled={isGettingLocation}
-                // className="absolute right-0 top-0.5 p-2 sm:p-0 sm:px-3"
               >
                 <span className="hidden sm:block">
                   {t("locationMap.getLocation")}
@@ -276,32 +326,36 @@ export default function LocationMap({
             <div className="w-3 h-3 rounded-full bg-black/20 mx-auto mt-1" />
           )}
         </div>
-        {/* <div className="absolute bottom-12 left-0 right-0 mx-4">
-          <div className="bg-background rounded-lg p-3 shadow-lg">
-            <div className="flex items-center gap-2">
-              <MapPin
-                className="w-4 h-4 text-primary flex-shrink-0"
-                weight="fill"
-              />
-              <span className="text-sm truncate">
-                {searchValue || DEFAULT_LOCATION.address}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestLocationPermission();
-                }}
-                disabled={isGettingLocation}
-                className="flex items-center justify-center"
-              >
-                <Crosshair className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div> */}
       </Map>
+
+      <AlertDialog
+        open={showLocationDialog}
+        onOpenChange={setShowLocationDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("locationMap.locationDialog.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("locationMap.locationDialog.description")}
+              {initialLocation?.address && (
+                <TypographyParagraph className="mt-2 block text-foreground font-medium">
+                  {initialLocation.address}
+                </TypographyParagraph>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleLocationReject}>
+              {t("locationMap.locationDialog.reject")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleLocationConfirm}>
+              {t("locationMap.locationDialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

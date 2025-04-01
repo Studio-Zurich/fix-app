@@ -50,7 +50,6 @@ const ReportFlow = () => {
     setDetectedLocation(location);
     if (location) {
       setLocation(location);
-      setLocationSubmitted(true);
     } else {
       setLocation(null);
       setLocationSubmitted(false);
@@ -105,7 +104,10 @@ const ReportFlow = () => {
 
   const handleNext = () => {
     if (currentStep === 2) {
-      setLocationSubmitted(true);
+      // Only set locationSubmitted when user confirms the location
+      if (location) {
+        setLocationSubmitted(true);
+      }
     }
     if (currentStep === 3) {
       // Skip to description step (5) if the selected type has no subtypes

@@ -188,7 +188,7 @@ export interface ImageUploadProps {
 }
 
 export interface LocationMapProps {
-  onLocationSelect: (location: ImageLocation) => void;
+  onLocationSelect: (location: ImageLocation | null) => void;
   initialLocation?: ImageLocation | null;
   locationSubmitted?: boolean;
   hasInteractedWithMap: boolean;

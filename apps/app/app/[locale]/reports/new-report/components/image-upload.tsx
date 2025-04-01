@@ -3,16 +3,6 @@ import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
 import { Camera, Image, MapPin } from "@phosphor-icons/react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@repo/ui/alert-dialog";
 import { Button } from "@repo/ui/button";
 import { TypographyParagraph } from "@repo/ui/text";
 import exifr from "exifr";
@@ -36,7 +26,6 @@ const ImageUpload = ({
     null
   );
   const [previews, setPreviews] = useState<string[]>([]);
-  const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [currentLocation, setCurrentLocation] =
     useState<GeolocationCoordinates | null>(null);
 
@@ -88,8 +77,7 @@ const ImageUpload = ({
             const location = await readImageLocation(firstFile);
             if (location) {
               setFoundLocation(location);
-              // Don't show dialog immediately, let user see the address first
-              setTimeout(() => setShowLocationDialog(true), 1500);
+              onLocationFound(location);
             } else {
               // If no EXIF location, try to get current location
               const coords = await getLocation();
@@ -105,19 +93,20 @@ const ImageUpload = ({
                   address,
                 };
                 setFoundLocation(newLocation);
-                setTimeout(() => setShowLocationDialog(true), 1500);
+                onLocationFound(newLocation);
               }
             }
           } catch (error) {
             console.error("Error checking location:", error);
             setFoundLocation(null);
+            onLocationFound(null);
           }
         }
       }
     };
 
     checkLocation();
-  }, [files, locationSubmitted]);
+  }, [files, locationSubmitted, onLocationFound]);
 
   const readImageLocation = async (
     file: File
@@ -178,20 +167,6 @@ const ImageUpload = ({
     setError(null);
     setFoundLocation(null);
     setCurrentLocation(null);
-  };
-
-  const handleLocationConfirm = () => {
-    if (foundLocation) {
-      setShowLocationDialog(false);
-      onLocationFound(foundLocation);
-    }
-  };
-
-  const handleLocationReject = () => {
-    setShowLocationDialog(false);
-    setFoundLocation(null);
-    setCurrentLocation(null);
-    onLocationFound(null);
   };
 
   return (
@@ -317,35 +292,6 @@ const ImageUpload = ({
           {error}
         </p>
       )}
-
-      <AlertDialog
-        open={showLocationDialog}
-        onOpenChange={setShowLocationDialog}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("locationMap.locationDialog.title")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("locationMap.locationDialog.description")}
-              {foundLocation?.address && (
-                <TypographyParagraph className="mt-2 block text-foreground font-medium">
-                  {foundLocation.address}
-                </TypographyParagraph>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleLocationReject}>
-              {t("locationMap.locationDialog.reject")}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleLocationConfirm}>
-              {t("locationMap.locationDialog.confirm")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
