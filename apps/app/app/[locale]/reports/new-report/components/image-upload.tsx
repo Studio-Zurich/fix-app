@@ -201,29 +201,52 @@ const ImageUpload = ({
         description={t("imageUpload.description")}
       />
       <div className="relative space-y-4">
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/gif"
-          multiple
-          capture="environment"
-          onChange={handleFileChange}
-          disabled={isUploading}
-          aria-label={t("takePhoto")}
-          aria-describedby={error ? "file-error" : undefined}
-          className="hidden"
-          id="file-input"
-        />
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              disabled={isUploading}
+              className="hidden"
+              id="library-input"
+            />
+            <Button asChild className="w-full" disabled={isUploading}>
+              <label
+                htmlFor="library-input"
+                className={`cursor-pointer w-full ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {t("chooseFromLibrary")}
+              </label>
+            </Button>
+          </div>
 
-        <label
-          htmlFor="file-input"
-          className={`block w-full cursor-pointer transition-colors ${
-            isUploading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
-          }`}
-        >
-          <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-foreground text-background shadow hover:bg-foreground/90 h-9 px-7 py-6 rounded-full w-full">
-            {t("takePhoto")}
-          </span>
-        </label>
+          <div className="flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              capture="environment"
+              onChange={handleFileChange}
+              disabled={isUploading}
+              className="hidden"
+              id="camera-input"
+            />
+            <Button asChild className="w-full" disabled={isUploading}>
+              <label
+                htmlFor="camera-input"
+                className={`cursor-pointer w-full ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {t("takePhoto")}
+              </label>
+            </Button>
+          </div>
+        </div>
 
         {files.length > 0 && (
           <div className="space-y-4">
