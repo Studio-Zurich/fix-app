@@ -9,7 +9,7 @@ const Exif = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTakePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,22 +38,36 @@ const Exif = () => {
       <div className="space-y-2">
         <h2 className="text-lg font-semibold">Photo EXIF Data</h2>
         <p className="text-sm text-muted-foreground">
-          Take a photo to see its EXIF metadata
+          Take a photo or select an image to see its EXIF metadata
         </p>
       </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={handleTakePhoto}
-        className="hidden"
-        id="photo-input"
-      />
+      <div className="flex gap-2">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+          id="file-input"
+        />
 
-      <label htmlFor="photo-input" className="block w-full cursor-pointer">
-        <Button className="w-full">Take Photo</Button>
-      </label>
+        <label htmlFor="file-input" className="flex-1">
+          <Button className="w-full">Choose Photo</Button>
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileSelect}
+          className="hidden"
+          id="camera-input"
+        />
+
+        <label htmlFor="camera-input" className="flex-1">
+          <Button className="w-full">Take Photo</Button>
+        </label>
+      </div>
 
       {preview && (
         <div className="relative">
