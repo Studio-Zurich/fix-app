@@ -80,7 +80,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   submitReport: async (locale) => {
     const state = get();
     if (!state.location || !state.selectedType || !state.userData) {
-      set({ error: "Missing required fields" });
+      set({ error: { code: "UNKNOWN", message: "Missing required fields" } });
       return;
     }
 
@@ -104,7 +104,12 @@ export const useReportStore = create<ReportStore>((set, get) => ({
 
       const result = await submitReport(formData);
       if (!result.success) {
-        set({ error: result.error?.message || "Upload failed" });
+        set({
+          error: result.error || {
+            code: "UPLOAD_FAILED",
+            message: "Upload failed",
+          },
+        });
         return;
       }
 
@@ -112,7 +117,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       get().resetForm();
       set({ currentStep: 8 }); // Move to success step only on success
     } catch (err) {
-      set({ error: "Upload failed" });
+      set({ error: { code: "UPLOAD_FAILED", message: "Upload failed" } });
     } finally {
       set({ uploading: false });
     }
