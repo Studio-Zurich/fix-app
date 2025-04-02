@@ -94,11 +94,12 @@
                 "noOffensive": "No offensive content"
             },
             "next": "Next",
+            "skip": "Skip",
             "back": "Back",
             "submit": "Submit",
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",
-                "uploadFailed": "Upload failed",
+                "uploadFailed": "An error occurred during upload. Please try again. If the problem persists, please send us an email to info@fixapp.ch",
                 "fileTooLarge": "File exceeds maximum size of 10MB",
                 "tooManyFiles": "Too many files. Maximum is {max}",
                 "noFilesSelected": "No files selected",

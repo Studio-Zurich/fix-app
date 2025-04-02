@@ -54,7 +54,17 @@ export async function processImageForUpload(
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  // Compress image
+  // Skip compression for HEIC/HEIF formats
+  if (file.type === "image/heic" || file.type === "image/heif") {
+    const fileExt = file.type === "image/heic" ? "heic" : "heif";
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    return {
+      buffer,
+      fileName,
+    };
+  }
+
+  // Compress image for other formats
   const compressedBuffer = await compressImage(buffer, options);
 
   // Generate new filename with appropriate extension

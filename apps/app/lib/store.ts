@@ -5,6 +5,7 @@ import {
   IncidentTypeType,
   Location,
   ReportDescription,
+  ReportError,
   UserData,
 } from "./types";
 
@@ -23,7 +24,7 @@ interface ReportStore {
   // UI State
   currentStep: number;
   uploading: boolean;
-  error: string | null;
+  error: ReportError | null;
 
   // Actions
   setFiles: (files: File[]) => void;
@@ -35,7 +36,7 @@ interface ReportStore {
   setUserData: (data: UserData) => void;
   setCurrentStep: (step: number) => void;
   setUploading: (uploading: boolean) => void;
-  setError: (error: string | null) => void;
+  setError: (error: ReportError | null) => void;
   setLocationSubmitted: (submitted: boolean) => void;
   setHasInteractedWithMap: (hasInteracted: boolean) => void;
 
@@ -109,6 +110,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
 
       // Reset form after successful upload
       get().resetForm();
+      set({ currentStep: 8 }); // Move to success step only on success
     } catch (err) {
       set({ error: "Upload failed" });
     } finally {

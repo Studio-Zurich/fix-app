@@ -16,6 +16,7 @@ import {
   UserData,
 } from "@/lib/types";
 import { processImageForUpload } from "@/lib/utils/image";
+import { ReportEmail as ErrorReportEmail } from "@repo/transactional/emails/error";
 import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
@@ -139,212 +140,217 @@ export async function submitReport(
       };
     }
 
-    // Step 2: Process and upload files if any
-    if (files.length > 0) {
-      // Process all images first
-      const processedImages = await Promise.all(
-        files.map(async (file): Promise<ProcessedImage> => {
-          const fileExt = file.name.split(".").pop()?.toLowerCase();
-          if (
-            !fileExt ||
-            !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
-              fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
-            )
-          ) {
-            return {
-              success: false,
-              error: {
-                code: "INVALID_FILE_TYPE",
-                message: t("components.reportFlow.errors.invalidFileType"),
-              },
-            };
-          }
-
-          try {
-            // Process and compress the image once
-            const { buffer, fileName } = await processImageForUpload(file, {
-              maxWidth: 1920,
-              maxHeight: 1080,
-              quality: 80,
-              format: "jpeg",
-            });
-
-            return {
-              success: true,
-              buffer,
-              fileName,
-              filePath: `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`,
-            };
-          } catch (error) {
-            console.error("Error processing image:", {
-              error,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type,
-            });
-            return {
-              success: false,
-              error: {
-                code: "PROCESSING_FAILED",
-                message: t("components.reportFlow.errors.processingFailed"),
-              },
-            };
-          }
-        })
-      );
-
-      // Check for any processing failures
-      const processingFailures = processedImages.filter(
-        (result): result is ProcessedImageError => !result.success
-      );
-      if (processingFailures.length > 0) {
-        const firstFailure = processingFailures[0];
-        if (!firstFailure) {
-          return {
-            success: false,
-            error: {
-              code: "UPLOAD_FAILED",
-              message: t("components.reportFlow.errors.uploadFailed"),
-            },
-          };
-        }
-        return {
-          success: false,
-          error: {
-            code:
-              firstFailure.error.code === "INVALID_FILE_TYPE"
-                ? "INVALID_FILE_TYPE"
-                : "UPLOAD_FAILED",
-            message: firstFailure.error.message,
-          },
-        };
-      }
-
-      // Upload files and create database records in parallel
-      const uploadPromises = processedImages
-        .filter((result): result is ProcessedImageSuccess => result.success)
-        .map(async (processedImage) => {
-          const { buffer, fileName, filePath } = processedImage;
-
-          // Upload file and create database record in parallel
-          const [uploadResult, imageRecord] = await Promise.all([
-            supabase.storage.from("report-images").upload(filePath, buffer),
-            supabase.from("report_images").insert({
-              report_id: report.id,
-              storage_path: filePath,
-              file_name: fileName,
-              file_type: "image/jpeg",
-              file_size: buffer.length,
-              created_at: timestamp,
-            }),
-          ]);
-
-          if (uploadResult.error || imageRecord.error) {
-            console.error("Error processing file:", {
-              uploadError: uploadResult.error,
-              imageError: imageRecord.error,
-              fileName,
-              fileSize: buffer.length,
-              fileType: "image/jpeg",
-            });
-            // Clean up if needed
-            if (!uploadResult.error) {
-              await supabase.storage.from("report-images").remove([filePath]);
-            }
-            return {
-              success: false,
-              error: {
-                code: "UPLOAD_FAILED",
-                message: t("components.reportFlow.errors.uploadFailed"),
-              },
-            };
-          }
-
-          uploadedFiles.push(filePath);
-          return { success: true, filePath };
-        });
-
-      // Wait for all uploads to complete
-      const uploadResults = await Promise.all(uploadPromises);
-      const failedUploads = uploadResults.filter((result) => !result.success);
-
-      if (failedUploads.length > 0) {
-        // Clean up any successfully uploaded files
-        if (uploadedFiles.length > 0) {
-          await supabase.storage.from("report-images").remove(uploadedFiles);
-        }
-
-        console.error("Some uploads failed:", {
-          totalFiles: files.length,
-          failedCount: failedUploads.length,
-          errors: failedUploads.map((u) => u.error),
-        });
-
-        return {
-          success: false,
-          error: {
-            code: "UPLOAD_FAILED",
-            message: t("components.reportFlow.errors.someUploadsFailed"),
-          },
-        };
-      }
-
-      // Prepare email data
-      const emailProps: EmailProps = {
-        imageCount: files.length,
-        locale: validatedData.locale,
-        reportId: report.id,
-        location: validatedData.location.address,
-        incidentType: {
-          type: {
-            ...validatedData.incidentType.type,
-            has_subtypes: Boolean(validatedData.incidentType.subtype),
-          },
-          subtype: validatedData.incidentType.subtype,
+    // Prepare email data
+    const emailProps: EmailProps = {
+      imageCount: files.length,
+      locale: validatedData.locale,
+      reportId: report.id,
+      location: validatedData.location.address,
+      incidentType: {
+        type: {
+          ...validatedData.incidentType.type,
+          has_subtypes: Boolean(validatedData.incidentType.subtype),
         },
-        description: validatedData.description?.text,
-        userData: validatedData.userData,
-      };
+        subtype: validatedData.incidentType.subtype,
+      },
+      description: validatedData.description?.text,
+      userData: validatedData.userData,
+    };
 
-      // Prepare email attachments using already processed images
-      const fileBuffers = processedImages
-        .filter(
-          (result): result is ProcessedImage & { success: true } =>
-            result.success
-        )
-        .map((processedImage) => ({
-          filename: processedImage.fileName,
-          content: processedImage.buffer,
-        }));
+    // Step 2: Send internal email
+    try {
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+        subject: t("mails.internal.subject"),
+        react: InternalReportEmail(emailProps),
+      });
+    } catch (error) {
+      console.error("Error sending internal email:", error);
+      // Send error notification
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+        subject: "Error in Report Processing - Internal Email Failed",
+        react: ErrorReportEmail({
+          ...emailProps,
+          reportId: report.id,
+          errorType: "internal_mail",
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Internal email sending failed",
+        }),
+      });
+      throw error;
+    }
 
-      // Send emails sequentially to ensure both are sent
+    // Step 3: Send external email
+    try {
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: validatedData.userData.email,
+        subject: t("mails.external.subject"),
+        react: ExternalReportEmail(emailProps),
+      });
+    } catch (error) {
+      console.error("Error sending external email:", error);
+      // Send error notification
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+        subject: "Error in Report Processing - External Email Failed",
+        react: ErrorReportEmail({
+          ...emailProps,
+          reportId: report.id,
+          errorType: "external_mail",
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "External email sending failed",
+        }),
+      });
+      throw error;
+    }
+
+    // Step 4: Process and upload files if any
+    if (files.length > 0) {
       try {
-        // Send internal email first
+        // Process all images first
+        const processedImages = await Promise.all(
+          files.map(async (file): Promise<ProcessedImage> => {
+            const fileExt = file.name.split(".").pop()?.toLowerCase();
+            if (
+              !fileExt ||
+              !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
+                fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
+              )
+            ) {
+              return {
+                success: false,
+                error: {
+                  code: "INVALID_FILE_TYPE",
+                  message: t("components.reportFlow.errors.invalidFileType"),
+                },
+              };
+            }
+
+            try {
+              // Process and compress the image once
+              const { buffer, fileName } = await processImageForUpload(file, {
+                maxWidth: 1920,
+                maxHeight: 1080,
+                quality: 80,
+                format: "jpeg",
+              });
+
+              return {
+                success: true,
+                buffer,
+                fileName,
+                filePath: `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`,
+              };
+            } catch (error) {
+              console.error("Error processing image:", {
+                error,
+                fileName: file.name,
+                fileSize: file.size,
+                fileType: file.type,
+              });
+              return {
+                success: false,
+                error: {
+                  code: "PROCESSING_FAILED",
+                  message: t("components.reportFlow.errors.processingFailed"),
+                },
+              };
+            }
+          })
+        );
+
+        // Check for any processing failures
+        const processingFailures = processedImages.filter(
+          (result): result is ProcessedImageError => !result.success
+        );
+        if (processingFailures.length > 0) {
+          const firstFailure = processingFailures[0];
+          if (!firstFailure) {
+            throw new Error("Image processing failed");
+          }
+          throw new Error(firstFailure.error.message);
+        }
+
+        // Upload files and create database records in parallel
+        const uploadPromises = processedImages
+          .filter((result): result is ProcessedImageSuccess => result.success)
+          .map(async (processedImage) => {
+            const { buffer, fileName, filePath } = processedImage;
+
+            // Upload file and create database record in parallel
+            const [uploadResult, imageRecord] = await Promise.all([
+              supabase.storage.from("report-images").upload(filePath, buffer),
+              supabase.from("report_images").insert({
+                report_id: report.id,
+                storage_path: filePath,
+                file_name: fileName,
+                file_type: "image/jpeg",
+                file_size: buffer.length,
+                created_at: timestamp,
+              }),
+            ]);
+
+            if (uploadResult.error || imageRecord.error) {
+              console.error("Error processing file:", {
+                uploadError: uploadResult.error,
+                imageError: imageRecord.error,
+                fileName,
+                fileSize: buffer.length,
+                fileType: "image/jpeg",
+              });
+              // Clean up if needed
+              if (!uploadResult.error) {
+                await supabase.storage.from("report-images").remove([filePath]);
+              }
+              throw new Error("File upload failed");
+            }
+
+            uploadedFiles.push(filePath);
+            return { success: true, filePath };
+          });
+
+        // Wait for all uploads to complete
+        const uploadResults = await Promise.all(uploadPromises);
+        const failedUploads = uploadResults.filter((result) => !result.success);
+
+        if (failedUploads.length > 0) {
+          // Clean up any successfully uploaded files
+          if (uploadedFiles.length > 0) {
+            await supabase.storage.from("report-images").remove(uploadedFiles);
+          }
+          throw new Error("Some uploads failed");
+        }
+      } catch (error) {
+        console.error("Error in image processing/upload:", error);
+        // Send error notification
         await sendEmailWithRetry({
           from: EMAIL_CONSTANTS.FROM_ADDRESS,
           to: EMAIL_CONSTANTS.TO_ADDRESS,
           bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-          subject: t("mails.internal.subject"),
-          react: InternalReportEmail(emailProps),
-          attachments: fileBuffers,
+          subject: "Error in Report Processing - Image Upload Failed",
+          react: ErrorReportEmail({
+            ...emailProps,
+            reportId: report.id,
+            errorType: "image_upload",
+            errorMessage:
+              error instanceof Error
+                ? error.message
+                : "Image processing or upload failed",
+          }),
         });
-
-        // Then send external email
-        await sendEmailWithRetry({
-          from: EMAIL_CONSTANTS.FROM_ADDRESS,
-          to: validatedData.userData.email,
-          subject: t("mails.external.subject"),
-          react: ExternalReportEmail(emailProps),
-          attachments: fileBuffers,
-        });
-      } catch (error) {
-        console.error("Error sending emails:", {
-          error,
-          reportId: report.id,
-          fileCount: files.length,
-        });
-        // Log the error but don't fail the whole process
-        // The files are already uploaded and the report is created
+        throw error;
       }
     }
 
@@ -365,7 +371,7 @@ export async function submitReport(
       success: false,
       error: {
         code: "UPLOAD_FAILED",
-        message: t("components.reportFlow.errors.uploadFailed"),
+        message: "Upload failed",
       },
     };
   }

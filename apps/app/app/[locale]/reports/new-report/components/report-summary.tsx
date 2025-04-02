@@ -3,10 +3,12 @@
 import {
   Location,
   ReportDescription,
+  ReportError,
   SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
 import { Pencil } from "@phosphor-icons/react";
+import { Alert, AlertDescription } from "@repo/ui/alert";
 import { Button } from "@repo/ui/button";
 
 import { useTranslations } from "next-intl";
@@ -26,6 +28,7 @@ interface ReportSummaryProps {
   onEditType: () => void;
   onEditDescription: () => void;
   onEditUserData: () => void;
+  error?: ReportError | null;
 }
 
 export default function ReportSummary({
@@ -41,6 +44,7 @@ export default function ReportSummary({
   onEditType,
   onEditDescription,
   onEditUserData,
+  error,
 }: ReportSummaryProps) {
   const t = useTranslations("components.reportFlow");
   const tTypes = useTranslations("incidentTypes");
@@ -89,6 +93,12 @@ export default function ReportSummary({
         description={t("summary.description")}
       />
 
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{t("errors.uploadFailed")}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Images Summary */}
       {files.length > 0 && (
         <div className="space-y-4">
@@ -100,6 +110,7 @@ export default function ReportSummary({
               size="sm"
               onClick={onEditImages}
               className="h-8 w-8 p-0"
+              disabled={isSubmitting}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -128,6 +139,7 @@ export default function ReportSummary({
             size="sm"
             onClick={onEditLocation}
             className="h-8 w-8 p-0"
+            disabled={isSubmitting}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -145,6 +157,7 @@ export default function ReportSummary({
             size="sm"
             onClick={onEditType}
             className="h-8 w-8 p-0"
+            disabled={isSubmitting}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -173,6 +186,7 @@ export default function ReportSummary({
               size="sm"
               onClick={onEditDescription}
               className="h-8 w-8 p-0"
+              disabled={isSubmitting}
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -193,6 +207,7 @@ export default function ReportSummary({
             size="sm"
             onClick={onEditUserData}
             className="h-8 w-8 p-0"
+            disabled={isSubmitting}
           >
             <Pencil className="h-4 w-4" />
           </Button>

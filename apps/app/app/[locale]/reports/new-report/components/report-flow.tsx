@@ -61,7 +61,10 @@ const ReportFlow = () => {
     const selectedFiles = Array.from(e.target.files || []);
 
     if (selectedFiles.length > MAX_FILES) {
-      setError(t("errors.tooManyFiles", { max: MAX_FILES }));
+      setError({
+        code: "TOO_MANY_FILES",
+        message: t("errors.tooManyFiles", { max: MAX_FILES }),
+      });
       return;
     }
 
@@ -69,7 +72,10 @@ const ReportFlow = () => {
       (file) => file.size > FILE_CONSTANTS.MAX_SIZE
     );
     if (oversizedFiles.length > 0) {
-      setError(t("errors.fileTooLarge"));
+      setError({
+        code: "FILE_TOO_LARGE",
+        message: t("errors.fileTooLarge"),
+      });
       return;
     }
 
@@ -122,7 +128,6 @@ const ReportFlow = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submitReport(locale as "de" | "en");
-    setCurrentStep(8);
   };
 
   const renderStep = () => {
@@ -138,17 +143,14 @@ const ReportFlow = () => {
               locationSubmitted={locationSubmitted}
               detectedLocation={detectedLocation}
             />
-            <div className="py-2 w-full flex justify-between">
-              <Button type="button" disabled variant="outline">
-                {t("back")}
-              </Button>
+            <div className="py-2 w-full">
               <Button
                 type="button"
                 onClick={handleNext}
                 disabled={uploading}
-                className="ml-auto"
+                className="w-full"
               >
-                {t("next")}
+                {files.length > 0 ? t("next") : t("skip")}
               </Button>
             </div>
           </>
@@ -299,9 +301,10 @@ const ReportFlow = () => {
               onEditType={() => setCurrentStep(3)}
               onEditDescription={() => setCurrentStep(5)}
               onEditUserData={() => setCurrentStep(6)}
+              error={error}
             />
 
-            <div className="py-2  w-full">
+            <div className="py-2 fixed bottom-0 w-[calc(100%-10vw)]">
               <Button
                 type="submit"
                 onClick={handleSubmit}
@@ -342,11 +345,6 @@ const ReportFlow = () => {
         <div className="flex flex-col flex-1">
           <div className="flex-1 overflow-y-auto flex flex-col">
             {renderStep()}
-            {error && (
-              <p id="file-error" role="alert" className="text-red-500">
-                {error}
-              </p>
-            )}
           </div>
         </div>
       </form>
