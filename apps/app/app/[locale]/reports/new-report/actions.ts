@@ -131,6 +131,32 @@ export async function submitReport(
         timestamp,
         fileCount: files.length,
       });
+
+      // Send error notification for database errors
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+        subject: "Error in Report Processing - Database Error",
+        react: ErrorReportEmail({
+          imageCount: files.length,
+          locale: validatedData.locale,
+          reportId: "DB_ERROR",
+          errorType: "internal_mail",
+          errorMessage: `Database error: ${reportError.message}`,
+          location: validatedData.location.address,
+          incidentType: {
+            type: {
+              ...validatedData.incidentType.type,
+              has_subtypes: Boolean(validatedData.incidentType.subtype),
+            },
+            subtype: validatedData.incidentType.subtype,
+          },
+          description: validatedData.description?.text,
+          userData: validatedData.userData,
+        }),
+      });
+
       return {
         success: false,
         error: {
@@ -365,6 +391,28 @@ export async function submitReport(
     // Clean up any uploaded files if there was an error
     if (uploadedFiles.length > 0) {
       await supabase.storage.from("report-images").remove(uploadedFiles);
+    }
+
+    // Send error notification for unexpected errors
+    try {
+      await sendEmailWithRetry({
+        from: EMAIL_CONSTANTS.FROM_ADDRESS,
+        to: EMAIL_CONSTANTS.TO_ADDRESS,
+        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
+        subject: "Error in Report Processing - Unexpected Error",
+        react: ErrorReportEmail({
+          imageCount: files?.length || 0,
+          locale: (formData.get("locale") as "de" | "en") || "de",
+          reportId: "UNEXPECTED_ERROR",
+          errorType: "internal_mail",
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Unexpected error during report submission",
+        }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send error notification:", emailError);
     }
 
     return {
