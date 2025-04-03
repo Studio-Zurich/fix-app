@@ -66,45 +66,101 @@ export async function submitReport(
   let files: File[] = [];
 
   try {
+    console.log("Starting report submission process...");
+
     // Get and validate form data
     files = formData.getAll("files") as File[];
+    console.log("Files received:", {
+      count: files.length,
+      sizes: files.map((f) => f.size),
+      types: files.map((f) => f.type),
+    });
+
     const locale = formData.get("locale") as "de" | "en";
     const locationJson = formData.get("location") as string;
-    const location = JSON.parse(locationJson) as Location;
     const incidentTypeJson = formData.get("incidentType") as string;
-    const incidentType = JSON.parse(
-      incidentTypeJson
-    ) as SelectedIncidentTypeType;
     const descriptionJson = formData.get("description") as string | null;
-    const description = descriptionJson
-      ? (JSON.parse(descriptionJson) as ReportDescription)
-      : undefined;
-
     const userDataJson = formData.get("userData") as string;
-    const userData = JSON.parse(userDataJson) as UserData;
+
+    console.log("Form data received:", {
+      locale,
+      hasLocation: Boolean(locationJson),
+      hasIncidentType: Boolean(incidentTypeJson),
+      hasDescription: Boolean(descriptionJson),
+      hasUserData: Boolean(userDataJson),
+    });
+
+    // Parse JSON data with error handling
+    let location: Location;
+    let incidentType: SelectedIncidentTypeType;
+    let description: ReportDescription | undefined;
+    let userData: UserData;
+
+    try {
+      location = JSON.parse(locationJson) as Location;
+      incidentType = JSON.parse(incidentTypeJson) as SelectedIncidentTypeType;
+      description = descriptionJson
+        ? (JSON.parse(descriptionJson) as ReportDescription)
+        : undefined;
+      userData = JSON.parse(userDataJson) as UserData;
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      throw new Error(
+        `JSON parsing failed: ${parseError instanceof Error ? parseError.message : "Unknown parse error"}`
+      );
+    }
 
     // Validate file count if files are provided
     if (files.length > 5) {
+      console.error("Too many files:", files.length);
       return {
         success: false,
         error: {
           code: "TOO_MANY_FILES",
           message: t("components.reportFlow.errors.tooManyFiles", { max: 5 }),
+          details: {
+            step: "validation",
+            technicalMessage: `File count (${files.length}) exceeds maximum (5)`,
+            timestamp: timestamp,
+          },
         },
       };
     }
 
+    console.log("Validating submission data...");
     // Validate submission data
-    const validatedData = reportSubmissionSchema.parse({
-      files: files.length > 0 ? files : undefined,
-      locale,
-      location,
-      incidentType,
-      description,
-      userData,
-    });
+    let validatedData;
+    try {
+      validatedData = reportSubmissionSchema.parse({
+        files: files.length > 0 ? files : undefined,
+        locale,
+        location,
+        incidentType,
+        description,
+        userData,
+      });
+      console.log("Data validation successful");
+    } catch (validationError) {
+      console.error("Validation error:", validationError);
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: t("components.reportFlow.errors.validationFailed"),
+          details: {
+            step: "validation",
+            technicalMessage:
+              validationError instanceof Error
+                ? validationError.message
+                : String(validationError),
+            timestamp: timestamp,
+          },
+        },
+      };
+    }
 
     // Step 1: Create report record
+    console.log("Creating report record...");
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
@@ -162,6 +218,11 @@ export async function submitReport(
         error: {
           code: "DATABASE_ERROR",
           message: t("components.reportFlow.errors.databaseError"),
+          details: {
+            step: "database_creation",
+            technicalMessage: reportError.message,
+            timestamp: timestamp,
+          },
         },
       };
     }
@@ -194,23 +255,19 @@ export async function submitReport(
       });
     } catch (error) {
       console.error("Error sending internal email:", error);
-      // Send error notification
-      await sendEmailWithRetry({
-        from: EMAIL_CONSTANTS.FROM_ADDRESS,
-        to: EMAIL_CONSTANTS.TO_ADDRESS,
-        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-        subject: "Error in Report Processing - Internal Email Failed",
-        react: ErrorReportEmail({
-          ...emailProps,
-          reportId: report.id,
-          errorType: "internal_mail",
-          errorMessage:
-            error instanceof Error
-              ? error.message
-              : "Internal email sending failed",
-        }),
-      });
-      throw error;
+      return {
+        success: false,
+        error: {
+          code: "EMAIL_ERROR",
+          message: t("components.reportFlow.errors.emailError"),
+          details: {
+            step: "internal_email",
+            technicalMessage:
+              error instanceof Error ? error.message : String(error),
+            timestamp: timestamp,
+          },
+        },
+      };
     }
 
     // Step 3: Send external email
@@ -393,33 +450,17 @@ export async function submitReport(
       await supabase.storage.from("report-images").remove(uploadedFiles);
     }
 
-    // Send error notification for unexpected errors
-    try {
-      await sendEmailWithRetry({
-        from: EMAIL_CONSTANTS.FROM_ADDRESS,
-        to: EMAIL_CONSTANTS.TO_ADDRESS,
-        bcc: EMAIL_CONSTANTS.BCC_ADDRESSES,
-        subject: "Error in Report Processing - Unexpected Error",
-        react: ErrorReportEmail({
-          imageCount: files?.length || 0,
-          locale: (formData.get("locale") as "de" | "en") || "de",
-          reportId: "UNEXPECTED_ERROR",
-          errorType: "internal_mail",
-          errorMessage:
-            error instanceof Error
-              ? error.message
-              : "Unexpected error during report submission",
-        }),
-      });
-    } catch (emailError) {
-      console.error("Failed to send error notification:", emailError);
-    }
-
     return {
       success: false,
       error: {
         code: "UPLOAD_FAILED",
-        message: "Upload failed",
+        message: t("components.reportFlow.errors.uploadFailed"),
+        details: {
+          step: "file_upload",
+          technicalMessage:
+            error instanceof Error ? error.message : String(error),
+          timestamp: timestamp,
+        },
       },
     };
   }

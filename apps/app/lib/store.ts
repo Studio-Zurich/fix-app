@@ -25,6 +25,7 @@ interface ReportStore {
   currentStep: number;
   uploading: boolean;
   error: ReportError | null;
+  lastAttemptTimestamp: string | null;
 
   // Actions
   setFiles: (files: File[]) => void;
@@ -43,6 +44,7 @@ interface ReportStore {
   // Form Actions
   submitReport: (locale: "de" | "en") => Promise<void>;
   resetForm: () => void;
+  handleError: (error: ReportError) => void;
 }
 
 export const useReportStore = create<ReportStore>((set, get) => ({
@@ -59,6 +61,7 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   currentStep: 1,
   uploading: false,
   error: null,
+  lastAttemptTimestamp: null,
 
   // Actions
   setFiles: (files) => set({ files }),
@@ -76,11 +79,34 @@ export const useReportStore = create<ReportStore>((set, get) => ({
   setHasInteractedWithMap: (hasInteracted) =>
     set({ hasInteractedWithMap: hasInteracted }),
 
+  handleError: (error) => {
+    const timestamp = new Date().toISOString();
+    set({
+      error,
+      uploading: false,
+      lastAttemptTimestamp: timestamp,
+    });
+    console.error("Report submission error:", {
+      ...error,
+      timestamp,
+      files: get().files.length,
+      step: error.details?.step || "unknown",
+    });
+  },
+
   // Form Actions
   submitReport: async (locale) => {
     const state = get();
     if (!state.location || !state.selectedType || !state.userData) {
-      set({ error: { code: "UNKNOWN", message: "Missing required fields" } });
+      state.handleError({
+        code: "VALIDATION_ERROR",
+        message: "Missing required fields",
+        details: {
+          step: "validation",
+          technicalMessage: "One or more required fields are missing",
+          timestamp: new Date().toISOString(),
+        },
+      });
       return;
     }
 
@@ -104,20 +130,32 @@ export const useReportStore = create<ReportStore>((set, get) => ({
 
       const result = await submitReport(formData);
       if (!result.success) {
-        set({
-          error: result.error || {
-            code: "UPLOAD_FAILED",
-            message: "Upload failed",
-          },
-        });
+        state.handleError(
+          result.error || {
+            code: "UNKNOWN_ERROR",
+            message: "An unknown error occurred",
+            details: {
+              step: "submission",
+              timestamp: new Date().toISOString(),
+            },
+          }
+        );
         return;
       }
 
       // Reset form after successful upload
       get().resetForm();
-      set({ currentStep: 8 }); // Move to success step only on success
+      set({ currentStep: 8 }); // Move to success step
     } catch (err) {
-      set({ error: { code: "UPLOAD_FAILED", message: "Upload failed" } });
+      state.handleError({
+        code: "SUBMISSION_ERROR",
+        message: "Failed to submit report",
+        details: {
+          step: "submission",
+          technicalMessage: err instanceof Error ? err.message : String(err),
+          timestamp: new Date().toISOString(),
+        },
+      });
     } finally {
       set({ uploading: false });
     }
@@ -137,5 +175,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       currentStep: 1,
       uploading: false,
       error: null,
+      lastAttemptTimestamp: null,
     }),
 }));

@@ -94,8 +94,35 @@ export default function ReportSummary({
       />
 
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{t("errors.uploadFailed")}</AlertDescription>
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription className="space-y-2">
+            <div className="font-medium">{error.message}</div>
+            {error.details && (
+              <div className="text-xs space-y-1 pt-2 border-t border-destructive/30">
+                {error.details.step && (
+                  <p>
+                    <span className="font-medium">Failed Step:</span>{" "}
+                    {error.details.step}
+                  </p>
+                )}
+                {error.details.technicalMessage && (
+                  <p>
+                    <span className="font-medium">Technical Details:</span>{" "}
+                    {error.details.technicalMessage}
+                  </p>
+                )}
+                {error.details.timestamp && (
+                  <p>
+                    <span className="font-medium">Time:</span>{" "}
+                    {new Date(error.details.timestamp).toLocaleTimeString()}
+                  </p>
+                )}
+              </div>
+            )}
+            <div className="text-xs mt-2 pt-2 border-t border-destructive/30">
+              {t("errors.tryAgainOrContact")}
+            </div>
+          </AlertDescription>
         </Alert>
       )}
 
