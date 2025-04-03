@@ -132,13 +132,15 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       if (!result || !result.success) {
         state.handleError(
           result?.error || {
-            code: "UNKNOWN_ERROR",
+            code: "SUBMISSION_ERROR",
             message: "Failed to submit report",
             details: {
               step: "submission",
-              technicalMessage: result
-                ? "Submission failed"
-                : "No response from server",
+              technicalMessage:
+                result?.error?.details?.technicalMessage ||
+                (result?.error?.message
+                  ? `Error: ${result.error.message}`
+                  : "Unknown error occurred"),
               timestamp: new Date().toISOString(),
             },
           }

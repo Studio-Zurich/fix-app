@@ -81,6 +81,16 @@ export async function processImageForUpload(
       fileSize: file.size,
       fileType: file.type,
     });
-    throw new Error("Failed to process image");
+
+    // Provide more specific error messages
+    if (file.type === "image/heic" || file.type === "image/heif") {
+      throw new Error(
+        `HEIC/HEIF format detected but processing failed. Original error: ${error instanceof Error ? error.message : String(error)}`
+      );
+    } else {
+      throw new Error(
+        `Failed to process image of type ${file.type}. Original error: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 }
