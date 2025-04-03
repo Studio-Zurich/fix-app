@@ -1,8 +1,14 @@
 // File upload constants
 export const FILE_CONSTANTS = {
   MAX_SIZE: 10 * 1024 * 1024, // 10MB
-  ALLOWED_TYPES: ["image/jpeg", "image/png", "image/gif"] as const,
-  ALLOWED_EXTENSIONS: ["jpg", "jpeg", "png", "gif"] as const,
+  ALLOWED_TYPES: [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/heic",
+    "image/heif",
+  ] as const,
+  ALLOWED_EXTENSIONS: ["jpg", "jpeg", "png", "gif", "heic", "heif"] as const,
   STORAGE_BUCKET: "report-images" as const,
 };
 

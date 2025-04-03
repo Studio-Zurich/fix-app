@@ -8,14 +8,10 @@ import {
   EmailSendParams,
   FileUploadResponse,
   Location,
-  ProcessedImage,
-  ProcessedImageError,
-  ProcessedImageSuccess,
   ReportDescription,
   SelectedIncidentTypeType,
   UserData,
 } from "@/lib/types";
-import { processImageForUpload } from "@/lib/utils/image";
 import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
 import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
 import { getTranslations } from "next-intl/server";
@@ -141,90 +137,31 @@ export async function submitReport(
 
     // Step 2: Process and upload files if any
     if (files.length > 0) {
-      // Process all images first
-      const processedImages = await Promise.all(
-        files.map(async (file): Promise<ProcessedImage> => {
-          const fileExt = file.name.split(".").pop()?.toLowerCase();
-          if (
-            !fileExt ||
-            !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
-              fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
-            )
-          ) {
-            return {
-              success: false,
-              error: {
-                code: "INVALID_FILE_TYPE",
-                message: t("components.reportFlow.errors.invalidFileType"),
-              },
-            };
-          }
-
-          try {
-            // Process and compress the image once
-            const { buffer, fileName } = await processImageForUpload(file, {
-              maxWidth: 1920,
-              maxHeight: 1080,
-              quality: 80,
-              format: "jpeg",
-            });
-
-            return {
-              success: true,
-              buffer,
-              fileName,
-              filePath: `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`,
-            };
-          } catch (error) {
-            console.error("Error processing image:", {
-              error,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type,
-            });
-            return {
-              success: false,
-              error: {
-                code: "PROCESSING_FAILED",
-                message: t("components.reportFlow.errors.processingFailed"),
-              },
-            };
-          }
-        })
-      );
-
-      // Check for any processing failures
-      const processingFailures = processedImages.filter(
-        (result): result is ProcessedImageError => !result.success
-      );
-      if (processingFailures.length > 0) {
-        const firstFailure = processingFailures[0];
-        if (!firstFailure) {
+      // Upload files and create database records in parallel
+      const uploadPromises = files.map(async (file) => {
+        const fileExt = file.name.split(".").pop()?.toLowerCase();
+        if (
+          !fileExt ||
+          !FILE_CONSTANTS.ALLOWED_EXTENSIONS.includes(
+            fileExt as (typeof FILE_CONSTANTS.ALLOWED_EXTENSIONS)[number]
+          )
+        ) {
           return {
             success: false,
             error: {
-              code: "UPLOAD_FAILED",
-              message: t("components.reportFlow.errors.uploadFailed"),
+              code: "INVALID_FILE_TYPE",
+              message: t("components.reportFlow.errors.invalidFileType"),
             },
           };
         }
-        return {
-          success: false,
-          error: {
-            code:
-              firstFailure.error.code === "INVALID_FILE_TYPE"
-                ? "INVALID_FILE_TYPE"
-                : "UPLOAD_FAILED",
-            message: firstFailure.error.message,
-          },
-        };
-      }
 
-      // Upload files and create database records in parallel
-      const uploadPromises = processedImages
-        .filter((result): result is ProcessedImageSuccess => result.success)
-        .map(async (processedImage) => {
-          const { buffer, fileName, filePath } = processedImage;
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${FILE_CONSTANTS.STORAGE_BUCKET}/${report.id}/${fileName}`;
+
+        try {
+          // Convert File to Buffer
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
 
           // Upload file and create database record in parallel
           const [uploadResult, imageRecord] = await Promise.all([
@@ -233,8 +170,8 @@ export async function submitReport(
               report_id: report.id,
               storage_path: filePath,
               file_name: fileName,
-              file_type: "image/jpeg",
-              file_size: buffer.length,
+              file_type: file.type,
+              file_size: file.size,
               created_at: timestamp,
             }),
           ]);
@@ -244,8 +181,8 @@ export async function submitReport(
               uploadError: uploadResult.error,
               imageError: imageRecord.error,
               fileName,
-              fileSize: buffer.length,
-              fileType: "image/jpeg",
+              fileSize: file.size,
+              fileType: file.type,
             });
             // Clean up if needed
             if (!uploadResult.error) {
@@ -262,7 +199,22 @@ export async function submitReport(
 
           uploadedFiles.push(filePath);
           return { success: true, filePath };
-        });
+        } catch (error) {
+          console.error("Error processing file:", {
+            error,
+            fileName,
+            fileSize: file.size,
+            fileType: file.type,
+          });
+          return {
+            success: false,
+            error: {
+              code: "UPLOAD_FAILED",
+              message: t("components.reportFlow.errors.uploadFailed"),
+            },
+          };
+        }
+      });
 
       // Wait for all uploads to complete
       const uploadResults = await Promise.all(uploadPromises);
@@ -306,16 +258,13 @@ export async function submitReport(
         userData: validatedData.userData,
       };
 
-      // Prepare email attachments using already processed images
-      const fileBuffers = processedImages
-        .filter(
-          (result): result is ProcessedImage & { success: true } =>
-            result.success
-        )
-        .map((processedImage) => ({
-          filename: processedImage.fileName,
-          content: processedImage.buffer,
-        }));
+      // Prepare email attachments using original files
+      const fileBuffers = await Promise.all(
+        files.map(async (file) => ({
+          filename: file.name,
+          content: Buffer.from(await file.arrayBuffer()),
+        }))
+      );
 
       // Send emails sequentially to ensure both are sent
       try {
