@@ -443,11 +443,16 @@ export async function submitReport(
       error,
       timestamp,
       fileCount: files?.length,
+      errorMessage: error instanceof Error ? error.message : String(error),
     });
 
     // Clean up any uploaded files if there was an error
     if (uploadedFiles.length > 0) {
-      await supabase.storage.from("report-images").remove(uploadedFiles);
+      try {
+        await supabase.storage.from("report-images").remove(uploadedFiles);
+      } catch (cleanupError) {
+        console.error("Error cleaning up files:", cleanupError);
+      }
     }
 
     return {
@@ -456,7 +461,7 @@ export async function submitReport(
         code: "UPLOAD_FAILED",
         message: t("components.reportFlow.errors.uploadFailed"),
         details: {
-          step: "file_upload",
+          step: "submission",
           technicalMessage:
             error instanceof Error ? error.message : String(error),
           timestamp: timestamp,

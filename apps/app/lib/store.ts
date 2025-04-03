@@ -129,13 +129,16 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       formData.append("userData", JSON.stringify(state.userData));
 
       const result = await submitReport(formData);
-      if (!result.success) {
+      if (!result || !result.success) {
         state.handleError(
-          result.error || {
+          result?.error || {
             code: "UNKNOWN_ERROR",
-            message: "An unknown error occurred",
+            message: "Failed to submit report",
             details: {
               step: "submission",
+              technicalMessage: result
+                ? "Submission failed"
+                : "No response from server",
               timestamp: new Date().toISOString(),
             },
           }
