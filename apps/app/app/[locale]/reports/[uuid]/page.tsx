@@ -1,5 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
-import { useTranslations } from "next-intl";
 
 interface ReportPageProps {
   params: {
@@ -16,18 +16,24 @@ export async function generateMetadata({
   };
 }
 
-export default function ReportPage({ params }: ReportPageProps) {
-  const t = useTranslations("Report");
+export default async function ReportPage({ params }: ReportPageProps) {
+  const supabase = await createClient();
 
-  // TODO: Fetch report data using the UUID
-  // If report not found, redirect to 404 -> then show that we do not have a report, yet
+  const { data: report, error } = await supabase
+    .from("reports")
+    .select("id")
+    .eq("id", params.uuid)
+    .single();
+
+  if (error) {
+    console.error("Error fetching report:", error);
+    return <div>Report not found</div>;
+  }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">{t("reportDetails")}</h1>
-      <div className="text-sm text-gray-500 mb-4">
-        {t("reportId")}: {params.uuid}
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Report Details</h1>
+      <div className="text-sm text-gray-500 mb-4">Report ID: {report.id}</div>
     </div>
   );
 }
