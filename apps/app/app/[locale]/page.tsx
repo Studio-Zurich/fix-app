@@ -1,10 +1,12 @@
 import { redirect } from "@/i18n/routing";
 
 export default async function DashboardPage({
-  params: { locale },
+  params,
 }: {
   params: { locale: string };
 }) {
+  // Await the params object before destructuring
+  const { locale } = await params;
   redirect({ href: "/reports/new-report", locale });
 }
 
