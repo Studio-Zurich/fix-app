@@ -162,8 +162,17 @@ const ReportFlow = () => {
         userData,
       });
 
-      const result = await submitReport(formData);
-      console.log("Submit result:", result);
+      // Try to call the server action
+      let result;
+      try {
+        result = await submitReport(formData);
+        console.log("Submit result:", result);
+      } catch (actionError) {
+        console.error("Error calling submitReport:", actionError);
+        setError("Failed to submit the report. Please try again later.");
+        setUploading(false);
+        return;
+      }
 
       // Check if result is undefined or doesn't have a success property
       if (!result || typeof result.success === "undefined") {
@@ -171,6 +180,7 @@ const ReportFlow = () => {
         setError(
           "Server returned an invalid response. Please try again later."
         );
+        setUploading(false);
         return;
       }
 
@@ -206,6 +216,7 @@ const ReportFlow = () => {
                 "An unexpected error occurred. Please try again later."
             );
         }
+        setUploading(false);
         return;
       }
 
