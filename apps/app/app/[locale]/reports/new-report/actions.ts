@@ -68,19 +68,70 @@ export async function submitReport(
     // Get and validate form data
     files = formData.getAll("files") as File[];
     const locale = formData.get("locale") as "de" | "en";
-    const locationJson = formData.get("location") as string;
-    const location = JSON.parse(locationJson) as Location;
-    const incidentTypeJson = formData.get("incidentType") as string;
-    const incidentType = JSON.parse(
-      incidentTypeJson
-    ) as SelectedIncidentTypeType;
-    const descriptionJson = formData.get("description") as string | null;
-    const description = descriptionJson
-      ? (JSON.parse(descriptionJson) as ReportDescription)
-      : undefined;
 
-    const userDataJson = formData.get("userData") as string;
-    const userData = JSON.parse(userDataJson) as UserData;
+    // Safely parse JSON data with error handling
+    let location: Location;
+    let incidentType: SelectedIncidentTypeType;
+    let description: ReportDescription | undefined;
+    let userData: UserData;
+
+    try {
+      const locationJson = formData.get("location") as string;
+      location = JSON.parse(locationJson) as Location;
+    } catch (error) {
+      console.error("Error parsing location data:", error);
+      return {
+        success: false,
+        error: {
+          code: "UNKNOWN",
+          message: "Invalid location data format",
+        },
+      };
+    }
+
+    try {
+      const incidentTypeJson = formData.get("incidentType") as string;
+      incidentType = JSON.parse(incidentTypeJson) as SelectedIncidentTypeType;
+    } catch (error) {
+      console.error("Error parsing incident type data:", error);
+      return {
+        success: false,
+        error: {
+          code: "UNKNOWN",
+          message: "Invalid incident type data format",
+        },
+      };
+    }
+
+    try {
+      const descriptionJson = formData.get("description") as string | null;
+      description = descriptionJson
+        ? (JSON.parse(descriptionJson) as ReportDescription)
+        : undefined;
+    } catch (error) {
+      console.error("Error parsing description data:", error);
+      return {
+        success: false,
+        error: {
+          code: "UNKNOWN",
+          message: "Invalid description data format",
+        },
+      };
+    }
+
+    try {
+      const userDataJson = formData.get("userData") as string;
+      userData = JSON.parse(userDataJson) as UserData;
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      return {
+        success: false,
+        error: {
+          code: "UNKNOWN",
+          message: "Invalid user data format",
+        },
+      };
+    }
 
     // Validate file count if files are provided
     if (files.length > 5) {
@@ -94,14 +145,26 @@ export async function submitReport(
     }
 
     // Validate submission data
-    const validatedData = reportSubmissionSchema.parse({
-      files: files.length > 0 ? files : undefined,
-      locale,
-      location,
-      incidentType,
-      description,
-      userData,
-    });
+    let validatedData;
+    try {
+      validatedData = reportSubmissionSchema.parse({
+        files: files.length > 0 ? files : undefined,
+        locale,
+        location,
+        incidentType,
+        description,
+        userData,
+      });
+    } catch (error) {
+      console.error("Error validating submission data:", error);
+      return {
+        success: false,
+        error: {
+          code: "UNKNOWN",
+          message: "Invalid submission data",
+        },
+      };
+    }
 
     // Step 1: Create report record
     const { data: report, error: reportError } = await supabase
