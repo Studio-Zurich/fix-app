@@ -5,6 +5,7 @@ import { ImageLocation } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Progress } from "@repo/ui/progress";
 import { useLocale, useTranslations } from "next-intl";
+import { submitReport } from "../actions";
 import ImageUpload from "./image-upload";
 import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
@@ -43,7 +44,8 @@ const ReportFlow = () => {
     setError,
     setLocationSubmitted,
     setHasInteractedWithMap,
-    submitReport,
+    setUploading,
+    resetForm,
   } = useReportStore();
 
   const handleLocationFound = (location: ImageLocation | null) => {
@@ -121,8 +123,86 @@ const ReportFlow = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await submitReport(locale as "de" | "en");
-    setCurrentStep(8);
+
+    // Validate required fields
+    if (!location || !selectedType || !userData) {
+      setError(t("errors.missingRequiredFields"));
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("files", file));
+      formData.append("locale", locale as "de" | "en");
+      formData.append("location", JSON.stringify(location));
+      formData.append(
+        "incidentType",
+        JSON.stringify({
+          type: selectedType,
+          subtype: selectedSubtype,
+        })
+      );
+      if (description) {
+        formData.append("description", JSON.stringify(description));
+      }
+      formData.append("userData", JSON.stringify(userData));
+
+      const result = await submitReport(formData);
+      if (!result.success) {
+        // Handle specific error codes from the server
+        switch (result.error?.code) {
+          case "TOO_MANY_FILES":
+            setError("Too many files were uploaded. Maximum allowed is 5.");
+            break;
+          case "INVALID_FILE_TYPE":
+            setError(
+              "One or more files have an invalid file type. Please upload images only."
+            );
+            break;
+          case "PROCESSING_FAILED":
+            setError(
+              "Failed to process one or more images. Please try again with different images."
+            );
+            break;
+          case "DATABASE_ERROR":
+            setError(
+              "Failed to save the report to the database. Please try again later."
+            );
+            break;
+          case "UPLOAD_FAILED":
+            setError(
+              "Failed to upload one or more images. Please check your internet connection and try again."
+            );
+            break;
+          default:
+            setError(
+              result.error?.message ||
+                "An unexpected error occurred. Please try again later."
+            );
+        }
+        return;
+      }
+
+      // Reset form after successful upload
+      resetForm();
+      setCurrentStep(8);
+    } catch (err) {
+      // Handle different types of errors
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError(
+          "Network error. Please check your internet connection and try again."
+        );
+      } else if (err instanceof Error) {
+        setError(`Error: ${err.message}`);
+      } else {
+        setError("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setUploading(false);
+    }
   };
 
   const renderStep = () => {

@@ -1,4 +1,3 @@
-import { submitReport } from "@/app/[locale]/reports/new-report/actions";
 import { create } from "zustand";
 import {
   IncidentSubtypeType,
@@ -40,7 +39,6 @@ interface ReportStore {
   setHasInteractedWithMap: (hasInteracted: boolean) => void;
 
   // Form Actions
-  submitReport: (locale: "de" | "en") => Promise<void>;
   resetForm: () => void;
 }
 
@@ -76,46 +74,6 @@ export const useReportStore = create<ReportStore>((set, get) => ({
     set({ hasInteractedWithMap: hasInteracted }),
 
   // Form Actions
-  submitReport: async (locale) => {
-    const state = get();
-    if (!state.location || !state.selectedType || !state.userData) {
-      set({ error: "Missing required fields" });
-      return;
-    }
-
-    set({ uploading: true, error: null });
-    try {
-      const formData = new FormData();
-      state.files.forEach((file) => formData.append("files", file));
-      formData.append("locale", locale);
-      formData.append("location", JSON.stringify(state.location));
-      formData.append(
-        "incidentType",
-        JSON.stringify({
-          type: state.selectedType,
-          subtype: state.selectedSubtype,
-        })
-      );
-      if (state.description) {
-        formData.append("description", JSON.stringify(state.description));
-      }
-      formData.append("userData", JSON.stringify(state.userData));
-
-      const result = await submitReport(formData);
-      if (!result.success) {
-        set({ error: result.error?.message || "Upload failed" });
-        return;
-      }
-
-      // Reset form after successful upload
-      get().resetForm();
-    } catch (err) {
-      set({ error: "Upload failed" });
-    } finally {
-      set({ uploading: false });
-    }
-  },
-
   resetForm: () =>
     set({
       files: [],
