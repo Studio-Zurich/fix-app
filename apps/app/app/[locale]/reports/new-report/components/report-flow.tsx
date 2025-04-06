@@ -150,7 +150,30 @@ const ReportFlow = () => {
       }
       formData.append("userData", JSON.stringify(userData));
 
+      console.log("Submitting form data:", {
+        filesCount: files.length,
+        locale,
+        location,
+        incidentType: {
+          type: selectedType,
+          subtype: selectedSubtype,
+        },
+        description,
+        userData,
+      });
+
       const result = await submitReport(formData);
+      console.log("Submit result:", result);
+
+      // Check if result is undefined or doesn't have a success property
+      if (!result || typeof result.success === "undefined") {
+        console.error("Invalid result from submitReport:", result);
+        setError(
+          "Server returned an invalid response. Please try again later."
+        );
+        return;
+      }
+
       if (!result.success) {
         // Handle specific error codes from the server
         switch (result.error?.code) {
@@ -190,6 +213,7 @@ const ReportFlow = () => {
       resetForm();
       setCurrentStep(8);
     } catch (err) {
+      console.error("Error in handleSubmit:", err);
       // Handle different types of errors
       if (err instanceof TypeError && err.message.includes("fetch")) {
         setError(
