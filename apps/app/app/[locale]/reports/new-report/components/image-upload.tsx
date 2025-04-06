@@ -2,9 +2,9 @@
 import { FILE_CONSTANTS } from "@/lib/constants";
 import { ImageLocation, ImageUploadProps } from "@/lib/types";
 import { convertDMSToDD, fetchAddressFromCoordinates } from "@/lib/utils/map";
-import { Camera, Image, MapPin } from "@phosphor-icons/react";
+import { Camera, Image, MapPin, X } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
-import { TypographyParagraph } from "@repo/ui/text";
+import { TypographyParagraph, TypographySpan } from "@repo/ui/text";
 import exifr from "exifr";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -261,17 +261,24 @@ const ImageUpload = ({
                   />
                   <Button
                     type="button"
-                    variant="destructive"
-                    size="sm"
                     onClick={(e) => {
                       e.preventDefault();
                       removeFile(index);
                     }}
                     disabled={isUploading}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 rounded-full p-1 w-5 h-5"
                   >
-                    {t("remove")}
+                    <X size={16} />
                   </Button>
+
+                  <div className="mt-1 text-center">
+                    {files[index] && (
+                      <TypographySpan className="text-muted-foreground">
+                        {files[index].name} (
+                        {(files[index].size / 1024 / 1024).toFixed(2)} MB)
+                      </TypographySpan>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
