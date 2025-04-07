@@ -1,3 +1,5 @@
+import ReportFlow from "./components/report-flow";
+
 export default function NewReportPage() {
-  return <div>test</div>;
+  return <ReportFlow />;
 }

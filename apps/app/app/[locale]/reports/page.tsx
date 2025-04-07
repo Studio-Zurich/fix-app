@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 
@@ -34,10 +35,13 @@ export default async function ReportsPage({ params }: ReportsPageProps) {
       <div className="text-sm text-gray-500 mb-4">
         {reports.map((report) => (
           <div key={report.id}>
-            <span>{report.id}</span>
+            <Link href={`/reports/${report.id}`}>
+              <span>{report.id}</span>
+            </Link>
           </div>
         ))}
       </div>
+      <Link href="/reports/new-report">New Report</Link>
     </div>
   );
 }
