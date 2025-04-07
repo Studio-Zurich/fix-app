@@ -1,4 +1,4 @@
-import { Locale } from "../../../apps/app/lib/types";
+import { Locale } from "../../../archiv/old-app/lib/types";
 import de from "./de.json";
 import en from "./en.json";
 

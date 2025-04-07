@@ -1,7 +1,6 @@
 import { routing } from "@/i18n/routing";
 import "@repo/ui/globals.css";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 
 import type { Metadata } from "next";
@@ -32,21 +31,19 @@ export const metadata: Metadata = {
   description: "Deine Stadt, Deine Initiative",
 };
 
-export default async function RootLayout({
+export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
-  const messages = await getMessages();
   return (
     <html lang={locale}>
       <head>
@@ -55,11 +52,7 @@ export default async function RootLayout({
       <body
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} ${brockmannSemiBold.variable} ${brockmannBold.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          <main className="h-full min-h-svh w-full flex flex-col container mx-auto gap-8">
-            {children}
-          </main>
-        </NextIntlClientProvider>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

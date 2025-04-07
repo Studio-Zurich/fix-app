@@ -1,6 +1,6 @@
 import { Heading, Text } from "@react-email/components";
 import messages from "@repo/translations/messages";
-import { EmailProps } from "../../../apps/app/lib/types";
+import { EmailProps } from "../../../archiv/old-app/lib/types";
 
 type ReportOverviewProps = Pick<
   EmailProps,

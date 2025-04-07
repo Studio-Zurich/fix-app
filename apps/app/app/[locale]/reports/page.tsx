@@ -1,42 +1,43 @@
-// import { Link } from "@/i18n/routing";
-// import { Metadata } from "next";
-// import { useTranslations } from "next-intl";
+import { createClient } from "@/lib/supabase/server";
+import { Metadata } from "next";
 
-// export const metadata: Metadata = {
-//   title: "Reports",
-//   description: "View all incident reports",
-// };
+interface ReportsPageProps {
+  params: Promise<{
+    locale: string;
+  }>;
+}
 
-// export default function ReportsPage() {
-//   const t = useTranslations("pages.reports");
+export async function generateMetadata({
+  params,
+}: ReportsPageProps): Promise<Metadata> {
+  await params;
+  return {
+    title: "Reports",
+    description: "View all incident reports",
+  };
+}
 
-//   return (
-//     <>
-//       <div>
-//         <div className="flex justify-between items-center mb-6">
-//           <h1 className="text-3xl font-bold">{t("title")}</h1>
-//           <Link
-//             href="/reports/new-report"
-//             className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90"
-//           >
-//             {t("title")}
-//           </Link>
-//         </div>
-//         {/* Report list will go here */}
-//         <div className="grid gap-4">
-//           {/* TODO: Add report list component */}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
+export default async function ReportsPage({ params }: ReportsPageProps) {
+  await params;
+  const supabase = await createClient();
 
-import { redirect } from "@/i18n/routing";
+  const { data: reports, error } = await supabase.from("reports").select("id");
 
-export default async function DashboardPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
-  redirect({ href: "/reports/new-report", locale });
+  if (error) {
+    console.error("Error fetching report:", error);
+    return <div>Report not found</div>;
+  }
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Reports</h1>
+      <div className="text-sm text-gray-500 mb-4">
+        {reports.map((report) => (
+          <div key={report.id}>
+            <span>{report.id}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

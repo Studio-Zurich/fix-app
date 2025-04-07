@@ -2,27 +2,30 @@ import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 
 interface ReportPageProps {
-  params: {
+  params: Promise<{
+    locale: string;
     uuid: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
   params,
 }: ReportPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
   return {
-    title: `Report ${params.uuid}`,
+    title: `Report ${resolvedParams.uuid}`,
     description: "View or edit incident report",
   };
 }
 
 export default async function ReportPage({ params }: ReportPageProps) {
+  const resolvedParams = await params;
   const supabase = await createClient();
 
   const { data: report, error } = await supabase
     .from("reports")
     .select("id")
-    .eq("id", params.uuid)
+    .eq("id", resolvedParams.uuid)
     .single();
 
   if (error) {
