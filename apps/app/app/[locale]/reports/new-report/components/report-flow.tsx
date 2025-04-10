@@ -8,7 +8,7 @@ import UserData from "./user-data";
 
 const ReportFlow = () => {
   // Use the useActionState hook to handle form submission
-  const [state, formAction] = useActionState<ActionState, FormData>(
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(
     submitReport,
     { success: false, message: "" }
   );
@@ -25,7 +25,9 @@ const ReportFlow = () => {
         <input type="hidden" name="locale" value={locale} />
         <ImageUpload />
         <UserData />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={pending}>
+          Submit
+        </Button>
       </form>
     </div>
   );
