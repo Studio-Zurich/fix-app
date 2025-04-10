@@ -3,7 +3,6 @@
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import sharp from "sharp";
 
 export type ActionState = {
   success: boolean;
@@ -76,24 +75,14 @@ export async function uploadReportImage(formData: FormData) {
   }
 
   try {
-    // Convert File to Buffer for sharp processing
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Compress image with sharp
-    const compressedBuffer = await sharp(buffer)
-      .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-
     // Use the original filename
     const filePath = `temp/${file.name}`;
 
-    // Upload to Supabase storage
+    // Upload to Supabase storage directly without processing
     const supabase = await createClient();
     const { error } = await supabase.storage
       .from("report-images")
-      .upload(filePath, compressedBuffer, {
+      .upload(filePath, file, {
         contentType: file.type,
         upsert: false,
       });
@@ -107,7 +96,7 @@ export async function uploadReportImage(formData: FormData) {
 
     return { url: publicUrl };
   } catch (error) {
-    console.error("Error processing image:", error);
-    return { error: "Failed to process and upload image" };
+    console.error("Error uploading image:", error);
+    return { error: "Failed to upload image" };
   }
 }
