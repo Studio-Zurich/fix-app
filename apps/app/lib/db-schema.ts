@@ -59,23 +59,5 @@ export const reportSchema = z.object({
   reporter_last_name: z.string(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
-});
-
-export const reportHistorySchema = z.object({
-  id: z.string().uuid(),
-  report_id: z.string().uuid(),
-  user_id: z.string().uuid(),
-  action: z.string(),
-  details: z.record(z.unknown()),
-  created_at: z.string().datetime(),
-});
-
-export const reportImageSchema = z.object({
-  id: z.string().uuid(),
-  report_id: z.string().uuid(),
-  storage_path: z.string(),
-  file_name: z.string(),
-  file_type: z.string(),
-  file_size: z.number(),
-  created_at: z.string().datetime(),
+  locale: z.string(),
 });

@@ -37,6 +37,10 @@ export default async function ReportPage({ params }: ReportPageProps) {
     <div>
       <h1 className="text-3xl font-bold mb-6">Report Details</h1>
       <div className="text-sm text-gray-500 mb-4">Report ID: {report.id}</div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Upload Images</h2>
+      </div>
     </div>
   );
 }
