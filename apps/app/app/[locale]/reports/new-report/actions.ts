@@ -75,7 +75,7 @@ export async function uploadReportImage(formData: FormData) {
   }
 
   try {
-    // Use the original filename
+    // Use the filename from the file object (which now has a unique name)
     const filePath = `temp/${file.name}`;
 
     // Upload to Supabase storage directly without processing
