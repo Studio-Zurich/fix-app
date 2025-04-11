@@ -25,6 +25,9 @@ export async function submitReport(
     const incidentTypeId = formData.get("incident_type_id");
     const incidentSubtypeId = formData.get("incident_subtype_id");
     const description = formData.get("description");
+    const locationLat = formData.get("location_lat");
+    const locationLng = formData.get("location_lng");
+    const locationAddress = formData.get("location_address");
     const imageFilename = formData.get("image-filename") as string;
 
     log("Submitting report with data", {
@@ -36,6 +39,9 @@ export async function submitReport(
       incidentTypeId,
       incidentSubtypeId,
       description,
+      locationLat,
+      locationLng,
+      locationAddress,
       imageFilename,
     });
 
@@ -49,6 +55,9 @@ export async function submitReport(
         incident_type_id: incidentTypeId,
         incident_subtype_id: incidentSubtypeId,
         description: description || "",
+        location_lat: locationLat ? parseFloat(locationLat as string) : null,
+        location_lng: locationLng ? parseFloat(locationLng as string) : null,
+        location_address: locationAddress || "",
         locale: locale,
         status: "open",
       })

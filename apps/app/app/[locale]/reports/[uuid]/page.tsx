@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 import Image from "next/image";
-import Overview from "./components/overview";
+
 interface ReportPageProps {
   params: Promise<{
     locale: string;
@@ -25,7 +25,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   const { data: report, error } = await supabase
     .from("reports")
-    .select("id")
+    .select("*")
     .eq("id", resolvedParams.uuid)
     .single();
 
@@ -56,7 +56,76 @@ export default async function ReportPage({ params }: ReportPageProps) {
     <div>
       <h1 className="text-3xl font-bold mb-6">Report Details</h1>
       <div className="text-sm text-gray-500 mb-4">Report ID: {report.id}</div>
-      <Overview />
+
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Report Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Status</p>
+            <p className="font-medium">{report.status}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Locale</p>
+            <p className="font-medium">{report.locale}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Created At</p>
+            <p className="font-medium">
+              {new Date(report.created_at).toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Updated At</p>
+            <p className="font-medium">
+              {new Date(report.updated_at).toLocaleString()}
+            </p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-sm text-gray-500">Description</p>
+            <p className="font-medium whitespace-pre-wrap">
+              {report.description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Location Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Address</p>
+            <p className="font-medium">{report.location_address}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Coordinates</p>
+            <p className="font-medium">
+              {report.location_lat}, {report.location_lng}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Reporter Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Name</p>
+            <p className="font-medium">
+              {report.reporter_first_name} {report.reporter_last_name}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Email</p>
+            <p className="font-medium">{report.reporter_email}</p>
+          </div>
+          {report.reporter_phone && (
+            <div>
+              <p className="text-sm text-gray-500">Phone</p>
+              <p className="font-medium">{report.reporter_phone}</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Report Images</h2>

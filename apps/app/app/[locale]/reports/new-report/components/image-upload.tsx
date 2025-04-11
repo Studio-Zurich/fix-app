@@ -102,7 +102,7 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         onClick={handleNext}
         disabled={!selectedFile || isProcessing}
       >
-        {isProcessing ? "Processing..." : "Next"}
+        {isProcessing ? "Processing..." : "Verify"}
       </Button>
 
       {/* Hidden input to pass the filename to the form submission */}

@@ -8,6 +8,7 @@ import ImageUpload from "./image-upload";
 import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
 import IncidentType from "./incident-type";
+import Location from "./location";
 import UserData from "./user-data";
 
 interface ReportFlowProps {
@@ -48,9 +49,10 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
       {/* Display success or error message */}
       {state.message && <div>{state.message}</div>}
 
-      <form action={formAction}>
+      <form action={formAction} className="grid gap-16">
         <input type="hidden" name="locale" value={locale} />
         <ImageUpload />
+        <Location />
         <IncidentType incidentTypes={incidentTypes} />
         <IncidentSubtype incidentSubtypes={incidentSubtypes} />
         <IncidentDescription />
