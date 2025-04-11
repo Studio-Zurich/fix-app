@@ -1,5 +1,6 @@
 "use client";
 import { log } from "@/lib/logger";
+import { useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { useLocale } from "next-intl";
 import { useActionState } from "react";
@@ -34,6 +35,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
     { success: false, message: "" }
   );
   const locale = useLocale();
+  const detectedLocation = useLocationStore((state) => state.detectedLocation);
 
   // Log form submission state
   log("Form submission state", { state, pending });
@@ -41,6 +43,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
     incidentTypesCount: incidentTypes.length,
     incidentSubtypesCount: incidentSubtypes.length,
   });
+  log("Detected location data from store", detectedLocation);
 
   return (
     <div>

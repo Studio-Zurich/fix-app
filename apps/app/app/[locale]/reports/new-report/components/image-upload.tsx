@@ -1,12 +1,24 @@
 import { log, logError, logSuccess } from "@/lib/logger";
+import { useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
+import exifr from "exifr";
 import { useState } from "react";
 import { uploadReportImage } from "../actions";
 import StepContainer from "./step-container";
 
 interface ImageUploadProps {
   onImageSelected?: (file: File) => void;
+}
+
+// Interface for EXIF data
+interface ExifData {
+  latitude?: number;
+  longitude?: number;
+  DateTimeOriginal?: string;
+  Make?: string;
+  Model?: string;
+  [key: string]: string | number | undefined; // For other potential EXIF properties
 }
 
 // Function to generate a unique filename
@@ -21,8 +33,12 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
+  const [exifData, setExifData] = useState<ExifData | null>(null);
+  const setDetectedLocation = useLocationStore(
+    (state) => state.setDetectedLocation
+  );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       log("File selected", {
@@ -31,6 +47,17 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         fileType: file.type,
       });
       setSelectedFile(file);
+
+      // Extract EXIF data
+      try {
+        const exif = await exifr.parse(file);
+        log("EXIF data extracted", { exif });
+        setExifData(exif);
+      } catch (error) {
+        logError("Error extracting EXIF data", error);
+        setExifData(null);
+      }
+
       if (onImageSelected) {
         onImageSelected(file);
       }
@@ -43,6 +70,15 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
     try {
       setIsProcessing(true);
       log("Starting image processing", { fileName: selectedFile.name });
+
+      // Save location data to store if available
+      if (exifData?.latitude && exifData?.longitude) {
+        log("Saving detected location data to store", {
+          latitude: exifData.latitude,
+          longitude: exifData.longitude,
+        });
+        setDetectedLocation(exifData.latitude, exifData.longitude);
+      }
 
       // Compress the image using browser-image-compression
       const compressedFile = await imageCompression(selectedFile, {
@@ -104,6 +140,40 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
       >
         {isProcessing ? "Processing..." : "Verify"}
       </Button>
+
+      {/* Display EXIF metadata */}
+      {/* DELETE LATER IN PRODUCTION */}
+      {exifData && (
+        <div className="mt-4 p-4 border rounded-md bg-gray-50">
+          <h3 className="text-lg font-medium mb-2">Image Metadata</h3>
+
+          {exifData.latitude && exifData.longitude ? (
+            <div className="mb-2">
+              <h4 className="font-medium">Location:</h4>
+              <p>Latitude: {exifData.latitude}</p>
+              <p>Longitude: {exifData.longitude}</p>
+            </div>
+          ) : (
+            <p className="text-gray-500">No location data found in image</p>
+          )}
+
+          {exifData.DateTimeOriginal && (
+            <div className="mb-2">
+              <h4 className="font-medium">Date Taken:</h4>
+              <p>{new Date(exifData.DateTimeOriginal).toLocaleString()}</p>
+            </div>
+          )}
+
+          {exifData.Make && (
+            <div className="mb-2">
+              <h4 className="font-medium">Camera:</h4>
+              <p>
+                {exifData.Make} {exifData.Model}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Hidden input to pass the filename to the form submission */}
       {uploadedFilename && (
