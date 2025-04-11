@@ -17,14 +17,18 @@ export async function submitReport(
   try {
     const supabase = await createClient();
 
-    const firstName = formData.get("first-name");
-    const lastName = formData.get("last-name");
+    const firstName = formData.get("reporter_first_name");
+    const lastName = formData.get("reporter_last_name");
+    const email = formData.get("reporter_email");
+    const phone = formData.get("reporter_phone");
     const locale = formData.get("locale");
     const imageFilename = formData.get("image-filename") as string;
 
     log("Submitting report with data", {
       firstName,
       lastName,
+      email,
+      phone,
       locale,
       imageFilename,
     });
@@ -34,6 +38,8 @@ export async function submitReport(
       .insert({
         reporter_first_name: firstName,
         reporter_last_name: lastName,
+        reporter_email: email,
+        reporter_phone: phone || null,
         locale: locale,
         status: "open",
       })
