@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useActionState } from "react";
 import { ActionState, submitReport } from "../actions";
 import ImageUpload from "./image-upload";
+import IncidentDescription from "./incident-description";
 import IncidentSubtype from "./incident-subtype";
 import IncidentType from "./incident-type";
 import UserData from "./user-data";
@@ -52,6 +53,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
         <ImageUpload />
         <IncidentType incidentTypes={incidentTypes} />
         <IncidentSubtype incidentSubtypes={incidentSubtypes} />
+        <IncidentDescription />
         <UserData />
         <Button type="submit" disabled={pending}>
           Submit

@@ -24,6 +24,7 @@ export async function submitReport(
     const locale = formData.get("locale");
     const incidentTypeId = formData.get("incident_type_id");
     const incidentSubtypeId = formData.get("incident_subtype_id");
+    const description = formData.get("description");
     const imageFilename = formData.get("image-filename") as string;
 
     log("Submitting report with data", {
@@ -34,6 +35,7 @@ export async function submitReport(
       locale,
       incidentTypeId,
       incidentSubtypeId,
+      description,
       imageFilename,
     });
 
@@ -46,6 +48,7 @@ export async function submitReport(
         reporter_phone: phone || null,
         incident_type_id: incidentTypeId,
         incident_subtype_id: incidentSubtypeId,
+        description: description || "",
         locale: locale,
         status: "open",
       })
