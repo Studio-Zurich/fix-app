@@ -5,9 +5,27 @@ import { useLocale } from "next-intl";
 import { useActionState } from "react";
 import { ActionState, submitReport } from "../actions";
 import ImageUpload from "./image-upload";
+import IncidentSubtype from "./incident-subtype";
+import IncidentType from "./incident-type";
 import UserData from "./user-data";
 
-const ReportFlow = () => {
+interface ReportFlowProps {
+  incidentTypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+  }>;
+  incidentSubtypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+    incident_type_id: string;
+  }>;
+}
+
+const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
   // Use the useActionState hook to handle form submission
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     submitReport,
@@ -17,6 +35,10 @@ const ReportFlow = () => {
 
   // Log form submission state
   log("Form submission state", { state, pending });
+  log("Report flow props", {
+    incidentTypesCount: incidentTypes.length,
+    incidentSubtypesCount: incidentSubtypes.length,
+  });
 
   return (
     <div>
@@ -28,6 +50,8 @@ const ReportFlow = () => {
       <form action={formAction}>
         <input type="hidden" name="locale" value={locale} />
         <ImageUpload />
+        <IncidentType incidentTypes={incidentTypes} />
+        <IncidentSubtype incidentSubtypes={incidentSubtypes} />
         <UserData />
         <Button type="submit" disabled={pending}>
           Submit
@@ -47,6 +71,12 @@ const ReportFlow = () => {
             </p>
             <p>
               <strong>Locale:</strong> {locale}
+            </p>
+            <p>
+              <strong>Incident Types:</strong> {incidentTypes.length}
+            </p>
+            <p>
+              <strong>Incident Subtypes:</strong> {incidentSubtypes.length}
             </p>
           </div>
         </div>
