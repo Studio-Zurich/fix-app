@@ -1,3 +1,4 @@
+import { log, logError, logSuccess } from "@/lib/logger";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
 import { useState } from "react";
@@ -19,10 +20,16 @@ const generateUniqueFilename = (originalFilename: string): string => {
 const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      log("File selected", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+      });
       setSelectedFile(file);
       if (onImageSelected) {
         onImageSelected(file);
@@ -35,6 +42,7 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
 
     try {
       setIsProcessing(true);
+      log("Starting image processing", { fileName: selectedFile.name });
 
       // Compress the image using browser-image-compression
       const compressedFile = await imageCompression(selectedFile, {
@@ -43,8 +51,16 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         useWebWorker: true,
       });
 
+      log("Image compressed", {
+        originalSize: selectedFile.size,
+        compressedSize: compressedFile.size,
+        compressionRatio:
+          ((compressedFile.size / selectedFile.size) * 100).toFixed(2) + "%",
+      });
+
       // Generate a unique filename
       const uniqueFilename = generateUniqueFilename(selectedFile.name);
+      log("Generated unique filename", { uniqueFilename });
 
       // Create a new File object with the unique filename
       const fileWithUniqueName = new File([compressedFile], uniqueFilename, {
@@ -56,9 +72,18 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
       formData.append("image", fileWithUniqueName);
 
       // Call the server action to upload the image
-      await uploadReportImage(formData);
+      const result = await uploadReportImage(formData);
+
+      if (result.filename) {
+        logSuccess("Image uploaded successfully", {
+          filename: result.filename,
+        });
+        setUploadedFilename(result.filename);
+      } else if (result.error) {
+        logError("Image upload failed", result.error);
+      }
     } catch (error) {
-      console.error("Error processing image:", error);
+      logError("Error processing image", error);
     } finally {
       setIsProcessing(false);
     }
@@ -79,6 +104,11 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
       >
         {isProcessing ? "Processing..." : "Next"}
       </Button>
+
+      {/* Hidden input to pass the filename to the form submission */}
+      {uploadedFilename && (
+        <input type="hidden" name="image-filename" value={uploadedFilename} />
+      )}
     </StepContainer>
   );
 };

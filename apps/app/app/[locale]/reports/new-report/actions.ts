@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "@/i18n/navigation";
+import { log, logError, logSuccess } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -19,6 +20,14 @@ export async function submitReport(
     const firstName = formData.get("first-name");
     const lastName = formData.get("last-name");
     const locale = formData.get("locale");
+    const imageFilename = formData.get("image-filename") as string;
+
+    log("Submitting report with data", {
+      firstName,
+      lastName,
+      locale,
+      imageFilename,
+    });
 
     const { data, error } = await supabase
       .from("reports")
@@ -31,6 +40,7 @@ export async function submitReport(
       .select();
 
     if (error) {
+      logError("Failed to submit report to database", error);
       return {
         success: false,
         message: `Failed to submit report: ${error.message}`,
@@ -38,11 +48,38 @@ export async function submitReport(
     }
 
     const reportId = data[0]?.id;
+    logSuccess("Report created successfully", { reportId });
 
-    console.log(
-      "Report submitted successfully, redirecting to:",
-      `/reports/${reportId}`
-    );
+    // If an image was uploaded, move it from temp to the report's folder
+    if (imageFilename) {
+      try {
+        // Define source and destination paths
+        const sourcePath = `temp/${imageFilename}`;
+        const destinationPath = `${reportId}/${imageFilename}`;
+
+        log("Moving image from temp to report folder", {
+          sourcePath,
+          destinationPath,
+        });
+
+        // Copy the file from temp to the report's folder
+        const { error: copyError } = await supabase.storage
+          .from("report-images")
+          .copy(sourcePath, destinationPath);
+
+        if (copyError) {
+          logError("Error copying image", copyError);
+          // Continue with the redirect even if image move fails
+        } else {
+          logSuccess("Image moved successfully", { destinationPath });
+        }
+      } catch (imageError) {
+        logError("Error handling image", imageError);
+        // Continue with the redirect even if image handling fails
+      }
+    }
+
+    log("Redirecting to report page", `/reports/${reportId}`);
 
     redirect({
       href: `/reports/${reportId}`,
@@ -58,7 +95,7 @@ export async function submitReport(
       throw e;
     }
 
-    console.error("Error in submitReport:", e);
+    logError("Error in submitReport", e);
 
     return {
       success: false,
@@ -71,12 +108,19 @@ export async function uploadReportImage(formData: FormData) {
   const file = formData.get("image") as File;
 
   if (!file) {
+    logError("No image provided for upload");
     return { error: "No image provided" };
   }
 
   try {
     // Use the filename from the file object (which now has a unique name)
     const filePath = `temp/${file.name}`;
+
+    log("Uploading image to temp folder", {
+      filePath,
+      fileSize: file.size,
+      fileType: file.type,
+    });
 
     // Upload to Supabase storage directly without processing
     const supabase = await createClient();
@@ -87,16 +131,21 @@ export async function uploadReportImage(formData: FormData) {
         upsert: false,
       });
 
-    if (error) throw error;
+    if (error) {
+      logError("Error uploading image to Supabase", error);
+      throw error;
+    }
 
     // Get the public URL
     const {
       data: { publicUrl },
     } = supabase.storage.from("report-images").getPublicUrl(filePath);
 
-    return { url: publicUrl };
+    logSuccess("Image uploaded successfully", { filePath, publicUrl });
+
+    return { url: publicUrl, filename: file.name };
   } catch (error) {
-    console.error("Error uploading image:", error);
+    logError("Error uploading image", error);
     return { error: "Failed to upload image" };
   }
 }

@@ -12,6 +12,5 @@ export default async function Home({
     locale,
   });
 
-  // This return statement won't be reached due to the redirect
   return <div>test</div>;
 }
