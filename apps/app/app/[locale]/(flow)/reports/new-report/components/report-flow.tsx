@@ -61,7 +61,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
         <div className="flex-1 bg-blue-400 pb-[66px]">
           <div className="fixed bottom-0 w-full bg-pink-400 h-min">
             <div className="px-[5vw] md:px-6 py-2 flex justify-between items-center">
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" className="w-full" disabled={pending}>
                 Submit
               </Button>
             </div>

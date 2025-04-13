@@ -126,20 +126,23 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   };
 
   return (
-    <StepContainer>
+    <StepContainer
+      nextButton={
+        <Button
+          type="button"
+          onClick={handleNext}
+          disabled={!selectedFile || isProcessing}
+        >
+          {isProcessing ? "Processing..." : "Verify"}
+        </Button>
+      }
+    >
       <input
         type="file"
         onChange={handleFileChange}
         accept="image/*"
         className="mb-4"
       />
-      <Button
-        type="button"
-        onClick={handleNext}
-        disabled={!selectedFile || isProcessing}
-      >
-        {isProcessing ? "Processing..." : "Verify"}
-      </Button>
 
       {/* Display EXIF metadata */}
       {/* DELETE LATER IN PRODUCTION */}

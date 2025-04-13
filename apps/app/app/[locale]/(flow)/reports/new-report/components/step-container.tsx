@@ -1,13 +1,23 @@
-import { Button } from "@repo/ui/button";
-
-const StepContainer = ({ children }: { children: React.ReactNode }) => {
+const StepContainer = ({
+  children,
+  prevButton,
+  nextButton,
+}: {
+  children: React.ReactNode;
+  prevButton?: React.ReactNode;
+  nextButton: React.ReactNode;
+}) => {
   return (
     <div className="flex-1 bg-blue-400 pb-[66px]">
       {children}
       <div className="fixed bottom-0 w-full bg-pink-400 h-min">
-        <div className="px-[5vw] md:px-6 py-2 flex justify-between items-center">
-          <Button variant="outline">Back</Button>
-          <Button>Next</Button>
+        <div
+          className={`px-[5vw] md:px-6 py-2 flex items-center ${
+            prevButton && nextButton ? "justify-between" : "justify-end"
+          }`}
+        >
+          {prevButton}
+          {nextButton}
         </div>
       </div>
     </div>
