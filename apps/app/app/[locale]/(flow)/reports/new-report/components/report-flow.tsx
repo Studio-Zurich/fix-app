@@ -46,13 +46,11 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
   log("Detected location data from store", detectedLocation);
 
   return (
-    <div>
-      <h1>ReportFlow</h1>
-
+    <>
       {/* Display success or error message */}
       {state.message && <div>{state.message}</div>}
 
-      <form action={formAction} className="grid gap-16">
+      <form action={formAction} className="flex-1 h-full flex flex-col gap-16">
         <input type="hidden" name="locale" value={locale} />
         <ImageUpload />
         <Location />
@@ -60,9 +58,15 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
         <IncidentSubtype incidentSubtypes={incidentSubtypes} />
         <IncidentDescription />
         <UserData />
-        <Button type="submit" disabled={pending}>
-          Submit
-        </Button>
+        <div className="flex-1 bg-blue-400 pb-[66px]">
+          <div className="fixed bottom-0 w-full bg-pink-400 h-min">
+            <div className="px-[5vw] md:px-6 py-2 flex justify-between items-center">
+              <Button type="submit" disabled={pending}>
+                Submit
+              </Button>
+            </div>
+          </div>
+        </div>
       </form>
 
       {/* Debug section - only visible when logging is enabled */}
@@ -88,7 +92,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
