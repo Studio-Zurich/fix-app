@@ -44,8 +44,8 @@ const UserData = () => {
     setUserData(formData);
     log("User data saved to store on Next click", formData);
 
-    // Advance to next step
-    reportStore.setState({ step: 2 });
+    // Advance to final step (step 6)
+    reportStore.setState({ step: 6 });
   };
 
   return (

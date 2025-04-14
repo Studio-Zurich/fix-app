@@ -25,7 +25,13 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   const { data: report, error } = await supabase
     .from("reports")
-    .select("*")
+    .select(
+      `
+      *,
+      incident_types:incident_type_id (id, name),
+      incident_subtypes:incident_subtype_id (id, name)
+    `
+    )
     .eq("id", resolvedParams.uuid)
     .single();
 
@@ -80,6 +86,24 @@ export default async function ReportPage({ params }: ReportPageProps) {
               {new Date(report.updated_at).toLocaleString()}
             </p>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Incident Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {report.incident_types && (
+            <div>
+              <p className="text-sm text-gray-500">Incident Type</p>
+              <p className="font-medium">{report.incident_types.name}</p>
+            </div>
+          )}
+          {report.incident_subtypes && (
+            <div>
+              <p className="text-sm text-gray-500">Incident Subtype</p>
+              <p className="font-medium">{report.incident_subtypes.name}</p>
+            </div>
+          )}
           <div className="md:col-span-2">
             <p className="text-sm text-gray-500">Description</p>
             <p className="font-medium whitespace-pre-wrap">

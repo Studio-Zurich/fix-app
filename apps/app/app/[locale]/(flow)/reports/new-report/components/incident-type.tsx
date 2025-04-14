@@ -1,8 +1,10 @@
 "use client";
 import { log } from "@/lib/logger";
+import { reportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentTypeProps {
@@ -12,14 +14,29 @@ interface IncidentTypeProps {
     description: string;
     active: boolean;
   }>;
+  incidentSubtypes?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+    incident_type_id: string;
+  }>;
 }
 
-const IncidentType = ({ incidentTypes }: IncidentTypeProps) => {
+const IncidentType = ({
+  incidentTypes,
+  incidentSubtypes = [],
+}: IncidentTypeProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<{
     id: string;
     name: string;
   } | null>(null);
+
+  // Get setIncidentType function from store using direct method to avoid subscription issues
+  const setIncidentType = useCallback((data: { id: string; name: string }) => {
+    reportStore.getState().setIncidentType(data);
+  }, []);
 
   // Filter incident types based on search query
   const filteredTypes = incidentTypes.filter((type) =>
@@ -31,8 +48,32 @@ const IncidentType = ({ incidentTypes }: IncidentTypeProps) => {
     log("Incident type selected", type);
   };
 
+  const handleNext = () => {
+    // Only proceed if a type is selected
+    if (selectedType) {
+      // Save to store
+      setIncidentType(selectedType);
+      log("Incident type saved to store on Next click", selectedType);
+
+      // Check if there are any subtypes for this incident type
+      const hasSubtypes = incidentSubtypes.some(
+        (subtype) => subtype.incident_type_id === selectedType.id
+      );
+
+      // Skip to description step (4) if there are no subtypes, otherwise go to subtype step (3)
+      reportStore.setState({ step: hasSubtypes ? 3 : 4 });
+      log(`Going to ${hasSubtypes ? "subtype" : "description"} step`);
+    }
+  };
+
   return (
-    <StepContainer>
+    <StepContainer
+      nextButton={
+        <Button type="button" onClick={handleNext} disabled={!selectedType}>
+          Next
+        </Button>
+      }
+    >
       <div className="space-y-4 incident-type-section">
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">

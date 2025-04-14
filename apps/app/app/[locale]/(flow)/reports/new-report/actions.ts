@@ -52,6 +52,12 @@ export async function submitReport(
       imageFilename,
     });
 
+    // Set incident_subtype_id to null if it's empty or not provided
+    const finalSubtypeId =
+      incidentSubtypeId && String(incidentSubtypeId).trim()
+        ? incidentSubtypeId
+        : null; // Use null when there's no subtype
+
     const { data, error } = await supabase
       .from("reports")
       .insert({
@@ -60,7 +66,7 @@ export async function submitReport(
         reporter_email: email,
         reporter_phone: phone || null,
         incident_type_id: incidentTypeId,
-        incident_subtype_id: incidentSubtypeId,
+        incident_subtype_id: finalSubtypeId,
         description: description || "",
         location_lat: locationLat ? parseFloat(locationLat as string) : null,
         location_lng: locationLng ? parseFloat(locationLng as string) : null,

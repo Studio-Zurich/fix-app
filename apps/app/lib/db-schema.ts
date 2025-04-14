@@ -47,7 +47,7 @@ export const reportSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid().optional(),
   incident_type_id: z.string().uuid(),
-  incident_subtype_id: z.string().uuid(),
+  incident_subtype_id: z.string().uuid().optional(),
   status: z.string(),
   description: z.string(),
   location_lat: z.number(),

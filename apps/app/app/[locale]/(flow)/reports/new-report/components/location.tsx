@@ -1,10 +1,11 @@
 "use client";
 import { log } from "@/lib/logger";
+import { reportStore, useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StepContainer from "./step-container";
 
 // Set the Mapbox access token
@@ -23,14 +24,29 @@ const Location = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
+  // Get detected location from location store
+  const detectedLocation = useLocationStore((state) => state.detectedLocation);
+
+  // Get setLocation function from store using direct method to avoid subscription issues
+  const setLocation = useCallback(
+    (location: { lat: number; lng: number; address: string }) => {
+      reportStore.getState().setLocation(location);
+    },
+    []
+  );
+
   // Initialize the map when the component mounts
   useEffect(() => {
     if (mapContainer.current && !map.current) {
+      // Use detected location from EXIF data if available, otherwise default to Switzerland
+      const initialLng = detectedLocation.longitude ?? 8.2275;
+      const initialLat = detectedLocation.latitude ?? 46.8182;
+
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/streets-v12",
-        center: [8.2275, 46.8182], // Default to Switzerland
-        zoom: 8,
+        center: [initialLng, initialLat],
+        zoom: detectedLocation.latitude ? 15 : 8, // Zoom in if we have a detected location
       });
 
       // Add navigation controls
@@ -40,8 +56,17 @@ const Location = () => {
       const marker = new mapboxgl.Marker({
         draggable: true,
       })
-        .setLngLat([8.2275, 46.8182])
+        .setLngLat([initialLng, initialLat])
         .addTo(map.current);
+
+      // Set initial coordinates if we have a detected location
+      if (detectedLocation.latitude && detectedLocation.longitude) {
+        setCoordinates({
+          lat: detectedLocation.latitude,
+          lng: detectedLocation.longitude,
+        });
+        log("Using detected location", detectedLocation);
+      }
 
       // Update coordinates when marker is dragged
       marker.on("dragend", () => {
@@ -58,7 +83,7 @@ const Location = () => {
         }
       };
     }
-  }, []);
+  }, [detectedLocation]);
 
   // Update map when coordinates change
   useEffect(() => {
@@ -110,8 +135,32 @@ const Location = () => {
     }
   };
 
+  const handleNext = () => {
+    // Only proceed if coordinates are set
+    if (coordinates) {
+      // Save to store
+      setLocation({
+        lat: coordinates.lat,
+        lng: coordinates.lng,
+        address: address,
+      });
+      log("Location saved to store on Next click", { coordinates, address });
+
+      // Go to incident type step
+      reportStore.setState({ step: 2 });
+    } else {
+      setVerificationError("Please set a location before continuing");
+    }
+  };
+
   return (
-    <StepContainer>
+    <StepContainer
+      nextButton={
+        <Button type="button" onClick={handleNext} disabled={!coordinates}>
+          Next
+        </Button>
+      }
+    >
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex flex-col space-y-2">

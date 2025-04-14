@@ -1,8 +1,10 @@
 "use client";
 import { log } from "@/lib/logger";
+import { reportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentSubtypeProps {
@@ -22,92 +24,66 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     name: string;
   } | null>(null);
 
-  // Get the selected incident type from the form
-  const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null);
+  // Get setIncidentSubtype function from store using direct method to avoid subscription issues
+  const setIncidentSubtype = useCallback(
+    (data: { id: string; name: string }) => {
+      reportStore.getState().setIncidentSubtype(data);
+    },
+    []
+  );
 
-  // Update selected type ID when the form changes
+  // Get selected type ID from store
+  const [selectedTypeId, setSelectedTypeId] = useState<string>("");
+
+  // Load the selected type from store
   useEffect(() => {
-    // Function to check for the selected incident type
-    const checkSelectedType = () => {
-      // First try to find the hidden input
-      const typeInput = document.querySelector(
-        'input[name="incident_type_id"]'
-      ) as HTMLInputElement;
-
-      if (typeInput && typeInput.value) {
-        setSelectedTypeId(typeInput.value);
-        log("Selected incident type ID updated from hidden input", {
-          typeId: typeInput.value,
-        });
-        return;
-      }
-
-      // If no hidden input or it's empty, try to find the checked checkbox
-      const checkedCheckbox = document.querySelector(
-        'input[name="incident_type_id"]:checked'
-      ) as HTMLInputElement;
-      if (checkedCheckbox) {
-        setSelectedTypeId(checkedCheckbox.value);
-        log("Selected incident type ID updated from checkbox", {
-          typeId: checkedCheckbox.value,
-        });
-        return;
-      }
-
-      // If still no selection, try to find any checked checkbox in the incident type section
-      const incidentTypeSection = document.querySelector(
-        ".incident-type-section"
-      );
-      if (incidentTypeSection) {
-        const checkedBox = incidentTypeSection.querySelector(
-          'input[type="checkbox"]:checked'
-        ) as HTMLInputElement;
-        if (checkedBox) {
-          setSelectedTypeId(checkedBox.id);
-          log("Selected incident type ID updated from section checkbox", {
-            typeId: checkedBox.id,
-          });
-          return;
-        }
-      }
-    };
-
-    // Initial check
-    checkSelectedType();
-
-    // Set up a more frequent interval to check for changes
-    const intervalId = setInterval(checkSelectedType, 500);
-
-    // Also listen for form changes
-    const handleFormChange = () => {
-      checkSelectedType();
-    };
-
-    document.addEventListener("change", handleFormChange);
-
-    return () => {
-      clearInterval(intervalId);
-      document.removeEventListener("change", handleFormChange);
-    };
+    const state = reportStore.getState();
+    if (state.incident_type_id) {
+      setSelectedTypeId(state.incident_type_id);
+      log("Selected incident type ID loaded from store", {
+        typeId: state.incident_type_id,
+        typeName: state.incident_type_name,
+      });
+    }
   }, []);
 
   // Filter subtypes based on search query and selected incident type
-  const filteredSubtypes = incidentSubtypes.filter((subtype) => {
-    const matchesSearch = subtype.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesType =
-      !selectedTypeId || subtype.incident_type_id === selectedTypeId;
-    return matchesSearch && matchesType;
-  });
+  const filteredSubtypes = useMemo(() => {
+    return incidentSubtypes.filter((subtype) => {
+      const matchesSearch = subtype.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesType =
+        !selectedTypeId || subtype.incident_type_id === selectedTypeId;
+      return matchesSearch && matchesType;
+    });
+  }, [incidentSubtypes, searchQuery, selectedTypeId]);
 
   const handleSelect = (subtype: { id: string; name: string }) => {
     setSelectedSubtype(subtype);
     log("Incident subtype selected", subtype);
   };
 
+  const handleNext = () => {
+    // Only proceed if a subtype is selected
+    if (selectedSubtype) {
+      // Save to store
+      setIncidentSubtype(selectedSubtype);
+      log("Incident subtype saved to store on Next click", selectedSubtype);
+
+      // Go to description step
+      reportStore.setState({ step: 4 });
+    }
+  };
+
   return (
-    <StepContainer>
+    <StepContainer
+      nextButton={
+        <Button type="button" onClick={handleNext} disabled={!selectedSubtype}>
+          Next
+        </Button>
+      }
+    >
       <div className="space-y-4">
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">

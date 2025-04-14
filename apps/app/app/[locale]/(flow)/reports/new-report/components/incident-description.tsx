@@ -1,11 +1,18 @@
 "use client";
 import { log } from "@/lib/logger";
+import { reportStore } from "@/lib/store";
+import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentDescriptionProps {
   maxCharacters?: number;
+}
+
+interface SelectedTypeInfo {
+  type: { id: string; name: string };
+  subtype?: { id: string; name: string };
 }
 
 const IncidentDescription = ({
@@ -13,75 +20,40 @@ const IncidentDescription = ({
 }: IncidentDescriptionProps) => {
   const [description, setDescription] = useState("");
   const [charactersLeft, setCharactersLeft] = useState(maxCharacters);
-  const [selectedType, setSelectedType] = useState<{
-    type: { id: string; name: string };
-    subtype?: { id: string; name: string };
-  } | null>(null);
 
-  // Update selected type when the form changes
+  // Get setDescription function from store using direct method to avoid subscription issues
+  const setStoreDescription = useCallback((desc: string) => {
+    reportStore.getState().setDescription(desc);
+  }, []);
+
+  const [selectedType, setSelectedType] = useState<SelectedTypeInfo | null>(
+    null
+  );
+
+  // Load the selected type and subtype from store
   useEffect(() => {
-    // Function to check for the selected incident type and subtype
-    const checkSelectedType = () => {
-      // Get the selected incident type
-      const typeInput = document.querySelector(
-        'input[name="incident_type_id"]'
-      ) as HTMLInputElement;
+    const state = reportStore.getState();
+    if (state.incident_type_id) {
+      const newSelectedType: SelectedTypeInfo = {
+        type: {
+          id: state.incident_type_id,
+          name: state.incident_type_name,
+        },
+      };
 
-      // Get the selected incident subtype
-      const subtypeInput = document.querySelector(
-        'input[name="incident_subtype_id"]'
-      ) as HTMLInputElement;
-
-      if (typeInput && typeInput.value) {
-        // Find the type name from the checkbox
-        const typeCheckbox = document.querySelector(
-          `input[id="${typeInput.value}"]`
-        ) as HTMLInputElement;
-
-        const typeName = typeCheckbox?.id || "";
-
-        // Find the subtype name if it exists
-        let subtypeName = "";
-        if (subtypeInput && subtypeInput.value) {
-          const subtypeCheckbox = document.querySelector(
-            `input[id="${subtypeInput.value}"]`
-          ) as HTMLInputElement;
-          subtypeName = subtypeCheckbox?.id || "";
-        }
-
-        setSelectedType({
-          type: { id: typeInput.value, name: typeName },
-          subtype: subtypeName
-            ? { id: subtypeInput.value, name: subtypeName }
-            : undefined,
-        });
-
-        log("Selected incident type and subtype updated", {
-          typeId: typeInput.value,
-          typeName,
-          subtypeId: subtypeInput?.value,
-          subtypeName,
-        });
+      if (state.incident_subtype_id) {
+        newSelectedType.subtype = {
+          id: state.incident_subtype_id,
+          name: state.incident_subtype_name,
+        };
       }
-    };
 
-    // Initial check
-    checkSelectedType();
-
-    // Set up an interval to check for changes
-    const intervalId = setInterval(checkSelectedType, 500);
-
-    // Also listen for form changes
-    const handleFormChange = () => {
-      checkSelectedType();
-    };
-
-    document.addEventListener("change", handleFormChange);
-
-    return () => {
-      clearInterval(intervalId);
-      document.removeEventListener("change", handleFormChange);
-    };
+      setSelectedType(newSelectedType);
+      log(
+        "Selected incident type and subtype loaded from store",
+        newSelectedType
+      );
+    }
   }, []);
 
   // Update character count when description changes
@@ -99,8 +71,23 @@ const IncidentDescription = ({
     }
   };
 
+  const handleNext = () => {
+    // Save description to store
+    setStoreDescription(description);
+    log("Description saved to store on Next click", { description });
+
+    // Go to user data step (step 5)
+    reportStore.setState({ step: 5 });
+  };
+
   return (
-    <StepContainer>
+    <StepContainer
+      nextButton={
+        <Button type="button" onClick={handleNext}>
+          Next
+        </Button>
+      }
+    >
       <div className="space-y-4 flex-1">
         {selectedType && (
           <div className="space-y-2">
