@@ -48,6 +48,11 @@ const IncidentType = ({
     log("Incident type selected", type);
   };
 
+  const handleBack = () => {
+    // Just go back to the previous step without validating or saving data
+    reportStore.setState({ step: 1 });
+  };
+
   const handleNext = () => {
     // Only proceed if a type is selected
     if (selectedType) {
@@ -68,6 +73,11 @@ const IncidentType = ({
 
   return (
     <StepContainer
+      prevButton={
+        <Button type="button" variant="outline" onClick={handleBack}>
+          Back
+        </Button>
+      }
       nextButton={
         <Button type="button" onClick={handleNext} disabled={!selectedType}>
           Next

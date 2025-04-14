@@ -64,6 +64,11 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     log("Incident subtype selected", subtype);
   };
 
+  const handleBack = () => {
+    // Just go back to the previous step without validating or saving data
+    reportStore.setState({ step: 2 });
+  };
+
   const handleNext = () => {
     // Only proceed if a subtype is selected
     if (selectedSubtype) {
@@ -78,6 +83,11 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
 
   return (
     <StepContainer
+      prevButton={
+        <Button type="button" variant="outline" onClick={handleBack}>
+          Back
+        </Button>
+      }
       nextButton={
         <Button type="button" onClick={handleNext} disabled={!selectedSubtype}>
           Next

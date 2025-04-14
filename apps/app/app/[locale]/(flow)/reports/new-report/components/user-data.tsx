@@ -39,6 +39,11 @@ const UserData = () => {
     });
   };
 
+  const handleBack = () => {
+    // Just go back to the previous step without validating or saving data
+    reportStore.setState({ step: 4 });
+  };
+
   const handleNext = () => {
     // Save all form data to store when Next is clicked
     setUserData(formData);
@@ -50,6 +55,11 @@ const UserData = () => {
 
   return (
     <StepContainer
+      prevButton={
+        <Button type="button" variant="outline" onClick={handleBack}>
+          Back
+        </Button>
+      }
       nextButton={
         <Button type="button" onClick={handleNext}>
           Next

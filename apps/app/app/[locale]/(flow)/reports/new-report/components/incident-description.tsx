@@ -71,6 +71,15 @@ const IncidentDescription = ({
     }
   };
 
+  const handleBack = () => {
+    // Check if we had a subtype selected to determine which step to go back to
+    const state = reportStore.getState();
+    const previousStep = state.incident_subtype_id ? 3 : 2;
+
+    // Just go back to the previous step without validating or saving data
+    reportStore.setState({ step: previousStep });
+  };
+
   const handleNext = () => {
     // Save description to store
     setStoreDescription(description);
@@ -82,6 +91,11 @@ const IncidentDescription = ({
 
   return (
     <StepContainer
+      prevButton={
+        <Button type="button" variant="outline" onClick={handleBack}>
+          Back
+        </Button>
+      }
       nextButton={
         <Button type="button" onClick={handleNext}>
           Next

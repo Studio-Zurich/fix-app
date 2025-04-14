@@ -153,8 +153,18 @@ const Location = () => {
     }
   };
 
+  const handleBack = () => {
+    // Just go back to the previous step without validating or saving data
+    reportStore.setState({ step: 0 });
+  };
+
   return (
     <StepContainer
+      prevButton={
+        <Button type="button" variant="outline" onClick={handleBack}>
+          Back
+        </Button>
+      }
       nextButton={
         <Button type="button" onClick={handleNext} disabled={!coordinates}>
           Next
