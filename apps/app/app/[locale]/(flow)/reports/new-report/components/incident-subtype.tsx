@@ -47,6 +47,21 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     }
   }, []);
 
+  // Load the selected subtype from store
+  useEffect(() => {
+    const state = reportStore.getState();
+    if (state.incident_subtype_id) {
+      setSelectedSubtype({
+        id: state.incident_subtype_id,
+        name: state.incident_subtype_name,
+      });
+      log("Selected incident subtype loaded from store", {
+        id: state.incident_subtype_id,
+        name: state.incident_subtype_name,
+      });
+    }
+  }, []);
+
   // Filter subtypes based on search query and selected incident type
   const filteredSubtypes = useMemo(() => {
     return incidentSubtypes.filter((subtype) => {

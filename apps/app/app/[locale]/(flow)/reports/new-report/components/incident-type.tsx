@@ -4,7 +4,7 @@ import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentTypeProps {
@@ -36,6 +36,21 @@ const IncidentType = ({
   // Get setIncidentType function from store using direct method to avoid subscription issues
   const setIncidentType = useCallback((data: { id: string; name: string }) => {
     reportStore.getState().setIncidentType(data);
+  }, []);
+
+  // Load the selected type from store when component mounts
+  useEffect(() => {
+    const state = reportStore.getState();
+    if (state.incident_type_id) {
+      setSelectedType({
+        id: state.incident_type_id,
+        name: state.incident_type_name,
+      });
+      log("Loaded selected incident type from store", {
+        id: state.incident_type_id,
+        name: state.incident_type_name,
+      });
+    }
   }, []);
 
   // Filter incident types based on search query

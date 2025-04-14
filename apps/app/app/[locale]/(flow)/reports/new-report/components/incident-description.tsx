@@ -56,6 +56,15 @@ const IncidentDescription = ({
     }
   }, []);
 
+  // Load the description from store when component mounts
+  useEffect(() => {
+    const state = reportStore.getState();
+    if (state.description) {
+      setDescription(state.description);
+      log("Description loaded from store", { description: state.description });
+    }
+  }, []);
+
   // Update character count when description changes
   useEffect(() => {
     setCharactersLeft(maxCharacters - description.length);

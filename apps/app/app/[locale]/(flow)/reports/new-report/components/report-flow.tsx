@@ -127,21 +127,25 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               name="reporter_first_name"
               value={storeData.reporter_first_name}
             />
+            <div>{storeData.reporter_first_name}</div>
             <input
               type="hidden"
               name="reporter_last_name"
               value={storeData.reporter_last_name}
             />
+            <div>{storeData.reporter_last_name}</div>
             <input
               type="hidden"
               name="reporter_email"
               value={storeData.reporter_email}
             />
+            <div>{storeData.reporter_email}</div>
             <input
               type="hidden"
               name="reporter_phone"
               value={storeData.reporter_phone}
             />
+            <div>{storeData.reporter_phone}</div>
 
             {/* Hidden inputs for incident data */}
             <input
@@ -149,16 +153,19 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               name="incident_type_id"
               value={storeData.incident_type_id}
             />
+            <div>{storeData.incident_type_id}</div>
             <input
               type="hidden"
               name="incident_subtype_id"
               value={storeData.incident_subtype_id}
             />
+            <div>{storeData.incident_subtype_id}</div>
             <input
               type="hidden"
               name="description"
               value={storeData.description}
             />
+            <div>{storeData.description}</div>
 
             {/* Hidden inputs for location data */}
             {storeData.location_lat && storeData.location_lng && (
@@ -168,16 +175,19 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                   name="location_lat"
                   value={storeData.location_lat}
                 />
+                <div>{storeData.location_lat}</div>
                 <input
                   type="hidden"
                   name="location_lng"
                   value={storeData.location_lng}
                 />
+                <div>{storeData.location_lng}</div>
                 <input
                   type="hidden"
                   name="location_address"
                   value={storeData.location_address}
                 />
+                <div>{storeData.location_address}</div>
               </>
             )}
 
@@ -228,14 +238,39 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               <p>
                 <strong>Pending:</strong> {pending ? "Yes" : "No"}
               </p>
+
               <p>
-                <strong>Locale:</strong> {locale}
+                <strong>Reporter First Name:</strong>{" "}
+                {storeData?.reporter_first_name}
               </p>
               <p>
-                <strong>Incident Types:</strong> {incidentTypes.length}
+                <strong>Reporter Last Name:</strong>{" "}
+                {storeData?.reporter_last_name}
               </p>
               <p>
-                <strong>Incident Subtypes:</strong> {incidentSubtypes.length}
+                <strong>Reporter Email:</strong> {storeData?.reporter_email}
+              </p>
+              <p>
+                <strong>Reporter Phone:</strong> {storeData?.reporter_phone}
+              </p>
+              <p>
+                <strong>Incident Type ID:</strong> {storeData?.incident_type_id}
+              </p>
+              <p>
+                <strong>Incident Subtype ID:</strong>{" "}
+                {storeData?.incident_subtype_id}
+              </p>
+              <p>
+                <strong>Incident Description:</strong> {storeData?.description}
+              </p>
+              <p>
+                <strong>Location Lat:</strong> {storeData?.location_lat}
+              </p>
+              <p>
+                <strong>Location Lng:</strong> {storeData?.location_lng}
+              </p>
+              <p>
+                <strong>Location Address:</strong> {storeData?.location_address}
               </p>
             </div>
           </PopoverContent>
