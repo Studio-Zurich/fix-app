@@ -64,7 +64,14 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   };
 
   const handleNext = async () => {
-    if (!selectedFile) return;
+    // If no image is selected, just move to the next step without uploading
+    if (!selectedFile) {
+      reportStore.setState({
+        step: 1,
+        imageUrl: null, // Make sure imageUrl is explicitly null when skipping
+      });
+      return;
+    }
 
     try {
       setIsProcessing(true);
@@ -133,12 +140,12 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   return (
     <StepContainer
       nextButton={
-        <Button
-          type="button"
-          onClick={handleNext}
-          disabled={!selectedFile || isProcessing}
-        >
-          {isProcessing ? "Processing..." : "Verify"}
+        <Button type="button" onClick={handleNext} disabled={isProcessing}>
+          {isProcessing
+            ? "Processing..."
+            : selectedFile
+              ? "Verify"
+              : "Skip Upload"}
         </Button>
       }
     >
