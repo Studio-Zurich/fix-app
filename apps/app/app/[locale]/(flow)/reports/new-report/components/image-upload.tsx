@@ -1,12 +1,11 @@
 import { log, logError, logSuccess } from "@/lib/logger";
-import { useLocationStore } from "@/lib/store";
+import { reportStore, useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
 import { useState } from "react";
 import { uploadReportImage } from "../actions";
 import StepContainer from "./step-container";
-
 interface ImageUploadProps {
   onImageSelected?: (file: File) => void;
 }
@@ -115,6 +114,12 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           filename: result.filename,
         });
         setUploadedFilename(result.filename);
+
+        // Use a direct update to avoid potential rerender issues
+        reportStore.setState({
+          step: 1,
+          imageUrl: result.url,
+        });
       } else if (result.error) {
         logError("Image upload failed", result.error);
       }

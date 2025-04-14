@@ -17,6 +17,13 @@ export async function submitReport(
   try {
     const supabase = await createClient();
 
+    // Log all form data keys and values for debugging
+    const formDataEntries: Record<string, string | File> = {};
+    for (const [key, value] of formData.entries()) {
+      formDataEntries[key] = value;
+    }
+    log("Form data received in submitReport action", formDataEntries);
+
     const firstName = formData.get("reporter_first_name");
     const lastName = formData.get("reporter_last_name");
     const email = formData.get("reporter_email");
