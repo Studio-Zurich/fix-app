@@ -4,7 +4,8 @@ import { reportStore, useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
-import { Crosshair, MapPin } from "@phosphor-icons/react";
+import { Crosshair, MapPin, Warning } from "@phosphor-icons/react";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/alert";
 import {
   Command,
   CommandEmpty,
@@ -38,6 +39,7 @@ const Location = () => {
   >([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
+  const [isOutsideSwitzerland, setIsOutsideSwitzerland] = useState(false);
   const [updateSource, setUpdateSource] = useState<
     "map" | "search" | "geolocation" | null
   >(null);
@@ -53,6 +55,22 @@ const Location = () => {
       reportStore.getState().setLocation(location);
     },
     []
+  );
+
+  // Check if coordinates are within Switzerland
+  const isWithinSwitzerland = useCallback((lat: number, lng: number) => {
+    const { minLat, maxLat, minLng, maxLng } = MAP_CONSTANTS.SWITZERLAND_BOUNDS;
+    return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+  }, []);
+
+  // Update coordinates and check if they're within Switzerland
+  const updateCoordinates = useCallback(
+    (lat: number, lng: number, source: "map" | "search" | "geolocation") => {
+      setCoordinates({ lat, lng });
+      setUpdateSource(source);
+      setIsOutsideSwitzerland(!isWithinSwitzerland(lat, lng));
+    },
+    [isWithinSwitzerland]
   );
 
   // Initialize the map when the component mounts
@@ -93,13 +111,21 @@ const Location = () => {
         setIsMoving(false);
         if (map.current) {
           const center = map.current.getCenter();
+          const lat = center.lat;
+          const lng = center.lng;
+
+          // Check if the new position is within Switzerland
+          const withinSwitzerland = isWithinSwitzerland(lat, lng);
+          setIsOutsideSwitzerland(!withinSwitzerland);
+
+          // Always update coordinates even if outside Switzerland
           setUpdateSource("map");
-          setCoordinates({ lat: center.lat, lng: center.lng });
+          setCoordinates({ lat, lng });
 
           // Get address for the new coordinates
           try {
             const response = await fetch(
-              `https://api.mapbox.com/geocoding/v5/mapbox.places/${center.lng},${center.lat}.json?access_token=${mapboxgl.accessToken}&country=ch&limit=1`
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}&country=ch&limit=1`
             );
             const data = await response.json();
             if (data.features && data.features.length > 0) {
@@ -110,7 +136,7 @@ const Location = () => {
             log("Error reverse geocoding", { error });
           }
 
-          log("Map position updated", { lat: center.lat, lng: center.lng });
+          log("Map position updated", { lat, lng, withinSwitzerland });
         }
       });
 
@@ -122,7 +148,7 @@ const Location = () => {
         }
       };
     }
-  }, [detectedLocation]);
+  }, [detectedLocation, isWithinSwitzerland]);
 
   // Update map when coordinates change from search or getting location, but not from map movement
   useEffect(() => {
@@ -136,8 +162,8 @@ const Location = () => {
   }, [coordinates, updateSource]);
 
   const handleNext = () => {
-    // Only proceed if coordinates are set
-    if (coordinates) {
+    // Only proceed if coordinates are set and within Switzerland
+    if (coordinates && !isOutsideSwitzerland) {
       // Save to store
       setLocation({
         lat: coordinates.lat,
@@ -182,8 +208,7 @@ const Location = () => {
   }) => {
     const [lng, lat] = suggestion.center;
     setAddress(suggestion.place_name);
-    setUpdateSource("search");
-    setCoordinates({ lat, lng });
+    updateCoordinates(lat, lng, "search");
     setSearchValue(suggestion.place_name);
   };
 
@@ -193,8 +218,8 @@ const Location = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setUpdateSource("geolocation");
-          setCoordinates({ lat: latitude, lng: longitude });
+          updateCoordinates(latitude, longitude, "geolocation");
+
           // Reverse geocode to get address
           fetch(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxgl.accessToken}&country=ch&limit=1`
@@ -233,7 +258,11 @@ const Location = () => {
         </Button>
       }
       nextButton={
-        <Button type="button" onClick={handleNext} disabled={!coordinates}>
+        <Button
+          type="button"
+          onClick={handleNext}
+          disabled={!coordinates || isOutsideSwitzerland}
+        >
           Next
         </Button>
       }
@@ -294,22 +323,45 @@ const Location = () => {
             )}
         </Command>
       </div>
-      <div className="h-svh w-full rounded-md overflow-hidden border">
+      <div className="h-svh w-full rounded-md overflow-hidden border relative">
         <div ref={mapContainer} className="h-full w-full" />
 
         {/* Centered pin */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none z-30 transform transition-all duration-300"
+          className="absolute left-1/2 top-1/2 pointer-events-none z-30 transform transition-all duration-300"
           style={{
-            transform: `translate(-50%, ${isMoving ? "calc(-100% - 8px)" : "-100%"})`,
+            transform: `translate(-50%, ${isMoving ? "-8px" : "0"})`,
           }}
         >
-          <MapPin className="w-8 h-8 text-primary" weight="fill" />
-          {isMoving && (
-            <div className="w-3 h-3 rounded-full bg-black/20 mx-auto mt-1" />
-          )}
+          <div className="flex flex-col items-center">
+            <MapPin
+              className="w-8 h-8 text-primary"
+              weight="fill"
+              style={{
+                transform: "translateY(-100%)",
+                marginBottom: "-2px", // Adjust pin tip position exactly
+              }}
+            />
+            {isMoving && (
+              <div className="w-3 h-3 rounded-full bg-black/20 relative -top-8" />
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Switzerland boundary alert */}
+      {isOutsideSwitzerland && (
+        <Alert
+          variant="destructive"
+          className="absolute bottom-[calc(66px+1rem)] left-1/2 transform -translate-x-1/2 w-[90%] max-w-md z-40 bg-background"
+        >
+          <Warning className="h-5 w-5" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            {MAP_CONSTANTS.OUTSIDE_SWITZERLAND_ERROR}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Hidden inputs to pass the location data to the form */}
       {coordinates && (
