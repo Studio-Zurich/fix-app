@@ -3,7 +3,7 @@ import { reportStore, useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadReportImage } from "../actions";
 import StepContainer from "./step-container";
 interface ImageUploadProps {
@@ -28,81 +28,42 @@ const generateUniqueFilename = (originalFilename: string): string => {
   return `${timestamp}-${randomString}.${fileExtension}`;
 };
 
-// Helper to parse GPS data from EXIF
-const parseGPSFromExif = async (
-  file: File
-): Promise<{ latitude?: number; longitude?: number } | null> => {
-  try {
-    // Try to get GPS data using full exifr options
-    const gps = await exifr.gps(file);
-    if (gps && gps.latitude && gps.longitude) {
-      log("GPS data extracted directly from exifr.gps", gps);
-      return gps;
-    }
-
-    // If that fails, try the parse method with only GPS enabled
-    const buffer = await file.arrayBuffer();
-
-    // Configure to only parse GPS data
-    const options = { gps: true };
-
-    const exif = await exifr.parse(buffer, options);
-
-    if (exif?.latitude !== undefined && exif?.longitude !== undefined) {
-      log("GPS data extracted with manual buffer parsing", {
-        latitude: exif.latitude,
-        longitude: exif.longitude,
-      });
-      return { latitude: exif.latitude, longitude: exif.longitude };
-    }
-
-    return null;
-  } catch (error) {
-    logError("Error extracting GPS data", error);
-    return null;
-  }
-};
-
 // Function to get current location using browser geolocation API
 const getLocation = async (): Promise<GeolocationCoordinates | null> => {
-  if (!navigator.geolocation) {
-    log("Geolocation is not supported by this browser");
-    return null;
-  }
-
   try {
     const position = await new Promise<GeolocationPosition>(
       (resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          (error) => {
-            if (error.code === 1) {
-              // PERMISSION_DENIED
-              log("Location permission denied by user");
-            } else if (error.code === 2) {
-              // POSITION_UNAVAILABLE
-              logError("Location information unavailable", {});
-            } else if (error.code === 3) {
-              // TIMEOUT
-              logError("Location request timed out", {});
-            } else {
-              logError("Unknown location error", {
-                code: error.code,
-                message: error.message,
-              });
-            }
-            reject(error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 8000, // Increased timeout
-            maximumAge: 0,
-          }
-        );
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        });
       }
     );
     return position.coords;
   } catch (err) {
+    logError("Error getting location", { error: String(err) });
+    return null;
+  }
+};
+
+// Function to read image location from EXIF data
+const readImageLocation = async (
+  file: File
+): Promise<{ latitude: number; longitude: number } | null> => {
+  try {
+    const buffer = await file.arrayBuffer();
+    const exif = await exifr.parse(buffer);
+
+    if (exif?.latitude && exif?.longitude) {
+      return {
+        latitude: exif.latitude,
+        longitude: exif.longitude,
+      };
+    }
+    return null;
+  } catch (error) {
+    logError("Error reading image location", error);
     return null;
   }
 };
@@ -112,104 +73,46 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
   const [exifData, setExifData] = useState<ExifData | null>(null);
-  const [browserLocation, setBrowserLocation] =
-    useState<GeolocationCoordinates | null>(null);
-  const locationRequested = useRef(false);
-
   const setDetectedLocation = useLocationStore(
     (state) => state.setDetectedLocation
   );
 
-  // Request browser location on component mount
-  useEffect(() => {
-    const requestLocation = async () => {
-      if (!locationRequested.current) {
-        locationRequested.current = true;
-        log("Requesting browser location on component mount");
-        const coords = await getLocation();
-        if (coords) {
-          log("Browser location obtained on mount", {
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-          });
-          setBrowserLocation(coords);
-        }
-      }
-    };
-
-    requestLocation();
-  }, []);
-
-  // Attempt to get location if exif data doesn't have it
+  // Check for location when file changes
   useEffect(() => {
     const checkLocation = async () => {
-      if (selectedFile && (!exifData?.latitude || !exifData?.longitude)) {
-        log("No location in EXIF, checking file for GPS data");
-
-        // First try to extract GPS directly from the file
-        const gpsData = await parseGPSFromExif(selectedFile);
-        if (gpsData?.latitude && gpsData?.longitude) {
-          log("Found GPS data in image", {
-            latitude: gpsData.latitude,
-            longitude: gpsData.longitude,
-          });
-
-          // Update EXIF data with found GPS coordinates
-          setExifData((prev) => ({
-            ...prev,
-            latitude: gpsData.latitude,
-            longitude: gpsData.longitude,
-          }));
-
-          setDetectedLocation(gpsData.latitude, gpsData.longitude);
-          return;
-        }
-
-        // If no GPS in file, use browser location as fallback
-        if (browserLocation) {
-          log("Using browser location as fallback", {
-            latitude: browserLocation.latitude,
-            longitude: browserLocation.longitude,
-          });
-
-          // Update EXIF display to show browser-acquired location
-          setExifData((prev) => ({
-            ...prev,
-            latitude: browserLocation.latitude,
-            longitude: browserLocation.longitude,
-            source: "browser",
-          }));
-
-          setDetectedLocation(
-            browserLocation.latitude,
-            browserLocation.longitude
-          );
-        } else {
-          // Try one more time to get browser location
-          const coords = await getLocation();
-          if (coords) {
-            log("Browser location obtained as fallback", {
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-            });
-            setBrowserLocation(coords);
-
-            // Update EXIF display to show browser-acquired location
-            setExifData((prev) => ({
-              ...prev,
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-              source: "browser",
-            }));
-
-            setDetectedLocation(coords.latitude, coords.longitude);
+      if (selectedFile) {
+        try {
+          // Try to get location from image
+          const location = await readImageLocation(selectedFile);
+          if (location) {
+            log("Location found in image", location);
+            setExifData((prev) => ({ ...prev, ...location }));
+            setDetectedLocation(location.latitude, location.longitude);
+          } else {
+            // If no EXIF location, try to get current location
+            const coords = await getLocation();
+            if (coords) {
+              log("Using browser location", {
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+              });
+              setExifData((prev) => ({
+                ...prev,
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                source: "browser",
+              }));
+              setDetectedLocation(coords.latitude, coords.longitude);
+            }
           }
+        } catch (error) {
+          logError("Error checking location", error);
         }
       }
     };
 
     checkLocation();
-  }, [selectedFile, exifData, browserLocation, setDetectedLocation]);
+  }, [selectedFile, setDetectedLocation]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -221,31 +124,11 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
       });
       setSelectedFile(file);
 
-      // Extract EXIF data
+      // Extract general EXIF data for display
       try {
-        // Get full EXIF data
         const exif = await exifr.parse(file);
         log("EXIF data extracted", { exif });
-
-        // Get GPS data specifically
-        const gps = await parseGPSFromExif(file);
-
-        // Combine the data
-        const combinedExif = {
-          ...exif,
-          ...(gps || {}),
-        };
-
-        setExifData(combinedExif);
-
-        // If we have GPS coordinates from either source, use them
-        if (combinedExif?.latitude && combinedExif?.longitude) {
-          log("Location found in combined EXIF/GPS data", {
-            latitude: combinedExif.latitude,
-            longitude: combinedExif.longitude,
-          });
-          setDetectedLocation(combinedExif.latitude, combinedExif.longitude);
-        }
+        setExifData(exif);
       } catch (error) {
         logError("Error extracting EXIF data", error);
         setExifData(null);
@@ -369,39 +252,44 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         </div>
       </div>
 
+      {/* Display selected file if any */}
+      {selectedFile && (
+        <div className="mt-4 p-4 border rounded-md bg-gray-50">
+          <h3 className="text-lg font-medium mb-2">Selected Image</h3>
+          <p>
+            {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)}{" "}
+            MB)
+          </p>
+        </div>
+      )}
+
       {/* Display EXIF metadata */}
       {/* DELETE LATER IN PRODUCTION */}
-      {(exifData || browserLocation) && (
+      {exifData && (
         <div className="mt-4 p-4 border rounded-md bg-gray-50">
           <h3 className="text-lg font-medium mb-2">Image Metadata</h3>
 
-          {exifData?.latitude && exifData?.longitude ? (
+          {exifData.latitude && exifData.longitude ? (
             <div className="mb-2">
               <h4 className="font-medium">Location:</h4>
               <p>Latitude: {exifData.latitude}</p>
               <p>Longitude: {exifData.longitude}</p>
               {exifData.source === "browser" && (
-                <p className="text-blue-500 text-sm">(from browser location)</p>
+                <p className="text-sm">(from browser location)</p>
               )}
             </div>
-          ) : browserLocation ? (
-            <div className="mb-2">
-              <h4 className="font-medium">Location (from browser):</h4>
-              <p>Latitude: {browserLocation.latitude}</p>
-              <p>Longitude: {browserLocation.longitude}</p>
-            </div>
           ) : (
-            <p className="text-gray-500">No location data found</p>
+            <p className="text-gray-500">No location data found in image</p>
           )}
 
-          {exifData?.DateTimeOriginal && (
+          {exifData.DateTimeOriginal && (
             <div className="mb-2">
               <h4 className="font-medium">Date Taken:</h4>
               <p>{new Date(exifData.DateTimeOriginal).toLocaleString()}</p>
             </div>
           )}
 
-          {exifData?.Make && (
+          {exifData.Make && (
             <div className="mb-2">
               <h4 className="font-medium">Camera:</h4>
               <p>
