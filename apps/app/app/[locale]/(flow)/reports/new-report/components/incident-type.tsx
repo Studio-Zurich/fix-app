@@ -99,71 +99,65 @@ const IncidentType = ({
         </Button>
       }
     >
-      <div className="space-y-4 incident-type-section">
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
-            glass
-          </span>
-          <Input
-            placeholder="Search incident types..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
+          glass
+        </span>
+        <Input
+          placeholder="Search incident types..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
 
-        <div className="space-y-2">
-          {filteredTypes.map((type) => (
+      <div className="space-y-2">
+        {filteredTypes.map((type) => (
+          <div
+            key={type.id}
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSelect(type);
+            }}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                id={type.id}
+                checked={selectedType?.id === type.id}
+                onCheckedChange={() => handleSelect(type)}
+                className="w-6 h-6"
+              />
+            </div>
             <div
-              key={type.id}
-              className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+              className="flex-1"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 handleSelect(type);
               }}
             >
-              <div onClick={(e) => e.stopPropagation()}>
-                <Checkbox
-                  id={type.id}
-                  checked={selectedType?.id === type.id}
-                  onCheckedChange={() => handleSelect(type)}
-                  className="w-6 h-6"
-                />
-              </div>
-              <div
-                className="flex-1"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSelect(type);
-                }}
+              <label
+                htmlFor={type.id}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
               >
-                <label
-                  htmlFor={type.id}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {type.name}
-                </label>
-                {type.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {type.description}
-                  </p>
-                )}
-              </div>
+                {type.name}
+              </label>
+              {type.description && (
+                <p className="text-sm text-muted-foreground">
+                  {type.description}
+                </p>
+              )}
             </div>
-          ))}
-        </div>
-
-        {/* Hidden input to pass the selected incident type to the form */}
-        {selectedType && (
-          <input
-            type="hidden"
-            name="incident_type_id"
-            value={selectedType.id}
-          />
-        )}
+          </div>
+        ))}
       </div>
+
+      {/* Hidden input to pass the selected incident type to the form */}
+      {selectedType && (
+        <input type="hidden" name="incident_type_id" value={selectedType.id} />
+      )}
     </StepContainer>
   );
 };
