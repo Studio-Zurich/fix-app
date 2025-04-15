@@ -30,7 +30,6 @@ const generateUniqueFilename = (originalFilename: string): string => {
 
 // Function to get current location using browser geolocation API
 const getLocation = async (): Promise<GeolocationCoordinates | null> => {
-  // Check if geolocation is available in this browser
   if (!navigator.geolocation) {
     log("Geolocation is not supported by this browser");
     return null;
@@ -42,10 +41,9 @@ const getLocation = async (): Promise<GeolocationCoordinates | null> => {
         navigator.geolocation.getCurrentPosition(
           resolve,
           (error) => {
-            // Handle specific geolocation errors
             if (error.code === 1) {
               // PERMISSION_DENIED
-              log("Location permission denied by user"); // Changed from error to info log
+              log("Location permission denied by user");
             } else if (error.code === 2) {
               // POSITION_UNAVAILABLE
               logError("Location information unavailable", {});
@@ -70,7 +68,6 @@ const getLocation = async (): Promise<GeolocationCoordinates | null> => {
     );
     return position.coords;
   } catch (err) {
-    // We've already logged the specific error in the reject handler
     return null;
   }
 };
@@ -98,7 +95,6 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           // Save the location to store
           setDetectedLocation(coords.latitude, coords.longitude);
         }
-        // No need for error handling here as errors are handled in getLocation
       }
     };
 
@@ -120,6 +116,15 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         const exif = await exifr.parse(file);
         log("EXIF data extracted", { exif });
         setExifData(exif);
+
+        // Check if we have GPS coordinates in EXIF
+        if (exif?.latitude && exif?.longitude) {
+          log("Location found in EXIF data", {
+            latitude: exif.latitude,
+            longitude: exif.longitude,
+          });
+          setDetectedLocation(exif.latitude, exif.longitude);
+        }
       } catch (error) {
         logError("Error extracting EXIF data", error);
         setExifData(null);
@@ -144,15 +149,6 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
     try {
       setIsProcessing(true);
       log("Starting image processing", { fileName: selectedFile.name });
-
-      // Save location data to store if available
-      if (exifData?.latitude && exifData?.longitude) {
-        log("Saving detected location data to store", {
-          latitude: exifData.latitude,
-          longitude: exifData.longitude,
-        });
-        setDetectedLocation(exifData.latitude, exifData.longitude);
-      }
 
       // Compress the image using browser-image-compression
       const compressedFile = await imageCompression(selectedFile, {
@@ -217,17 +213,40 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         </Button>
       }
     >
-      {/* 
-        The capture="environment" attribute helps iOS Safari access the camera directly
-        and will trigger location permission requests on iOS.
-      */}
-      <input
-        type="file"
-        onChange={handleFileChange}
-        accept="image/*"
-        capture="environment"
-        className="mb-4"
-      />
+      <div className="grid gap-2 mb-4">
+        {/* Camera input with capture attribute for direct camera access */}
+        <div>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            id="camera-input"
+          />
+          <Button asChild className="w-full">
+            <label htmlFor="camera-input" className="cursor-pointer w-full">
+              Take Photo
+            </label>
+          </Button>
+        </div>
+
+        {/* Library input without capture attribute for gallery access */}
+        <div>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+            id="library-input"
+          />
+          <Button asChild className="w-full" variant="outline">
+            <label htmlFor="library-input" className="cursor-pointer w-full">
+              Choose from Library
+            </label>
+          </Button>
+        </div>
+      </div>
 
       {/* Display EXIF metadata */}
       {/* DELETE LATER IN PRODUCTION */}
