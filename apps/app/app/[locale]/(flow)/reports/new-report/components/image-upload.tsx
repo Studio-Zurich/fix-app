@@ -3,7 +3,7 @@ import { reportStore, useLocationStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadReportImage } from "../actions";
 import StepContainer from "./step-container";
 interface ImageUploadProps {
@@ -28,6 +28,53 @@ const generateUniqueFilename = (originalFilename: string): string => {
   return `${timestamp}-${randomString}.${fileExtension}`;
 };
 
+// Function to get current location using browser geolocation API
+const getLocation = async (): Promise<GeolocationCoordinates | null> => {
+  // Check if geolocation is available in this browser
+  if (!navigator.geolocation) {
+    log("Geolocation is not supported by this browser");
+    return null;
+  }
+
+  try {
+    const position = await new Promise<GeolocationPosition>(
+      (resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          (error) => {
+            // Handle specific geolocation errors
+            if (error.code === 1) {
+              // PERMISSION_DENIED
+              log("Location permission denied by user"); // Changed from error to info log
+            } else if (error.code === 2) {
+              // POSITION_UNAVAILABLE
+              logError("Location information unavailable", {});
+            } else if (error.code === 3) {
+              // TIMEOUT
+              logError("Location request timed out", {});
+            } else {
+              logError("Unknown location error", {
+                code: error.code,
+                message: error.message,
+              });
+            }
+            reject(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          }
+        );
+      }
+    );
+    return position.coords;
+  } catch (err) {
+    // We've already logged the specific error in the reject handler
+    return null;
+  }
+};
+
 const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -36,6 +83,27 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const setDetectedLocation = useLocationStore(
     (state) => state.setDetectedLocation
   );
+
+  // Attempt to get location if exif data doesn't have it
+  useEffect(() => {
+    const checkLocation = async () => {
+      if (selectedFile && (!exifData?.latitude || !exifData?.longitude)) {
+        // Try to get current location when EXIF data doesn't have location
+        const coords = await getLocation();
+        if (coords) {
+          log("Location acquired from browser geolocation", {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          });
+          // Save the location to store
+          setDetectedLocation(coords.latitude, coords.longitude);
+        }
+        // No need for error handling here as errors are handled in getLocation
+      }
+    };
+
+    checkLocation();
+  }, [selectedFile, exifData, setDetectedLocation]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -149,10 +217,15 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         </Button>
       }
     >
+      {/* 
+        The capture="environment" attribute helps iOS Safari access the camera directly
+        and will trigger location permission requests on iOS.
+      */}
       <input
         type="file"
         onChange={handleFileChange}
         accept="image/*"
+        capture="environment"
         className="mb-4"
       />
 
