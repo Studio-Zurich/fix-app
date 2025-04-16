@@ -1,11 +1,21 @@
 "use client";
 import { log } from "@/lib/logger";
-import { reportStore, useLocationStore } from "@/lib/store";
+import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
 import { Crosshair, MapPin, Warning } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/alert-dialog";
 import {
   Command,
   CommandEmpty,
@@ -41,21 +51,36 @@ const Location = () => {
   const [isMoving, setIsMoving] = useState(false);
   const [isOutsideSwitzerland, setIsOutsideSwitzerland] = useState(false);
   const [updateSource, setUpdateSource] = useState<
-    "map" | "search" | "geolocation" | null
+    "map" | "search" | "geolocation" | "detected" | null
   >(null);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [initialLocationChecked, setInitialLocationChecked] = useState(false);
+  const [hasChosenDialogOption, setHasChosenDialogOption] = useState(false);
+
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
-  // Get detected location from location store
-  const detectedLocation = useLocationStore((state) => state.detectedLocation);
-
-  // Get setLocation function from store using direct method to avoid subscription issues
-  const setLocation = useCallback(
-    (location: { lat: number; lng: number; address: string }) => {
-      reportStore.getState().setLocation(location);
-    },
-    []
+  // Get data from the reportStore
+  const detectedLocation = reportStore(
+    (state) => state.image_step.detected_location
   );
+  const hasUsedAlertDialog = reportStore(
+    (state) => state.location_step.hasUsedAlertDialog
+  );
+  const savedLocation = reportStore(
+    (state) => state.location_step.set_location
+  );
+
+  // Get functions from reportStore
+  const setLocation = reportStore((state) => state.setLocation);
+  const setStep = (step: number) => reportStore.setState({ step });
+  const markAlertDialogUsed = () =>
+    reportStore.setState((state) => ({
+      location_step: {
+        ...state.location_step,
+        hasUsedAlertDialog: true,
+      },
+    }));
 
   // Check if coordinates are within Switzerland
   const isWithinSwitzerland = useCallback((lat: number, lng: number) => {
@@ -65,7 +90,11 @@ const Location = () => {
 
   // Update coordinates and check if they're within Switzerland
   const updateCoordinates = useCallback(
-    (lat: number, lng: number, source: "map" | "search" | "geolocation") => {
+    (
+      lat: number,
+      lng: number,
+      source: "map" | "search" | "geolocation" | "detected"
+    ) => {
       setCoordinates({ lat, lng });
       setUpdateSource(source);
       setIsOutsideSwitzerland(!isWithinSwitzerland(lat, lng));
@@ -73,34 +102,82 @@ const Location = () => {
     [isWithinSwitzerland]
   );
 
+  // Check for detected location and show dialog if needed
+  useEffect(() => {
+    if (
+      !initialLocationChecked &&
+      detectedLocation.latitude &&
+      detectedLocation.longitude &&
+      !hasUsedAlertDialog &&
+      !hasChosenDialogOption
+    ) {
+      // Show dialog only if we have detected location and haven't shown dialog before
+      setShowLocationDialog(true);
+      setInitialLocationChecked(true);
+    } else if (
+      !initialLocationChecked &&
+      savedLocation.latitude &&
+      savedLocation.longitude
+    ) {
+      // If we have a previously saved location, use it
+      setCoordinates({
+        lat: savedLocation.latitude,
+        lng: savedLocation.longitude,
+      });
+      setAddress(savedLocation.address);
+      setSearchValue(savedLocation.address);
+      setUpdateSource("detected");
+      setInitialLocationChecked(true);
+    } else {
+      setInitialLocationChecked(true);
+    }
+  }, [
+    detectedLocation,
+    hasUsedAlertDialog,
+    initialLocationChecked,
+    savedLocation,
+    hasChosenDialogOption,
+  ]);
+
+  // Handler for location dialog confirmation
+  const handleLocationConfirm = () => {
+    if (detectedLocation.latitude && detectedLocation.longitude) {
+      updateCoordinates(
+        detectedLocation.latitude,
+        detectedLocation.longitude,
+        "detected"
+      );
+      setAddress(detectedLocation.address);
+      setSearchValue(detectedLocation.address);
+    }
+    // Mark that user has made a choice in the dialog, but don't set the hasUsedAlertDialog flag yet
+    setHasChosenDialogOption(true);
+    setShowLocationDialog(false);
+  };
+
+  // Handler for location dialog rejection
+  const handleLocationReject = () => {
+    // Mark that user has made a choice in the dialog, but don't set the hasUsedAlertDialog flag yet
+    setHasChosenDialogOption(true);
+    setShowLocationDialog(false);
+  };
+
   // Initialize the map when the component mounts
   useEffect(() => {
     if (mapContainer.current && !map.current) {
-      // Use detected location from EXIF data if available, otherwise default to DEFAULT_LOCATION
-      const initialLng =
-        detectedLocation.longitude ?? DEFAULT_LOCATION.longitude;
-      const initialLat = detectedLocation.latitude ?? DEFAULT_LOCATION.latitude;
+      // Start with default location
+      const initialLng = DEFAULT_LOCATION.longitude;
+      const initialLat = DEFAULT_LOCATION.latitude;
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/streets-v12",
         center: [initialLng, initialLat],
-        zoom: detectedLocation.latitude
-          ? MAP_CONSTANTS.DEFAULT_ZOOM
-          : DEFAULT_LOCATION.zoom,
+        zoom: DEFAULT_LOCATION.zoom,
       });
 
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-      // Set initial coordinates if we have a detected location
-      if (detectedLocation.latitude && detectedLocation.longitude) {
-        setCoordinates({
-          lat: detectedLocation.latitude,
-          lng: detectedLocation.longitude,
-        });
-        log("Using detected location", detectedLocation);
-      }
 
       // Update coordinates when map moves
       map.current.on("movestart", () => {
@@ -148,9 +225,9 @@ const Location = () => {
         }
       };
     }
-  }, [detectedLocation, isWithinSwitzerland]);
+  }, [isWithinSwitzerland]);
 
-  // Update map when coordinates change from search or getting location, but not from map movement
+  // Update map when coordinates change from search, getting location, or detected location
   useEffect(() => {
     if (map.current && coordinates && updateSource !== "map") {
       map.current.flyTo({
@@ -164,6 +241,12 @@ const Location = () => {
   const handleNext = () => {
     // Only proceed if coordinates are set and within Switzerland
     if (coordinates && !isOutsideSwitzerland) {
+      // Mark the alert dialog as used when the user clicks Next
+      // This means they have committed to a location choice
+      if (hasChosenDialogOption) {
+        markAlertDialogUsed();
+      }
+
       // Save to store
       setLocation({
         lat: coordinates.lat,
@@ -173,13 +256,13 @@ const Location = () => {
       log("Location saved to store on Next click", { coordinates, address });
 
       // Go to incident type step
-      reportStore.setState({ step: 2 });
+      setStep(2);
     }
   };
 
   const handleBack = () => {
     // Just go back to the previous step without validating or saving data
-    reportStore.setState({ step: 0 });
+    setStep(0);
   };
 
   const handleSearch = async (value: string) => {
@@ -362,6 +445,31 @@ const Location = () => {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* AlertDialog for detected location */}
+      <AlertDialog
+        open={showLocationDialog}
+        onOpenChange={setShowLocationDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Use detected location?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We detected a location from your image. Would you like to use this
+              location?
+              {detectedLocation.address && detectedLocation.address}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleLocationReject}>
+              No, let me select location
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleLocationConfirm}>
+              Yes, use this location
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Hidden inputs to pass the location data to the form */}
       {coordinates && (

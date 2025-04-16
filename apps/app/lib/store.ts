@@ -46,6 +46,7 @@ interface ReportState {
       longitude: number | null;
       address: string;
     };
+    hasUsedAlertDialog: boolean;
   };
 
   // Actions
@@ -119,6 +120,7 @@ export const reportStore = create<ReportState>((set) => ({
       longitude: null,
       address: "",
     },
+    hasUsedAlertDialog: false,
   },
 
   // Actions
