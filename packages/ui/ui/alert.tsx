@@ -2,6 +2,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@repo/ui/lib/utils";
+import { TypographyH5 } from "./headline";
+import { TypographyParagraph } from "./text";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-base [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
@@ -36,9 +38,10 @@ const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <h5
+  <TypographyH5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    size="text-base"
+    className={cn("", className)}
     {...props}
   />
 ));
@@ -48,9 +51,10 @@ const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <div
+  <TypographyParagraph
+    size="text-sm"
     ref={ref}
-    className={cn("text-base [&_p]:leading-relaxed", className)}
+    className={cn("", className)}
     {...props}
   />
 ));

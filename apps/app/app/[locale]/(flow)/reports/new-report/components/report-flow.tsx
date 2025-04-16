@@ -3,7 +3,9 @@ import { log } from "@/lib/logger";
 import { reportStore, useLocationStore } from "@/lib/store";
 import { GearFine, PencilSimple } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
+import { TypographyH2, TypographyH3 } from "@repo/ui/headline";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
+import { TypographyParagraph } from "@repo/ui/text";
 import { useLocale } from "next-intl";
 import { useActionState, useEffect, useMemo } from "react";
 import { ActionState, submitReport } from "../actions";
@@ -118,193 +120,232 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
 
         {/* Step 6: Final submission/summary */}
         {step === 6 && (
-          <div className="flex-1 flex flex-col space-y-6 p-4 pb-[66px]">
-            {/* Hidden inputs for user data */}
-            <input
-              type="hidden"
-              name="reporter_first_name"
-              value={storeData.reporter_first_name}
-            />
-            <input
-              type="hidden"
-              name="reporter_last_name"
-              value={storeData.reporter_last_name}
-            />
-            <input
-              type="hidden"
-              name="reporter_email"
-              value={storeData.reporter_email}
-            />
-            <input
-              type="hidden"
-              name="reporter_phone"
-              value={storeData.reporter_phone}
-            />
-
-            {/* Hidden inputs for incident data */}
-            <input
-              type="hidden"
-              name="incident_type_id"
-              value={storeData.incident_type_id}
-            />
-            <input
-              type="hidden"
-              name="incident_subtype_id"
-              value={storeData.incident_subtype_id}
-            />
-            <input
-              type="hidden"
-              name="description"
-              value={storeData.description}
-            />
-
-            {/* Hidden inputs for location data */}
-            {storeData.location_lat !== null &&
-              storeData.location_lng !== null && (
-                <>
-                  <input
-                    type="hidden"
-                    name="location_lat"
-                    value={storeData.location_lat}
-                  />
-                  <input
-                    type="hidden"
-                    name="location_lng"
-                    value={storeData.location_lng}
-                  />
-                  <input
-                    type="hidden"
-                    name="location_address"
-                    value={storeData.location_address}
-                  />
-                </>
-              )}
-
-            {/* Hidden input for image filename */}
-            {storeData.imageUrl && (
+          <div className="flex-1 relative space-y-8 h-svh overflow-hidden flex flex-col px-[5vw] lg:px-6">
+            <div className="space-y-2 mt-4">
+              <TypographyH2>Summary</TypographyH2>
+              <TypographyParagraph className="text-muted-foreground">
+                Please review your report before submitting.
+              </TypographyParagraph>
+            </div>
+            <div className="flex-1 flex flex-col space-y-6 pb-[66px]">
+              {/* Hidden inputs for user data */}
               <input
                 type="hidden"
-                name="image-filename"
-                value={storeData.imageUrl.split("/").pop() || ""}
+                name="reporter_first_name"
+                value={storeData.reporter_first_name}
               />
-            )}
+              <input
+                type="hidden"
+                name="reporter_last_name"
+                value={storeData.reporter_last_name}
+              />
+              <input
+                type="hidden"
+                name="reporter_email"
+                value={storeData.reporter_email}
+              />
+              <input
+                type="hidden"
+                name="reporter_phone"
+                value={storeData.reporter_phone}
+              />
 
-            {/* Images Summary */}
-            {storeData.imageUrl && (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">Images</h4>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => reportStore.setState({ step: 0 })}
-                    className="h-8 w-8 p-0"
-                  >
-                    <PencilSimple className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  <div className="relative">
-                    <img
-                      src={storeData.imageUrl}
-                      alt="Report image"
-                      className="w-full h-32 object-cover rounded-lg"
+              {/* Hidden inputs for incident data */}
+              <input
+                type="hidden"
+                name="incident_type_id"
+                value={storeData.incident_type_id}
+              />
+              <input
+                type="hidden"
+                name="incident_subtype_id"
+                value={storeData.incident_subtype_id}
+              />
+              <input
+                type="hidden"
+                name="description"
+                value={storeData.description}
+              />
+
+              {/* Hidden inputs for location data */}
+              {storeData.location_lat !== null &&
+                storeData.location_lng !== null && (
+                  <>
+                    <input
+                      type="hidden"
+                      name="location_lat"
+                      value={storeData.location_lat}
                     />
+                    <input
+                      type="hidden"
+                      name="location_lng"
+                      value={storeData.location_lng}
+                    />
+                    <input
+                      type="hidden"
+                      name="location_address"
+                      value={storeData.location_address}
+                    />
+                  </>
+                )}
+
+              {/* Hidden input for image filename */}
+              {storeData.imageUrl && (
+                <input
+                  type="hidden"
+                  name="image-filename"
+                  value={storeData.imageUrl.split("/").pop() || ""}
+                />
+              )}
+
+              {/* Images Summary */}
+              {storeData.imageUrl && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <TypographyH3 size="text-lg">Images</TypographyH3>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => reportStore.setState({ step: 0 })}
+                      className="h-8 w-8 p-0"
+                    >
+                      <PencilSimple className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <div className="relative">
+                      <img
+                        src={storeData.imageUrl}
+                        alt="Report image"
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Location Summary */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium">Location</h4>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => reportStore.setState({ step: 1 })}
-                  className="h-8 w-8 p-0"
-                >
-                  <PencilSimple className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {storeData.location_address}
-              </p>
-            </div>
-
-            {/* Incident Type Summary */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium">Incident Type</h4>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => reportStore.setState({ step: 2 })}
-                  className="h-8 w-8 p-0"
-                >
-                  <PencilSimple className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                <p>{storeData.incident_type_name}</p>
-                {storeData.incident_subtype_name && (
-                  <p className="mt-1">{storeData.incident_subtype_name}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Description Summary */}
-            {storeData.description && (
+              {/* Location Summary */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <h4 className="font-medium">Incident Description</h4>
+                  <TypographyH3 size="text-lg">Location</TypographyH3>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => reportStore.setState({ step: 4 })}
+                    onClick={() => reportStore.setState({ step: 1 })}
                     className="h-8 w-8 p-0"
                   >
                     <PencilSimple className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {storeData.description}
-                </p>
-              </div>
-            )}
-
-            {/* User Data Summary */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium">Contact Info</h4>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => reportStore.setState({ step: 5 })}
-                  className="h-8 w-8 p-0"
+                <TypographyParagraph
+                  size="text-sm"
+                  className="text-muted-foreground"
                 >
-                  <PencilSimple className="h-4 w-4" />
+                  {storeData.location_address}
+                </TypographyParagraph>
+              </div>
+
+              {/* Incident Type Summary */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <TypographyH3 size="text-lg">Incident Type</TypographyH3>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => reportStore.setState({ step: 2 })}
+                    className="h-8 w-8 p-0"
+                  >
+                    <PencilSimple className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <TypographyParagraph
+                  size="text-sm"
+                  className="text-muted-foreground"
+                >
+                  {storeData.incident_type_name}
+                </TypographyParagraph>
+                {storeData.incident_subtype_name && (
+                  <TypographyParagraph
+                    size="text-sm"
+                    className="text-muted-foreground"
+                  >
+                    {storeData.incident_subtype_name}
+                  </TypographyParagraph>
+                )}
+              </div>
+
+              {/* Description Summary */}
+              {storeData.description && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <TypographyH3 size="text-lg">
+                      Incident Description
+                    </TypographyH3>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => reportStore.setState({ step: 4 })}
+                      className="h-8 w-8 p-0"
+                    >
+                      <PencilSimple className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <TypographyParagraph
+                    size="text-sm"
+                    className="text-muted-foreground line-clamp-3"
+                  >
+                    {storeData.description}
+                  </TypographyParagraph>
+                </div>
+              )}
+
+              {/* User Data Summary */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <TypographyH3 size="text-lg">Contact Info</TypographyH3>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => reportStore.setState({ step: 5 })}
+                    className="h-8 w-8 p-0"
+                  >
+                    <PencilSimple className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <TypographyParagraph
+                  size="text-sm"
+                  className="text-muted-foreground"
+                >
+                  {storeData.reporter_first_name} {storeData.reporter_last_name}
+                </TypographyParagraph>
+                <TypographyParagraph
+                  size="text-sm"
+                  className="text-muted-foreground"
+                >
+                  {storeData.reporter_email}
+                </TypographyParagraph>
+                {storeData.reporter_phone && (
+                  <TypographyParagraph
+                    size="text-sm"
+                    className="text-muted-foreground"
+                  >
+                    {storeData.reporter_phone}
+                  </TypographyParagraph>
+                )}
+              </div>
+
+              <div className="fixed bottom-0 w-full left-0 bg-white border-t py-3 px-4">
+                <Button type="submit" className="w-full" disabled={pending}>
+                  Submit
                 </Button>
               </div>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>
-                  {storeData.reporter_first_name} {storeData.reporter_last_name}
-                </p>
-                <p>{storeData.reporter_email}</p>
-                {storeData.reporter_phone && <p>{storeData.reporter_phone}</p>}
-              </div>
-            </div>
-
-            <div className="fixed bottom-0 w-full left-0 bg-white border-t py-3 px-4">
-              <Button type="submit" className="w-full" disabled={pending}>
-                Submit
-              </Button>
             </div>
           </div>
         )}

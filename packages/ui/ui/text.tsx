@@ -5,11 +5,11 @@ import * as React from "react";
 const textVariants = cva("", {
   variants: {
     weight: {
-      normal: "font-normal",
+      regular: "font-regular",
     },
   },
   defaultVariants: {
-    weight: "normal",
+    weight: "regular",
   },
 });
 

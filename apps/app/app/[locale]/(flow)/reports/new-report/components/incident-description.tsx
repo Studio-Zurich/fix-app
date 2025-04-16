@@ -4,6 +4,8 @@ import { incidentDescriptionSchema } from "@/lib/schemas";
 import { reportStore } from "@/lib/store";
 import { IncidentDescriptionProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
+import { TypographyH3 } from "@repo/ui/headline";
+import { TypographyParagraph } from "@repo/ui/text";
 import { Textarea } from "@repo/ui/textarea";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -113,10 +115,10 @@ const IncidentDescription = ({
         {incidentTypeName && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium">
+              <TypographyH3 size="text-base">
                 {incidentTypeName}
                 {incidentSubtypeName && <> – {incidentSubtypeName}</>}
-              </h3>
+              </TypographyH3>
             </div>
           </div>
         )}
@@ -129,19 +131,21 @@ const IncidentDescription = ({
             rows={6}
             className="resize-none"
           />
-          <div className="flex justify-between">
-            <div>
-              {/* Remove inline error since we're now using the StepContainer error prop */}
-            </div>
-            <p className="text-sm text-muted-foreground">
+          <div className="flex justify-end">
+            <TypographyParagraph
+              className="text-muted-foreground"
+              size="text-sm"
+            >
               {charactersLeft} characters left
-            </p>
+            </TypographyParagraph>
           </div>
         </div>
 
-        <div className="text-sm text-muted-foreground space-y-1">
-          <p>Guidelines:</p>
-          <ul className="list-disc list-inside pl-2">
+        <div className="space-y-1">
+          <TypographyParagraph className="text-muted-foreground">
+            Guidelines:
+          </TypographyParagraph>
+          <ul className="list-disc list-inside pl-2 text-sm text-muted-foreground">
             <li>Be specific about what you observed</li>
             <li>Do not include personal information</li>
             <li>Be respectful and professional</li>

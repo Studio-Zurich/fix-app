@@ -2,6 +2,7 @@
 import { log } from "@/lib/logger";
 import { reportStore } from "@/lib/store";
 import { IncidentTypeProps } from "@/lib/types";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
@@ -95,9 +96,7 @@ const IncidentType = ({
       error={validationError}
     >
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
-          glass
-        </span>
+        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Search incident types..."
           value={searchQuery}
@@ -106,7 +105,7 @@ const IncidentType = ({
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 pb-[66px] overflow-y-auto">
         {filteredTypes.map((type) => (
           <div
             key={type.id}
