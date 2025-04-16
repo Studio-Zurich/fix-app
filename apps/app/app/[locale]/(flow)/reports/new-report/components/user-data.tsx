@@ -1,24 +1,16 @@
+"use client";
 import { log } from "@/lib/logger";
 import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 const UserData = () => {
-  // Get setUserData function from store using direct method to avoid subscription issues
-  const setUserData = useCallback(
-    (data: {
-      reporter_first_name?: string;
-      reporter_last_name?: string;
-      reporter_email?: string;
-      reporter_phone?: string;
-    }) => {
-      reportStore.getState().setUserData(data);
-    },
-    []
-  );
+  // Get functions from reportStore
+  const setUserData = reportStore((state) => state.setUserData);
+  const setStep = (step: number) => reportStore.setState({ step });
 
   // Use local state for form values
   const [formData, setFormData] = useState({
@@ -27,6 +19,22 @@ const UserData = () => {
     reporter_email: "",
     reporter_phone: "",
   });
+
+  // Load user data from store when component mounts
+  useEffect(() => {
+    const state = reportStore.getState();
+    const userData = state.user_step;
+
+    if (userData) {
+      setFormData({
+        reporter_first_name: userData.reporter_first_name || "",
+        reporter_last_name: userData.reporter_last_name || "",
+        reporter_email: userData.reporter_email || "",
+        reporter_phone: userData.reporter_phone || "",
+      });
+      log("User data loaded from store", userData);
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,7 +49,7 @@ const UserData = () => {
 
   const handleBack = () => {
     // Just go back to the previous step without validating or saving data
-    reportStore.setState({ step: 4 });
+    setStep(4);
   };
 
   const handleNext = () => {
@@ -50,7 +58,7 @@ const UserData = () => {
     log("User data saved to store on Next click", formData);
 
     // Advance to final step (step 6)
-    reportStore.setState({ step: 6 });
+    setStep(6);
   };
 
   return (

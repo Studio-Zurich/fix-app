@@ -4,7 +4,7 @@ import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentTypeProps {
@@ -33,22 +33,24 @@ const IncidentType = ({
     name: string;
   } | null>(null);
 
-  // Get setIncidentType function from store using direct method to avoid subscription issues
-  const setIncidentType = useCallback((data: { id: string; name: string }) => {
-    reportStore.getState().setIncidentType(data);
-  }, []);
+  // Get functions from reportStore
+  const setIncidentType = reportStore((state) => state.setIncidentType);
+  const setStep = (step: number) => reportStore.setState({ step });
 
   // Load the selected type from store when component mounts
   useEffect(() => {
     const state = reportStore.getState();
-    if (state.incident_type_id) {
+    const incidentTypeId = state.incident_step.incident_type_id;
+    const incidentTypeName = state.incident_step.incident_type_name;
+
+    if (incidentTypeId && incidentTypeName) {
       setSelectedType({
-        id: state.incident_type_id,
-        name: state.incident_type_name,
+        id: incidentTypeId,
+        name: incidentTypeName,
       });
       log("Loaded selected incident type from store", {
-        id: state.incident_type_id,
-        name: state.incident_type_name,
+        id: incidentTypeId,
+        name: incidentTypeName,
       });
     }
   }, []);
@@ -65,7 +67,7 @@ const IncidentType = ({
 
   const handleBack = () => {
     // Just go back to the previous step without validating or saving data
-    reportStore.setState({ step: 1 });
+    setStep(1);
   };
 
   const handleNext = () => {
@@ -81,7 +83,7 @@ const IncidentType = ({
       );
 
       // Skip to description step (4) if there are no subtypes, otherwise go to subtype step (3)
-      reportStore.setState({ step: hasSubtypes ? 3 : 4 });
+      setStep(hasSubtypes ? 3 : 4);
       log(`Going to ${hasSubtypes ? "subtype" : "description"} step`);
     }
   };

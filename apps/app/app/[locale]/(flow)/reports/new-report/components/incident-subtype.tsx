@@ -4,7 +4,7 @@ import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentSubtypeProps {
@@ -24,55 +24,39 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     name: string;
   } | null>(null);
 
-  // Get setIncidentSubtype function from store using direct method to avoid subscription issues
-  const setIncidentSubtype = useCallback(
-    (data: { id: string; name: string }) => {
-      reportStore.getState().setIncidentSubtype(data);
-    },
-    []
+  // Get functions from reportStore
+  const setIncidentSubtype = reportStore((state) => state.setIncidentSubtype);
+  const setStep = (step: number) => reportStore.setState({ step });
+
+  // Load the selected incident type and subtype from store when component mounts
+  useEffect(() => {
+    const state = reportStore.getState();
+    const incidentSubtypeId = state.incident_step.incident_subtype_id;
+    const incidentSubtypeName = state.incident_step.incident_subtype_name;
+
+    if (incidentSubtypeId && incidentSubtypeName) {
+      setSelectedSubtype({
+        id: incidentSubtypeId,
+        name: incidentSubtypeName,
+      });
+      log("Loaded selected incident subtype from store", {
+        id: incidentSubtypeId,
+        name: incidentSubtypeName,
+      });
+    }
+  }, []);
+
+  // Get the selected incident type from store
+  const selectedIncidentTypeId = reportStore(
+    (state) => state.incident_step.incident_type_id
   );
 
-  // Get selected type ID from store
-  const [selectedTypeId, setSelectedTypeId] = useState<string>("");
-
-  // Load the selected type from store
-  useEffect(() => {
-    const state = reportStore.getState();
-    if (state.incident_type_id) {
-      setSelectedTypeId(state.incident_type_id);
-      log("Selected incident type ID loaded from store", {
-        typeId: state.incident_type_id,
-        typeName: state.incident_type_name,
-      });
-    }
-  }, []);
-
-  // Load the selected subtype from store
-  useEffect(() => {
-    const state = reportStore.getState();
-    if (state.incident_subtype_id) {
-      setSelectedSubtype({
-        id: state.incident_subtype_id,
-        name: state.incident_subtype_name,
-      });
-      log("Selected incident subtype loaded from store", {
-        id: state.incident_subtype_id,
-        name: state.incident_subtype_name,
-      });
-    }
-  }, []);
-
-  // Filter subtypes based on search query and selected incident type
-  const filteredSubtypes = useMemo(() => {
-    return incidentSubtypes.filter((subtype) => {
-      const matchesSearch = subtype.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesType =
-        !selectedTypeId || subtype.incident_type_id === selectedTypeId;
-      return matchesSearch && matchesType;
-    });
-  }, [incidentSubtypes, searchQuery, selectedTypeId]);
+  // Filter subtypes based on the selected incident type and search query
+  const filteredSubtypes = incidentSubtypes.filter(
+    (subtype) =>
+      subtype.incident_type_id === selectedIncidentTypeId &&
+      subtype.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSelect = (subtype: { id: string; name: string }) => {
     setSelectedSubtype(subtype);
@@ -80,8 +64,8 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
   };
 
   const handleBack = () => {
-    // Just go back to the previous step without validating or saving data
-    reportStore.setState({ step: 2 });
+    // Go back to the incident type step
+    setStep(2);
   };
 
   const handleNext = () => {
@@ -91,8 +75,8 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
       setIncidentSubtype(selectedSubtype);
       log("Incident subtype saved to store on Next click", selectedSubtype);
 
-      // Go to description step
-      reportStore.setState({ step: 4 });
+      // Move to the description step
+      setStep(4);
     }
   };
 
@@ -109,84 +93,69 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
         </Button>
       }
     >
-      <div className="space-y-4">
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
-            glass
-          </span>
-          <Input
-            placeholder="Search incident subtypes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
-        {selectedTypeId ? (
-          <div className="space-y-2">
-            {filteredSubtypes.length > 0 ? (
-              filteredSubtypes.map((subtype) => (
-                <div
-                  key={subtype.id}
-                  className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleSelect(subtype);
-                  }}
-                >
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      id={subtype.id}
-                      checked={selectedSubtype?.id === subtype.id}
-                      onCheckedChange={() => handleSelect(subtype)}
-                      className="w-6 h-6"
-                    />
-                  </div>
-                  <div
-                    className="flex-1"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleSelect(subtype);
-                    }}
-                  >
-                    <label
-                      htmlFor={subtype.id}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      {subtype.name}
-                    </label>
-                    {subtype.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {subtype.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                No subtypes found. Please select an incident type first or try a
-                different search.
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="p-4 text-center text-muted-foreground">
-            Please select an incident type first.
-          </div>
-        )}
-
-        {/* Hidden input to pass the selected incident subtype to the form */}
-        {selectedSubtype && (
-          <input
-            type="hidden"
-            name="incident_subtype_id"
-            value={selectedSubtype.id}
-          />
-        )}
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">
+          glass
+        </span>
+        <Input
+          placeholder="Search incident subtypes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
       </div>
+
+      <div className="space-y-2">
+        {filteredSubtypes.map((subtype) => (
+          <div
+            key={subtype.id}
+            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSelect(subtype);
+            }}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                id={subtype.id}
+                checked={selectedSubtype?.id === subtype.id}
+                onCheckedChange={() => handleSelect(subtype)}
+                className="w-6 h-6"
+              />
+            </div>
+            <div
+              className="flex-1"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelect(subtype);
+              }}
+            >
+              <label
+                htmlFor={subtype.id}
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {subtype.name}
+              </label>
+              {subtype.description && (
+                <p className="text-sm text-muted-foreground">
+                  {subtype.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Hidden input to pass the selected incident subtype to the form */}
+      {selectedSubtype && (
+        <input
+          type="hidden"
+          name="incident_subtype_id"
+          value={selectedSubtype.id}
+        />
+      )}
     </StepContainer>
   );
 };

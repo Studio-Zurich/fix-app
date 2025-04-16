@@ -3,16 +3,11 @@ import { log } from "@/lib/logger";
 import { reportStore } from "@/lib/store";
 import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 interface IncidentDescriptionProps {
   maxCharacters?: number;
-}
-
-interface SelectedTypeInfo {
-  type: { id: string; name: string };
-  subtype?: { id: string; name: string };
 }
 
 const IncidentDescription = ({
@@ -21,47 +16,18 @@ const IncidentDescription = ({
   const [description, setDescription] = useState("");
   const [charactersLeft, setCharactersLeft] = useState(maxCharacters);
 
-  // Get setDescription function from store using direct method to avoid subscription issues
-  const setStoreDescription = useCallback((desc: string) => {
-    reportStore.getState().setDescription(desc);
-  }, []);
-
-  const [selectedType, setSelectedType] = useState<SelectedTypeInfo | null>(
-    null
-  );
-
-  // Load the selected type and subtype from store
-  useEffect(() => {
-    const state = reportStore.getState();
-    if (state.incident_type_id) {
-      const newSelectedType: SelectedTypeInfo = {
-        type: {
-          id: state.incident_type_id,
-          name: state.incident_type_name,
-        },
-      };
-
-      if (state.incident_subtype_id) {
-        newSelectedType.subtype = {
-          id: state.incident_subtype_id,
-          name: state.incident_subtype_name,
-        };
-      }
-
-      setSelectedType(newSelectedType);
-      log(
-        "Selected incident type and subtype loaded from store",
-        newSelectedType
-      );
-    }
-  }, []);
+  // Get functions from reportStore
+  const setStoreDescription = reportStore((state) => state.setDescription);
+  const setStep = (step: number) => reportStore.setState({ step });
 
   // Load the description from store when component mounts
   useEffect(() => {
     const state = reportStore.getState();
-    if (state.description) {
-      setDescription(state.description);
-      log("Description loaded from store", { description: state.description });
+    const storeDescription = state.incident_step.description;
+
+    if (storeDescription) {
+      setDescription(storeDescription);
+      log("Description loaded from store", { description: storeDescription });
     }
   }, []);
 
@@ -83,10 +49,10 @@ const IncidentDescription = ({
   const handleBack = () => {
     // Check if we had a subtype selected to determine which step to go back to
     const state = reportStore.getState();
-    const previousStep = state.incident_subtype_id ? 3 : 2;
+    const previousStep = state.incident_step.incident_subtype_id ? 3 : 2;
 
     // Just go back to the previous step without validating or saving data
-    reportStore.setState({ step: previousStep });
+    setStep(previousStep);
   };
 
   const handleNext = () => {
@@ -95,8 +61,16 @@ const IncidentDescription = ({
     log("Description saved to store on Next click", { description });
 
     // Go to user data step (step 5)
-    reportStore.setState({ step: 5 });
+    setStep(5);
   };
+
+  // Get the selected incident type and subtype from store
+  const incidentTypeName = reportStore(
+    (state) => state.incident_step.incident_type_name
+  );
+  const incidentSubtypeName = reportStore(
+    (state) => state.incident_step.incident_subtype_name
+  );
 
   return (
     <StepContainer
@@ -112,12 +86,12 @@ const IncidentDescription = ({
       }
     >
       <div className="space-y-4 flex-1">
-        {selectedType && (
+        {incidentTypeName && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="font-medium">
-                {selectedType.type.name}
-                {selectedType.subtype && <> – {selectedType.subtype.name}</>}
+                {incidentTypeName}
+                {incidentSubtypeName && <> – {incidentSubtypeName}</>}
               </h3>
             </div>
           </div>
