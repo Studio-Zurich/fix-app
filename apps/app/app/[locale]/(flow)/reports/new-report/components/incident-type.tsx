@@ -1,27 +1,12 @@
 "use client";
 import { log } from "@/lib/logger";
 import { reportStore } from "@/lib/store";
+import { IncidentTypeProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
 import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
-
-interface IncidentTypeProps {
-  incidentTypes: Array<{
-    id: string;
-    name: string;
-    description: string;
-    active: boolean;
-  }>;
-  incidentSubtypes?: Array<{
-    id: string;
-    name: string;
-    description: string;
-    active: boolean;
-    incident_type_id: string;
-  }>;
-}
 
 const IncidentType = ({
   incidentTypes,

@@ -33,3 +33,41 @@ export interface UploadResult {
 export interface ImageUploadProps {
   onImageSelected?: (file: File) => void;
 }
+
+// Component Props Interfaces
+export interface IncidentTypeProps {
+  incidentTypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+  }>;
+  incidentSubtypes?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+    incident_type_id: string;
+  }>;
+}
+
+export interface IncidentSubtypeProps {
+  incidentSubtypes: Array<{
+    id: string;
+    name: string;
+    description: string;
+    active: boolean;
+    incident_type_id: string;
+  }>;
+}
+
+export interface IncidentDescriptionProps {
+  maxCharacters?: number;
+}
+
+export interface UserDataFormFields {
+  reporter_first_name: string;
+  reporter_last_name: string;
+  reporter_email: string;
+  reporter_phone: string;
+}

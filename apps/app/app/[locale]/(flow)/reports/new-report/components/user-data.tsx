@@ -1,10 +1,13 @@
 "use client";
 import { log } from "@/lib/logger";
+import { userDataSchema } from "@/lib/schemas";
 import { reportStore } from "@/lib/store";
+import { UserDataFormFields } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import StepContainer from "./step-container";
 
 const UserData = () => {
@@ -12,13 +15,17 @@ const UserData = () => {
   const setUserData = reportStore((state) => state.setUserData);
   const setStep = (step: number) => reportStore.setState({ step });
 
-  // Use local state for form values
-  const [formData, setFormData] = useState({
+  // Use local state for form values and validation errors
+  const [formData, setFormData] = useState<UserDataFormFields>({
     reporter_first_name: "",
     reporter_last_name: "",
     reporter_email: "",
     reporter_phone: "",
   });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof UserDataFormFields, string>>
+  >({});
 
   // Load user data from store when component mounts
   useEffect(() => {
@@ -45,6 +52,33 @@ const UserData = () => {
       ...formData,
       [name]: value,
     });
+
+    // Clear error for this field when user types
+    if (errors[name as keyof UserDataFormFields]) {
+      setErrors({
+        ...errors,
+        [name]: undefined,
+      });
+    }
+  };
+
+  const validateForm = (): boolean => {
+    try {
+      userDataSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Partial<Record<keyof UserDataFormFields, string>> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0] as keyof UserDataFormFields] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
   };
 
   const handleBack = () => {
@@ -53,6 +87,11 @@ const UserData = () => {
   };
 
   const handleNext = () => {
+    // Validate form before proceeding
+    if (!validateForm()) {
+      return;
+    }
+
     // Save all form data to store when Next is clicked
     setUserData(formData);
     log("User data saved to store on Next click", formData);
@@ -84,7 +123,13 @@ const UserData = () => {
             required
             value={formData.reporter_first_name}
             onChange={handleInputChange}
+            aria-invalid={!!errors.reporter_first_name}
           />
+          {errors.reporter_first_name && (
+            <p className="text-sm text-destructive">
+              {errors.reporter_first_name}
+            </p>
+          )}
         </div>
 
         <div className="grid gap-1.5">
@@ -96,7 +141,13 @@ const UserData = () => {
             required
             value={formData.reporter_last_name}
             onChange={handleInputChange}
+            aria-invalid={!!errors.reporter_last_name}
           />
+          {errors.reporter_last_name && (
+            <p className="text-sm text-destructive">
+              {errors.reporter_last_name}
+            </p>
+          )}
         </div>
 
         <div className="grid gap-1.5">
@@ -108,7 +159,11 @@ const UserData = () => {
             required
             value={formData.reporter_email}
             onChange={handleInputChange}
+            aria-invalid={!!errors.reporter_email}
           />
+          {errors.reporter_email && (
+            <p className="text-sm text-destructive">{errors.reporter_email}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -119,7 +174,11 @@ const UserData = () => {
             name="reporter_phone"
             value={formData.reporter_phone}
             onChange={handleInputChange}
+            aria-invalid={!!errors.reporter_phone}
           />
+          {errors.reporter_phone && (
+            <p className="text-sm text-destructive">{errors.reporter_phone}</p>
+          )}
         </div>
       </div>
     </StepContainer>

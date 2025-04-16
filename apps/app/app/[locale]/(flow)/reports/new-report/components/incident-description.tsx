@@ -1,20 +1,20 @@
 "use client";
 import { log } from "@/lib/logger";
+import { incidentDescriptionSchema } from "@/lib/schemas";
 import { reportStore } from "@/lib/store";
+import { IncidentDescriptionProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Textarea } from "@repo/ui/textarea";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import StepContainer from "./step-container";
-
-interface IncidentDescriptionProps {
-  maxCharacters?: number;
-}
 
 const IncidentDescription = ({
   maxCharacters = 500,
 }: IncidentDescriptionProps) => {
   const [description, setDescription] = useState("");
   const [charactersLeft, setCharactersLeft] = useState(maxCharacters);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Get functions from reportStore
   const setStoreDescription = reportStore((state) => state.setDescription);
@@ -42,7 +42,23 @@ const IncidentDescription = ({
     const newDescription = e.target.value;
     if (newDescription.length <= maxCharacters) {
       setDescription(newDescription);
+      setValidationError(null);
       log("Description updated", { length: newDescription.length });
+    }
+  };
+
+  const validateDescription = (): boolean => {
+    try {
+      incidentDescriptionSchema.parse({ description });
+      setValidationError(null);
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setValidationError(error.errors[0].message);
+      } else {
+        setValidationError("An unknown error occurred");
+      }
+      return false;
     }
   };
 
@@ -56,6 +72,11 @@ const IncidentDescription = ({
   };
 
   const handleNext = () => {
+    // Validate description before proceeding
+    if (!validateDescription()) {
+      return;
+    }
+
     // Save description to store
     setStoreDescription(description);
     log("Description saved to store on Next click", { description });
@@ -105,9 +126,16 @@ const IncidentDescription = ({
             rows={6}
             className="resize-none"
           />
-          <p className="text-sm text-muted-foreground text-right">
-            {charactersLeft} characters left
-          </p>
+          <div className="flex justify-between">
+            <div>
+              {validationError && (
+                <p className="text-sm text-destructive">{validationError}</p>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {charactersLeft} characters left
+            </p>
+          </div>
         </div>
 
         <div className="text-sm text-muted-foreground space-y-1">

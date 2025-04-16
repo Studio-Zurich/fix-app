@@ -1,3 +1,6 @@
+import { WarningCircle } from "@phosphor-icons/react";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/alert";
+
 const StepContainer = ({
   children,
   prevButton,
@@ -9,6 +12,14 @@ const StepContainer = ({
 }) => {
   return (
     <div className="flex-1 bg-blue-400 pb-[66px]">
+      <Alert variant="destructive">
+        <WarningCircle size={20} />
+        <AlertTitle>Heads up!</AlertTitle>
+        <AlertDescription>
+          You can add components and dependencies to your app using the cli.
+        </AlertDescription>
+      </Alert>
+
       {children}
       <div className="fixed bottom-0 w-full bg-pink-400 h-min">
         <div
