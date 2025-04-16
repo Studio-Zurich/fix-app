@@ -1,24 +1,15 @@
+import { GEOLOCATION_CONSTANTS, IMAGE_CONSTANTS } from "@/lib/constants";
 import { log, logError, logSuccess } from "@/lib/logger";
-import { reportStore, useLocationStore } from "@/lib/store";
+import { imageUploadSchema } from "@/lib/schemas";
+import { reportStore } from "@/lib/store";
+import { ExifData, ImageUploadProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { uploadReportImage } from "../actions";
 import StepContainer from "./step-container";
-interface ImageUploadProps {
-  onImageSelected?: (file: File) => void;
-}
-
-// Interface for EXIF data
-interface ExifData {
-  latitude?: number;
-  longitude?: number;
-  DateTimeOriginal?: string;
-  Make?: string;
-  Model?: string;
-  [key: string]: string | number | undefined; // For other potential EXIF properties
-}
 
 // Function to generate a unique filename
 const generateUniqueFilename = (originalFilename: string): string => {
@@ -34,16 +25,51 @@ const getLocation = async (): Promise<GeolocationCoordinates | null> => {
     const position = await new Promise<GeolocationPosition>(
       (resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
+          enableHighAccuracy: GEOLOCATION_CONSTANTS.ENABLE_HIGH_ACCURACY,
+          timeout: GEOLOCATION_CONSTANTS.TIMEOUT,
+          maximumAge: GEOLOCATION_CONSTANTS.MAXIMUM_AGE,
         });
       }
     );
     return position.coords;
   } catch (err) {
-    logError("Error getting location", { error: String(err) });
+    // Don't log this as an error since it's expected behavior when geolocation is denied or unavailable
+    log("Geolocation not available", { reason: String(err) });
     return null;
+  }
+};
+
+// Function to get address from coordinates using reverse geocoding
+const getAddressFromCoordinates = async (
+  latitude: number,
+  longitude: number
+): Promise<string> => {
+  try {
+    // Use Nominatim OpenStreetMap API for reverse geocoding
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+      {
+        headers: {
+          "Accept-Language": "en", // Request English results
+          "User-Agent": "Report-App", // Identify your application
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data && data.display_name) {
+      return data.display_name;
+    } else {
+      return "Unknown location";
+    }
+  } catch (error) {
+    logError("Error getting address from coordinates", error);
+    return "Address lookup failed";
   }
 };
 
@@ -61,9 +87,12 @@ const readImageLocation = async (
         longitude: exif.longitude,
       };
     }
+    // This is normal behavior for images without location data
+    log("No location data found in image");
     return null;
   } catch (error) {
-    logError("Error reading image location", error);
+    // Only log actual parsing errors as errors
+    logError("Error parsing EXIF data", error);
     return null;
   }
 };
@@ -73,9 +102,89 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
   const [exifData, setExifData] = useState<ExifData | null>(null);
-  const setDetectedLocation = useLocationStore(
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [locationSource, setLocationSource] = useState<
+    "image" | "browser" | "store" | null
+  >(null);
+  const [detectedLocation, setDetectedLocation] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+    address: string;
+  }>({
+    latitude: null,
+    longitude: null,
+    address: "",
+  });
+  const [previouslyUploaded, setPreviouslyUploaded] = useState(false);
+
+  // Access store
+  const storeImageUrl = reportStore((state) => state.image_step.imageUrl);
+  const storeDetectedLocation = reportStore(
+    (state) => state.image_step.detected_location
+  );
+  const setImageUrl = reportStore((state) => state.setImageUrl);
+  const setReportDetectedLocation = reportStore(
     (state) => state.setDetectedLocation
   );
+  const setStep = (step: number) => reportStore.setState({ step });
+
+  // Check for existing data in store when component mounts
+  useEffect(() => {
+    if (storeImageUrl) {
+      log("Found previously uploaded image in store", { url: storeImageUrl });
+      setPreviouslyUploaded(true);
+
+      // Extract filename from URL to display in UI
+      const filename = storeImageUrl.split("/").pop() || "";
+      setUploadedFilename(filename);
+
+      // If we have location data in the store, use it
+      if (
+        storeDetectedLocation &&
+        storeDetectedLocation.latitude !== null &&
+        storeDetectedLocation.longitude !== null
+      ) {
+        log("Found location data in store", storeDetectedLocation);
+        setDetectedLocation({
+          latitude: storeDetectedLocation.latitude,
+          longitude: storeDetectedLocation.longitude,
+          address: storeDetectedLocation.address || "",
+        });
+        setLocationSource("store");
+      }
+    }
+  }, [storeImageUrl, storeDetectedLocation]);
+
+  // Fetch address when coordinates change (only if no address already)
+  useEffect(() => {
+    const fetchAddress = async () => {
+      if (
+        detectedLocation.latitude &&
+        detectedLocation.longitude &&
+        !detectedLocation.address
+      ) {
+        try {
+          const address = await getAddressFromCoordinates(
+            detectedLocation.latitude,
+            detectedLocation.longitude
+          );
+          log("Address fetched", { address });
+          setDetectedLocation((prev) => ({
+            ...prev,
+            address,
+          }));
+        } catch (error) {
+          logError("Error fetching address", error);
+        }
+      }
+    };
+
+    fetchAddress();
+  }, [
+    detectedLocation.latitude,
+    detectedLocation.longitude,
+    detectedLocation.address,
+  ]);
 
   // Check for location when file changes
   useEffect(() => {
@@ -87,7 +196,12 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           if (location) {
             log("Location found in image", location);
             setExifData((prev) => ({ ...prev, ...location }));
-            setDetectedLocation(location.latitude, location.longitude);
+            setDetectedLocation({
+              latitude: location.latitude,
+              longitude: location.longitude,
+              address: "", // Will be populated by the address effect
+            });
+            setLocationSource("image");
           } else {
             // If no EXIF location, try to get current location
             const coords = await getLocation();
@@ -100,35 +214,70 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
                 ...prev,
                 latitude: coords.latitude,
                 longitude: coords.longitude,
-                source: "browser",
               }));
-              setDetectedLocation(coords.latitude, coords.longitude);
+              setDetectedLocation({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                address: "", // Will be populated by the address effect
+              });
+              setLocationSource("browser");
+            } else {
+              log("No location available from image or browser");
+              setLocationSource(null);
             }
           }
         } catch (error) {
-          logError("Error checking location", error);
+          logError("Unexpected error checking location", error);
+          setLocationSource(null);
         }
       }
     };
 
     checkLocation();
-  }, [selectedFile, setDetectedLocation]);
+  }, [selectedFile]);
+
+  const validateFile = (file: File): string | null => {
+    try {
+      imageUploadSchema.parse({ image: file });
+      return null;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return error.errors[0].message;
+      }
+      return "Invalid file";
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validationResult = validateFile(file);
+      if (validationResult) {
+        setValidationError(validationResult);
+        return;
+      }
+
+      setValidationError(null);
       log("File selected", {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
       });
+
+      // Reset previous image info
+      setPreviouslyUploaded(false);
       setSelectedFile(file);
 
       // Extract general EXIF data for display
       try {
         const exif = await exifr.parse(file);
-        log("EXIF data extracted", { exif });
-        setExifData(exif);
+        if (exif) {
+          log("EXIF data extracted", { exif });
+          setExifData(exif);
+        } else {
+          log("No EXIF data found in image");
+          setExifData(null);
+        }
       } catch (error) {
         logError("Error extracting EXIF data", error);
         setExifData(null);
@@ -141,35 +290,44 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   };
 
   const handleNext = async () => {
+    // If using previously uploaded image, just move to the next step
+    if (previouslyUploaded && storeImageUrl) {
+      log("Using previously uploaded image, skipping upload", {
+        url: storeImageUrl,
+      });
+      setStep(1);
+      return;
+    }
+
     // If no image is selected, just move to the next step without uploading
     if (!selectedFile) {
-      reportStore.setState({
-        step: 1,
-        imageUrl: null, // Make sure imageUrl is explicitly null when skipping
-      });
+      setStep(1);
+      setImageUrl("");
       return;
     }
 
     try {
       setIsProcessing(true);
-      log("Starting image processing", { fileName: selectedFile.name });
+      log("Starting image processing", {
+        fileName: selectedFile?.name || "unknown",
+      });
 
       // Compress the image using browser-image-compression
-      const compressedFile = await imageCompression(selectedFile, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
+      const compressedFile = await imageCompression(selectedFile!, {
+        maxSizeMB: IMAGE_CONSTANTS.COMPRESSION.MAX_SIZE_MB,
+        maxWidthOrHeight: IMAGE_CONSTANTS.COMPRESSION.MAX_WIDTH_OR_HEIGHT,
+        useWebWorker: IMAGE_CONSTANTS.COMPRESSION.USE_WEB_WORKER,
       });
 
       log("Image compressed", {
-        originalSize: selectedFile.size,
+        originalSize: selectedFile!.size,
         compressedSize: compressedFile.size,
         compressionRatio:
-          ((compressedFile.size / selectedFile.size) * 100).toFixed(2) + "%",
+          ((compressedFile.size / selectedFile!.size) * 100).toFixed(2) + "%",
       });
 
       // Generate a unique filename
-      const uniqueFilename = generateUniqueFilename(selectedFile.name);
+      const uniqueFilename = generateUniqueFilename(selectedFile!.name);
       log("Generated unique filename", { uniqueFilename });
 
       // Create a new File object with the unique filename
@@ -184,22 +342,39 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
       // Call the server action to upload the image
       const result = await uploadReportImage(formData);
 
-      if (result.filename) {
+      if (result.filename && result.url) {
         logSuccess("Image uploaded successfully", {
           filename: result.filename,
         });
         setUploadedFilename(result.filename);
 
-        // Use a direct update to avoid potential rerender issues
-        reportStore.setState({
-          step: 1,
-          imageUrl: result.url,
-        });
+        // Save the detected location to the report store if available
+        if (
+          detectedLocation.latitude !== null &&
+          detectedLocation.longitude !== null
+        ) {
+          log("Saving detected location to report store", detectedLocation);
+          setReportDetectedLocation({
+            latitude: detectedLocation.latitude,
+            longitude: detectedLocation.longitude,
+            address:
+              detectedLocation.address ||
+              (locationSource === "image"
+                ? "Location from image"
+                : "Current location"),
+          });
+        }
+
+        // Update the store with the image URL and move to next step
+        setImageUrl(result.url);
+        setStep(1);
       } else if (result.error) {
         logError("Image upload failed", result.error);
+        setValidationError(result.error);
       }
     } catch (error) {
       logError("Error processing image", error);
+      setValidationError("Error processing image");
     } finally {
       setIsProcessing(false);
     }
@@ -211,8 +386,8 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         <Button type="button" onClick={handleNext} disabled={isProcessing}>
           {isProcessing
             ? "Processing..."
-            : selectedFile
-              ? "Verify"
+            : previouslyUploaded || selectedFile
+              ? "Continue"
               : "Skip Upload"}
         </Button>
       }
@@ -223,14 +398,14 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           <input
             type="file"
             onChange={handleFileChange}
-            accept="image/*"
+            accept={IMAGE_CONSTANTS.ALLOWED_TYPES.join(",")}
             capture="environment"
             className="hidden"
             id="camera-input"
           />
           <Button asChild className="w-full">
             <label htmlFor="camera-input" className="cursor-pointer w-full">
-              Take Photo
+              {previouslyUploaded ? "Take New Photo" : "Take Photo"}
             </label>
           </Button>
         </div>
@@ -240,17 +415,45 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           <input
             type="file"
             onChange={handleFileChange}
-            accept="image/*"
+            accept={IMAGE_CONSTANTS.ALLOWED_TYPES.join(",")}
             className="hidden"
             id="library-input"
           />
           <Button asChild className="w-full" variant="outline">
             <label htmlFor="library-input" className="cursor-pointer w-full">
-              Choose from Library
+              {previouslyUploaded ? "Choose New Image" : "Choose from Library"}
             </label>
           </Button>
         </div>
       </div>
+
+      {/* Validation error message */}
+      {validationError && (
+        <div className="mt-2 text-red-500 text-sm">{validationError}</div>
+      )}
+
+      {/* Display previously uploaded image */}
+      {previouslyUploaded && storeImageUrl && !selectedFile && (
+        <div className="mt-4 p-4 border rounded-md bg-gray-50">
+          <h3 className="text-lg font-medium mb-2">Current Image</h3>
+          <div className="relative">
+            <img
+              src={storeImageUrl}
+              alt="Uploaded image"
+              className="w-full h-48 object-cover rounded-md mb-2"
+            />
+          </div>
+          {uploadedFilename && (
+            <p className="text-sm text-gray-600">File: {uploadedFilename}</p>
+          )}
+          {locationSource === "store" && detectedLocation.address && (
+            <div className="mt-2 text-sm text-gray-500">
+              <p>Location information available</p>
+              <p className="mt-1 italic">{detectedLocation.address}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Display selected file if any */}
       {selectedFile && (
@@ -260,6 +463,19 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
             {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)}{" "}
             MB)
           </p>
+          {locationSource && locationSource !== "store" && (
+            <div className="mt-1 text-sm text-gray-500">
+              <p>
+                Location:{" "}
+                {locationSource === "image"
+                  ? "From image metadata"
+                  : "Using current location"}
+              </p>
+              {detectedLocation.address && (
+                <p className="mt-1 italic">{detectedLocation.address}</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -274,8 +490,13 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
               <h4 className="font-medium">Location:</h4>
               <p>Latitude: {exifData.latitude}</p>
               <p>Longitude: {exifData.longitude}</p>
-              {exifData.source === "browser" && (
+              {locationSource === "browser" && (
                 <p className="text-sm">(from browser location)</p>
+              )}
+              {detectedLocation.address && (
+                <p className="text-sm mt-1">
+                  Address: {detectedLocation.address}
+                </p>
               )}
             </div>
           ) : (

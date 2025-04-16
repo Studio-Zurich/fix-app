@@ -11,20 +11,50 @@ interface LocationState {
 
 interface ReportState {
   step: number;
-  imageUrl: string | null;
-  reporter_first_name: string;
-  reporter_last_name: string;
-  reporter_email: string;
-  reporter_phone: string;
-  incident_type_id: string;
-  incident_type_name: string;
-  incident_subtype_id: string;
-  incident_subtype_name: string;
-  description: string;
-  location_lat: number | null;
-  location_lng: number | null;
-  location_address: string;
+
+  // Step 1: Image Upload
+  image_step: {
+    imageUrl: string | null;
+    detected_location: {
+      latitude: number | null;
+      longitude: number | null;
+      address: string;
+    };
+  };
+
+  // Step 2: User Information
+  user_step: {
+    reporter_first_name: string;
+    reporter_last_name: string;
+    reporter_email: string;
+    reporter_phone: string;
+  };
+
+  // Step 3: Incident Information
+  incident_step: {
+    incident_type_id: string;
+    incident_type_name: string;
+    incident_subtype_id: string;
+    incident_subtype_name: string;
+    description: string;
+  };
+
+  // Step 4: Location Information
+  location_step: {
+    set_location: {
+      latitude: number | null;
+      longitude: number | null;
+      address: string;
+    };
+  };
+
+  // Actions
   setImageUrl: (url: string) => void;
+  setDetectedLocation: (location: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  }) => void;
   setUserData: (userData: {
     reporter_first_name?: string;
     reporter_last_name?: string;
@@ -54,36 +84,116 @@ export const useLocationStore = create<LocationState>((set) => ({
 
 export const reportStore = create<ReportState>((set) => ({
   step: 0,
-  imageUrl: null,
-  reporter_first_name: "",
-  reporter_last_name: "",
-  reporter_email: "",
-  reporter_phone: "",
-  incident_type_id: "",
-  incident_type_name: "",
-  incident_subtype_id: "",
-  incident_subtype_name: "",
-  description: "",
-  location_lat: null,
-  location_lng: null,
-  location_address: "",
-  setImageUrl: (url) => set({ imageUrl: url }),
-  setUserData: (userData) => set((state) => ({ ...state, ...userData })),
-  setIncidentType: (incidentType) =>
-    set({
-      incident_type_id: incidentType.id,
-      incident_type_name: incidentType.name,
-    }),
-  setIncidentSubtype: (incidentSubtype) =>
-    set({
-      incident_subtype_id: incidentSubtype.id,
-      incident_subtype_name: incidentSubtype.name,
-    }),
-  setDescription: (description) => set({ description }),
-  setLocation: (location) =>
-    set({
-      location_lat: location.lat,
-      location_lng: location.lng,
-      location_address: location.address,
-    }),
+
+  // Step 1: Image Upload
+  image_step: {
+    imageUrl: null,
+    detected_location: {
+      latitude: null,
+      longitude: null,
+      address: "",
+    },
+  },
+
+  // Step 2: User Information
+  user_step: {
+    reporter_first_name: "",
+    reporter_last_name: "",
+    reporter_email: "",
+    reporter_phone: "",
+  },
+
+  // Step 3: Incident Information
+  incident_step: {
+    incident_type_id: "",
+    incident_type_name: "",
+    incident_subtype_id: "",
+    incident_subtype_name: "",
+    description: "",
+  },
+
+  // Step 4: Location Information
+  location_step: {
+    set_location: {
+      latitude: null,
+      longitude: null,
+      address: "",
+    },
+  },
+
+  // Actions
+  setImageUrl: (url: string) =>
+    set((state) => ({
+      image_step: {
+        ...state.image_step,
+        imageUrl: url,
+      },
+    })),
+
+  setDetectedLocation: (location: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  }) =>
+    set((state) => ({
+      image_step: {
+        ...state.image_step,
+        detected_location: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          address: location.address || "",
+        },
+      },
+    })),
+
+  setUserData: (userData: {
+    reporter_first_name?: string;
+    reporter_last_name?: string;
+    reporter_email?: string;
+    reporter_phone?: string;
+  }) =>
+    set((state) => ({
+      user_step: {
+        ...state.user_step,
+        ...userData,
+      },
+    })),
+
+  setIncidentType: (incidentType: { id: string; name: string }) =>
+    set((state) => ({
+      incident_step: {
+        ...state.incident_step,
+        incident_type_id: incidentType.id,
+        incident_type_name: incidentType.name,
+      },
+    })),
+
+  setIncidentSubtype: (incidentSubtype: { id: string; name: string }) =>
+    set((state) => ({
+      incident_step: {
+        ...state.incident_step,
+        incident_subtype_id: incidentSubtype.id,
+        incident_subtype_name: incidentSubtype.name,
+      },
+    })),
+
+  setDescription: (description: string) =>
+    set((state) => ({
+      incident_step: {
+        ...state.incident_step,
+        description,
+      },
+    })),
+
+  setLocation: (location: { lat: number; lng: number; address: string }) =>
+    set((state) => ({
+      location_step: {
+        ...state.location_step,
+        set_location: {
+          latitude: location.lat,
+          longitude: location.lng,
+          address: location.address,
+        },
+      },
+    })),
 }));

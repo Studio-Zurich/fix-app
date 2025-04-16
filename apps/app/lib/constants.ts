@@ -26,3 +26,23 @@ export const DEFAULT_LOCATION = {
   zoom: 13,
   address: "Postplatz, 6300 Zug, Switzerland",
 } as const;
+
+// Image upload constants
+export const IMAGE_CONSTANTS = {
+  MAX_SIZE_MB: 15,
+  COMPRESSION: {
+    MAX_SIZE_MB: 1,
+    MAX_WIDTH_OR_HEIGHT: 1920,
+    USE_WEB_WORKER: true,
+  },
+  ALLOWED_TYPES: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+  FILE_TYPE_ERROR: "Only JPG, PNG, GIF, and WEBP images are allowed",
+  FILE_SIZE_ERROR: "Image must be smaller than 15MB",
+} as const;
+
+// Geolocation constants
+export const GEOLOCATION_CONSTANTS = {
+  ENABLE_HIGH_ACCURACY: true,
+  TIMEOUT: 5000,
+  MAXIMUM_AGE: 0,
+} as const;

@@ -42,24 +42,25 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
 
   // Get user data from the store - memoized to prevent infinite loops
   const storeData = useMemo(() => {
+    const state = reportStore.getState();
     return {
       // User data
-      reporter_first_name: reportStore.getState().reporter_first_name,
-      reporter_last_name: reportStore.getState().reporter_last_name,
-      reporter_email: reportStore.getState().reporter_email,
-      reporter_phone: reportStore.getState().reporter_phone,
+      reporter_first_name: state.user_step.reporter_first_name,
+      reporter_last_name: state.user_step.reporter_last_name,
+      reporter_email: state.user_step.reporter_email,
+      reporter_phone: state.user_step.reporter_phone,
       // Incident data
-      incident_type_id: reportStore.getState().incident_type_id,
-      incident_type_name: reportStore.getState().incident_type_name,
-      incident_subtype_id: reportStore.getState().incident_subtype_id,
-      incident_subtype_name: reportStore.getState().incident_subtype_name,
-      description: reportStore.getState().description,
+      incident_type_id: state.incident_step.incident_type_id,
+      incident_type_name: state.incident_step.incident_type_name,
+      incident_subtype_id: state.incident_step.incident_subtype_id,
+      incident_subtype_name: state.incident_step.incident_subtype_name,
+      description: state.incident_step.description,
       // Location data
-      location_lat: reportStore.getState().location_lat,
-      location_lng: reportStore.getState().location_lng,
-      location_address: reportStore.getState().location_address,
+      location_lat: state.location_step.set_location.latitude,
+      location_lng: state.location_step.set_location.longitude,
+      location_address: state.location_step.set_location.address,
       // Image data
-      imageUrl: reportStore.getState().imageUrl,
+      imageUrl: state.image_step.imageUrl,
     };
   }, [step]); // Only recalculate when the step changes
 
@@ -158,25 +159,26 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
             />
 
             {/* Hidden inputs for location data */}
-            {storeData.location_lat && storeData.location_lng && (
-              <>
-                <input
-                  type="hidden"
-                  name="location_lat"
-                  value={storeData.location_lat}
-                />
-                <input
-                  type="hidden"
-                  name="location_lng"
-                  value={storeData.location_lng}
-                />
-                <input
-                  type="hidden"
-                  name="location_address"
-                  value={storeData.location_address}
-                />
-              </>
-            )}
+            {storeData.location_lat !== null &&
+              storeData.location_lng !== null && (
+                <>
+                  <input
+                    type="hidden"
+                    name="location_lat"
+                    value={storeData.location_lat}
+                  />
+                  <input
+                    type="hidden"
+                    name="location_lng"
+                    value={storeData.location_lng}
+                  />
+                  <input
+                    type="hidden"
+                    name="location_address"
+                    value={storeData.location_address}
+                  />
+                </>
+              )}
 
             {/* Hidden input for image filename */}
             {storeData.imageUrl && (
@@ -322,39 +324,41 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                 <strong>Pending:</strong> {pending ? "Yes" : "No"}
               </p>
 
-              <p>
-                <strong>Reporter First Name:</strong>{" "}
-                {storeData?.reporter_first_name}
-              </p>
-              <p>
-                <strong>Reporter Last Name:</strong>{" "}
-                {storeData?.reporter_last_name}
-              </p>
-              <p>
-                <strong>Reporter Email:</strong> {storeData?.reporter_email}
-              </p>
-              <p>
-                <strong>Reporter Phone:</strong> {storeData?.reporter_phone}
-              </p>
-              <p>
-                <strong>Incident Type ID:</strong> {storeData?.incident_type_id}
-              </p>
-              <p>
-                <strong>Incident Subtype ID:</strong>{" "}
-                {storeData?.incident_subtype_id}
-              </p>
-              <p>
-                <strong>Incident Description:</strong> {storeData?.description}
-              </p>
-              <p>
-                <strong>Location Lat:</strong> {storeData?.location_lat}
-              </p>
-              <p>
-                <strong>Location Lng:</strong> {storeData?.location_lng}
-              </p>
-              <p>
-                <strong>Location Address:</strong> {storeData?.location_address}
-              </p>
+              <div className="mt-4">
+                <p className="font-bold mb-2">Complete Store State:</p>
+                <pre className="text-xs overflow-auto max-h-[300px] p-2 bg-gray-100 rounded">
+                  {JSON.stringify(reportStore.getState(), null, 2)}
+                </pre>
+              </div>
+
+              <div className="mt-4">
+                <p className="font-bold mb-2">Current Step Data:</p>
+                <p>
+                  <strong>Step:</strong> {reportStore.getState().step}
+                </p>
+                <p>
+                  <strong>Image URL:</strong>{" "}
+                  {reportStore.getState().image_step?.imageUrl || "None"}
+                </p>
+                <p>
+                  <strong>Reporter:</strong>{" "}
+                  {`${reportStore.getState().user_step?.reporter_first_name || ""} ${reportStore.getState().user_step?.reporter_last_name || ""}`}
+                </p>
+                <p>
+                  <strong>Email:</strong>{" "}
+                  {reportStore.getState().user_step?.reporter_email || "None"}
+                </p>
+                <p>
+                  <strong>Incident Type:</strong>{" "}
+                  {reportStore.getState().incident_step?.incident_type_name ||
+                    "None"}
+                </p>
+                <p>
+                  <strong>Location:</strong>{" "}
+                  {reportStore.getState().location_step?.set_location
+                    ?.address || "None"}
+                </p>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
