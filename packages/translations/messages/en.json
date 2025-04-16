@@ -1,260 +1,197 @@
 {
     "incidentTypes": {
         "searchIncidentTypes": "Enter search terms",
-        "animals": {
-            "name": "Animals",
-            "description": "Report issues with animals",
-            "subtypes": {
-                "animals_deceased": {
-                    "name": "Deceased Animal",
-                    "description": "Report a deceased animal"
-                },
-                "animals_noise": {
-                    "name": "Animal Noise",
-                    "description": "Report animal noise issues"
+        "types": {
+            "f084e16d-b4eb-48eb-9ba0-a2cff5af5236": {
+                "name": "Animals",
+                "description": "Report issues with animals",
+                "subtypes": {
+                    "2873e5ac-dd07-43e8-97eb-a64ee95df334": {
+                        "name": "Deceased Animal",
+                        "description": "Report a deceased animal"
+                    },
+                    "79256bc3-c953-42bd-bfc6-ac1c42ad6995": {
+                        "name": "Animal Noise",
+                        "description": "Report animal noise issues"
+                    }
                 }
-            }
-        },
-        "feedback": {
-            "name": "Feedback",
-            "description": "Provide feedback",
-            "subtypes": {
-                "feedback_general": {
-                    "name": "General Feedback",
-                    "description": "Provide general feedback"
-                },
-                "feedback_accessibility": {
-                    "name": "Accessibility",
-                    "description": "Provide feedback about accessibility"
+            },
+            "057f163e-06ba-43e2-8559-f537c77ec404": {
+                "name": "Energy",
+                "description": "Report energy-related issues",
+                "subtypes": {
+                    "ad2a4779-c8f4-4655-b9e3-653e7e87e3c7": {
+                        "name": "Gas Issue",
+                        "description": "Report issues with gas supply"
+                    },
+                    "b8adbd5b-ff8d-4577-8568-19879d2115c5": {
+                        "name": "Electricity Issue",
+                        "description": "Report issues with electricity"
+                    }
                 }
-            }
-        },
-        "energy": {
-            "name": "Energy",
-            "description": "Report energy-related issues",
-            "subtypes": {
-                "energy_gas": {
-                    "name": "Gas Issue",
-                    "description": "Report issues with gas supply"
-                },
-                "energy_electricity": {
-                    "name": "Electricity Issue",
-                    "description": "Report issues with electricity"
+            },
+            "08aac3b7-8aec-428c-9f97-78210ccdcf83": {
+                "name": "Vegetation",
+                "description": "Report vegetation issues",
+                "subtypes": {
+                    "139725d5-5a45-4693-a3e9-697214173480": {
+                        "name": "General Vegetation",
+                        "description": "Report general vegetation issues"
+                    },
+                    "360959bf-fc6e-4de8-a6fb-17c397c2ee58": {
+                        "name": "Overgrown Vegetation",
+                        "description": "Report overgrown vegetation"
+                    },
+                    "cb1ed876-3943-4e68-be6d-39b8a02130ae": {
+                        "name": "Fallen Tree",
+                        "description": "Report a fallen tree"
+                    }
                 }
-            }
-        },
-        "vandalism": {
-            "name": "Vandalism",
-            "description": "Report vandalism incidents"
-        },
-        "noise": {
-            "name": "Noise",
-            "description": "Report noise disturbances",
-            "subtypes": {
-                "noise_general": {
-                    "name": "General Noise",
-                    "description": "Report general noise issues"
-                },
-                "noise_construction": {
-                    "name": "Construction Noise",
-                    "description": "Report construction-related noise"
+            },
+            "13775358-37ad-4796-8677-1cfc290d6f4b": {
+                "name": "Sharing Services",
+                "description": "Report sharing service issues",
+                "subtypes": {
+                    "c1088b36-f61c-47fe-aa6d-3c780e0ee0f2": {
+                        "name": "E-Scooter",
+                        "description": "Report e-scooter issues"
+                    },
+                    "2623a5b7-6be9-467c-8fad-5a3325726282": {
+                        "name": "Shared Bike",
+                        "description": "Report shared bike issues"
+                    },
+                    "df726760-de18-47d7-82be-7e7ee426b874": {
+                        "name": "Illegal Parking",
+                        "description": "Report illegally parked sharing vehicles"
+                    }
                 }
-            }
-        },
-        "vehicles": {
-            "name": "Vehicles",
-            "description": "Report vehicle-related issues",
-            "subtypes": {
-                "vehicles_general": {
-                    "name": "General Vehicle Issue",
-                    "description": "Report general vehicle issues"
-                },
-                "vehicles_abandoned": {
-                    "name": "Abandoned Vehicle",
-                    "description": "Report an abandoned vehicle"
-                },
-                "vehicles_illegal_parking": {
-                    "name": "Illegal Parking",
-                    "description": "Report illegal parking"
+            },
+            "4f842366-fbd4-443b-a47d-ded89ee8a30d": {
+                "name": "Water",
+                "description": "Report water-related issues",
+                "subtypes": {
+                    "b5a88866-be8b-4a48-bde6-5c919581c1a8": {
+                        "name": "General Water Issue",
+                        "description": "Report general water issues"
+                    },
+                    "8bd8537e-6529-4b0f-b805-fbf1d3342de8": {
+                        "name": "Fire Hydrant",
+                        "description": "Report fire hydrant issues"
+                    },
+                    "ae32815c-f826-4fa2-a965-b842bbd79877": {
+                        "name": "Water Fountain",
+                        "description": "Report water fountain issues"
+                    },
+                    "91bfa798-d194-4a6e-9b13-e83dcd4245e4": {
+                        "name": "Water Leak",
+                        "description": "Report water leaks"
+                    },
+                    "4e074598-fd24-417a-8b4e-0dcae1ac5f81": {
+                        "name": "Storm Drain",
+                        "description": "Report blocked storm drains"
+                    }
                 }
-            }
-        },
-        "vegetation": {
-            "name": "Vegetation",
-            "description": "Report vegetation issues",
-            "subtypes": {
-                "vegetation_general": {
-                    "name": "General Vegetation",
-                    "description": "Report general vegetation issues"
-                },
-                "vegetation_overgrown": {
-                    "name": "Overgrown Vegetation",
-                    "description": "Report overgrown vegetation"
-                },
-                "vegetation_fallen_tree": {
-                    "name": "Fallen Tree",
-                    "description": "Report a fallen tree"
+            },
+            "7661c5e9-292a-4f02-901f-e30a4c057bd1": {
+                "name": "Vehicles",
+                "description": "Report vehicle-related issues",
+                "subtypes": {
+                    "af8cb373-48b2-47ff-897d-99dec0a269d3": {
+                        "name": "General Vehicle Issue",
+                        "description": "Report general vehicle issues"
+                    },
+                    "0667ca65-16bf-43be-a41a-f686b75fe214": {
+                        "name": "Abandoned Vehicle",
+                        "description": "Report an abandoned vehicle"
+                    }
                 }
-            }
-        },
-        "facilities": {
-            "name": "Facilities",
-            "description": "Report issues with public facilities",
-            "subtypes": {
-                "facilities_general": {
-                    "name": "General Facilities",
-                    "description": "Report general facility issues"
-                },
-                "facilities_playground": {
-                    "name": "Playground",
-                    "description": "Report playground issues"
-                },
-                "facilities_public_toilet": {
-                    "name": "Public Toilet",
-                    "description": "Report public toilet issues"
+            },
+            "79dde61e-a76a-4eb4-bd61-57fea9961a06": {
+                "name": "Vandalism",
+                "description": "Report vandalism incidents"
+            },
+            "af6dddc4-3c06-4eef-986b-58e579588596": {
+                "name": "Transport",
+                "description": "Report public transport issues",
+                "subtypes": {
+                    "96bf01ac-b993-459b-8a6b-175bdfd4f4a0": {
+                        "name": "Bus Stop",
+                        "description": "Report issues with bus stops"
+                    },
+                    "aebabe2c-9b82-4aae-883b-8d35afe25b4f": {
+                        "name": "Train Station",
+                        "description": "Report issues with train stations"
+                    },
+                    "c5db6e81-1de5-47ca-94be-7d568a79fbf9": {
+                        "name": "Tram Stop",
+                        "description": "Report issues with tram stops"
+                    }
                 }
-            }
-        },
-        "waste": {
-            "name": "Waste",
-            "description": "Report waste-related issues",
-            "subtypes": {
-                "waste_general": {
-                    "name": "General Waste",
-                    "description": "Report general waste issues"
-                },
-                "waste_overflowing_bin": {
-                    "name": "Overflowing Bin",
-                    "description": "Report an overflowing waste bin"
-                },
-                "waste_damaged_bin": {
-                    "name": "Damaged Bin",
-                    "description": "Report a damaged waste bin"
+            },
+            "e01b2d33-42a5-49d2-aaf5-34f7e8e8af69": {
+                "name": "Facilities",
+                "description": "Report issues with public facilities",
+                "subtypes": {
+                    "e968ee7c-34f0-4d2c-b3a4-3810c963882f": {
+                        "name": "General Facilities",
+                        "description": "Report general facility issues"
+                    },
+                    "a3c1d39c-19d5-4577-b366-1eb9a7e30154": {
+                        "name": "Playground",
+                        "description": "Report playground issues"
+                    },
+                    "4af3df2d-c91a-4296-b829-235741b81511": {
+                        "name": "Public Toilet",
+                        "description": "Report public toilet issues"
+                    }
                 }
-            }
-        },
-        "transport": {
-            "name": "Transport",
-            "description": "Report public transport issues",
-            "subtypes": {
-                "transport_bus_stop": {
-                    "name": "Bus Stop",
-                    "description": "Report issues with bus stops"
-                },
-                "transport_train_station": {
-                    "name": "Train Station",
-                    "description": "Report issues with train stations"
-                },
-                "transport_tram_stop": {
-                    "name": "Tram Stop",
-                    "description": "Report issues with tram stops"
+            },
+            "e449512e-f862-48b5-89eb-2f32da0bdebf": {
+                "name": "Waste",
+                "description": "Report waste-related issues",
+                "subtypes": {
+                    "932ea78f-57d1-42fb-9398-237e4d1f719e": {
+                        "name": "General Waste",
+                        "description": "Report general waste issues"
+                    },
+                    "7b6f6775-21be-4fca-b1eb-056836dbff79": {
+                        "name": "Overflowing Bin",
+                        "description": "Report an overflowing waste bin"
+                    },
+                    "f8a5488a-3f09-4a23-9920-11571e634809": {
+                        "name": "Damaged Bin",
+                        "description": "Report a damaged waste bin"
+                    }
                 }
-            }
-        },
-        "infrastructure": {
-            "name": "Infrastructure",
-            "description": "Report infrastructure issues",
-            "subtypes": {
-                "infrastructure_damaged_road": {
-                    "name": "Damaged Road",
-                    "description": "Report road damage"
-                },
-                "infrastructure_damaged_path": {
-                    "name": "Damaged Path",
-                    "description": "Report damaged walkways or paths"
-                },
-                "infrastructure_damaged_sign": {
-                    "name": "Damaged Sign",
-                    "description": "Report damaged signs"
-                },
-                "infrastructure_damaged_light": {
-                    "name": "Damaged Light",
-                    "description": "Report street light issues"
-                },
-                "infrastructure_damaged_traffic_light": {
-                    "name": "Damaged Traffic Light",
-                    "description": "Report traffic light issues"
-                },
-                "infrastructure_street_cleaning": {
-                    "name": "Street Cleaning",
-                    "description": "Report street cleaning issues"
-                }
-            }
-        },
-        "sharing": {
-            "name": "Sharing Services",
-            "description": "Report sharing service issues",
-            "subtypes": {
-                "sharing_scooter": {
-                    "name": "E-Scooter",
-                    "description": "Report e-scooter issues"
-                },
-                "sharing_bike": {
-                    "name": "Shared Bike",
-                    "description": "Report shared bike issues"
-                },
-                "sharing_illegal_parking": {
-                    "name": "Illegal Parking",
-                    "description": "Report illegally parked sharing vehicles"
-                }
-            }
-        },
-        "water": {
-            "name": "Water",
-            "description": "Report water-related issues",
-            "subtypes": {
-                "water_general": {
-                    "name": "General Water Issue",
-                    "description": "Report general water issues"
-                },
-                "water_fire_hydrant": {
-                    "name": "Fire Hydrant",
-                    "description": "Report fire hydrant issues"
-                },
-                "water_fountain": {
-                    "name": "Water Fountain",
-                    "description": "Report water fountain issues"
-                },
-                "water_leak": {
-                    "name": "Water Leak",
-                    "description": "Report water leaks"
-                },
-                "water_storm_block": {
-                    "name": "Storm Drain",
-                    "description": "Report blocked storm drains"
-                }
-            }
-        },
-        "graffiti": {
-            "name": "Graffiti",
-            "subtypes": {
-                "vandalism": {
-                    "name": "Vandalism"
-                },
-                "street_art": {
-                    "name": "Street Art"
-                }
-            }
-        },
-        "litter": {
-            "name": "Litter",
-            "subtypes": {
-                "garbage": {
-                    "name": "Garbage"
-                },
-                "recycling": {
-                    "name": "Recycling"
-                }
-            }
-        },
-        "damage": {
-            "name": "Damage",
-            "subtypes": {
-                "infrastructure": {
-                    "name": "Infrastructure"
-                },
-                "property": {
-                    "name": "Property"
+            },
+            "0297ba3c-7216-40c1-8b4e-de67cb37fcd2": {
+                "name": "Infrastructure",
+                "description": "Report infrastructure issues",
+                "subtypes": {
+                    "c1b6cd7b-d2f7-4578-9f92-fa7b25f945af": {
+                        "name": "Damaged Road",
+                        "description": "Report road damage"
+                    },
+                    "be266932-ca43-4e2c-b2a8-e18435cf9e5f": {
+                        "name": "Damaged Path",
+                        "description": "Report damaged walkways or paths"
+                    },
+                    "73cf10b4-7642-44eb-a7dc-9e7c4260e121": {
+                        "name": "Damaged Sign",
+                        "description": "Report damaged signs"
+                    },
+                    "41ca014b-e91b-4957-9317-ce0fae48b3bd": {
+                        "name": "Damaged Light",
+                        "description": "Report street light issues"
+                    },
+                    "e8fbd814-0327-439c-b987-931a0d879703": {
+                        "name": "Damaged Traffic Light",
+                        "description": "Report traffic light issues"
+                    },
+                    "d8ac2edb-bb35-47a9-a759-09507b1447c1": {
+                        "name": "Street Cleaning",
+                        "description": "Report street cleaning issues"
+                    }
                 }
             }
         }

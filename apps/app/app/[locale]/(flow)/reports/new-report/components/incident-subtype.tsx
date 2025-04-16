@@ -6,6 +6,7 @@ import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
 import { Input } from "@repo/ui/input";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
@@ -15,6 +16,9 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     id: string;
     name: string;
   } | null>(null);
+
+  // Get translations
+  const t = useTranslations("incidentTypes");
 
   // Get functions from reportStore
   const setIncidentSubtype = reportStore((state) => state.setIncidentSubtype);
@@ -43,12 +47,55 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
     (state) => state.incident_step.incident_type_id
   );
 
+  // Get the translated name for a subtype based on its UUID
+  const getTranslatedSubtype = (subtypeId: string) => {
+    try {
+      // First, try to find the subtype under its parent type
+      const parentType = incidentSubtypes.find(
+        (subtype) => subtype.id === subtypeId
+      )?.incident_type_id;
+
+      if (parentType) {
+        // Try to get the translation from the parent type's subtypes
+        const translatedName = t.raw(
+          `types.${parentType}.subtypes.${subtypeId}.name`
+        );
+        const translatedDescription = t.raw(
+          `types.${parentType}.subtypes.${subtypeId}.description`
+        );
+
+        if (translatedName) {
+          return {
+            name: translatedName as string,
+            description: translatedDescription as string,
+          };
+        }
+      }
+    } catch (error) {
+      // If translation doesn't exist, fall back to database values
+    }
+
+    // Fall back to database name if no translation found
+    const dbSubtype = incidentSubtypes.find(
+      (subtype) => subtype.id === subtypeId
+    );
+    if (!dbSubtype) return null;
+
+    return {
+      name: dbSubtype.name,
+      description: dbSubtype.description,
+    };
+  };
+
   // Filter subtypes based on the selected incident type and search query
-  const filteredSubtypes = incidentSubtypes.filter(
-    (subtype) =>
+  const filteredSubtypes = incidentSubtypes.filter((subtype) => {
+    const translatedSubtype = getTranslatedSubtype(subtype.id);
+    return (
       subtype.incident_type_id === selectedIncidentTypeId &&
-      subtype.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      translatedSubtype &&
+      translatedSubtype.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   const handleSelect = (subtype: { id: string; name: string }) => {
     setSelectedSubtype(subtype);
@@ -91,7 +138,7 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
         <Input
-          placeholder="Search incident subtypes..."
+          placeholder={t("searchIncidentTypes")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9"
@@ -99,46 +146,60 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
       </div>
 
       <div className="space-y-2 pb-[66px] overflow-y-auto">
-        {filteredSubtypes.map((subtype) => (
-          <div
-            key={subtype.id}
-            className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleSelect(subtype);
-            }}
-          >
-            <div onClick={(e) => e.stopPropagation()}>
-              <Checkbox
-                id={subtype.id}
-                checked={selectedSubtype?.id === subtype.id}
-                onCheckedChange={() => handleSelect(subtype)}
-                className="w-6 h-6"
-              />
-            </div>
+        {filteredSubtypes.map((subtype) => {
+          const translatedSubtype = getTranslatedSubtype(subtype.id);
+          return (
             <div
-              className="flex-1"
+              key={subtype.id}
+              className="flex items-center space-x-3 p-4 border rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleSelect(subtype);
+                handleSelect({
+                  id: subtype.id,
+                  name: translatedSubtype?.name || subtype.name,
+                });
               }}
             >
-              <label
-                htmlFor={subtype.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              <div onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  id={subtype.id}
+                  checked={selectedSubtype?.id === subtype.id}
+                  onCheckedChange={() =>
+                    handleSelect({
+                      id: subtype.id,
+                      name: translatedSubtype?.name || subtype.name,
+                    })
+                  }
+                  className="w-6 h-6"
+                />
+              </div>
+              <div
+                className="flex-1"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelect({
+                    id: subtype.id,
+                    name: translatedSubtype?.name || subtype.name,
+                  });
+                }}
               >
-                {subtype.name}
-              </label>
-              {subtype.description && (
-                <p className="text-sm text-muted-foreground">
-                  {subtype.description}
-                </p>
-              )}
+                <label
+                  htmlFor={subtype.id}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {translatedSubtype?.name || subtype.name}
+                </label>
+                {translatedSubtype?.description && (
+                  <p className="text-sm text-muted-foreground">
+                    {translatedSubtype.description}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Hidden input to pass the selected incident subtype to the form */}
