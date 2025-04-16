@@ -312,8 +312,8 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
 
       {process.env.NEXT_PUBLIC_ENABLE_LOGGING === "true" && (
         <Popover>
-          <PopoverTrigger className="fixed bottom-1/3 right-[5vw] bg-background rounded-full p-1">
-            <GearFine size={24} />
+          <PopoverTrigger className="fixed bottom-1/3 right-0 bg-background rounded-l-md p-1">
+            <GearFine size={32} />
           </PopoverTrigger>
           <PopoverContent>
             <div className="text-sm font-mono">
@@ -329,35 +329,6 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                 <pre className="text-xs overflow-auto max-h-[300px] p-2 bg-gray-100 rounded">
                   {JSON.stringify(reportStore.getState(), null, 2)}
                 </pre>
-              </div>
-
-              <div className="mt-4">
-                <p className="font-bold mb-2">Current Step Data:</p>
-                <p>
-                  <strong>Step:</strong> {reportStore.getState().step}
-                </p>
-                <p>
-                  <strong>Image URL:</strong>{" "}
-                  {reportStore.getState().image_step?.imageUrl || "None"}
-                </p>
-                <p>
-                  <strong>Reporter:</strong>{" "}
-                  {`${reportStore.getState().user_step?.reporter_first_name || ""} ${reportStore.getState().user_step?.reporter_last_name || ""}`}
-                </p>
-                <p>
-                  <strong>Email:</strong>{" "}
-                  {reportStore.getState().user_step?.reporter_email || "None"}
-                </p>
-                <p>
-                  <strong>Incident Type:</strong>{" "}
-                  {reportStore.getState().incident_step?.incident_type_name ||
-                    "None"}
-                </p>
-                <p>
-                  <strong>Location:</strong>{" "}
-                  {reportStore.getState().location_step?.set_location
-                    ?.address || "None"}
-                </p>
               </div>
             </div>
           </PopoverContent>

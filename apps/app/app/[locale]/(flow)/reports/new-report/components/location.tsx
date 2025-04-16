@@ -335,6 +335,8 @@ const Location = () => {
 
   return (
     <StepContainer
+      title="Select Location"
+      description="Select the location of the incident."
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
           Back

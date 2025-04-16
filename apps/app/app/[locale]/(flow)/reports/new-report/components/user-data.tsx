@@ -27,6 +27,9 @@ const UserData = () => {
     Partial<Record<keyof UserDataFormFields, string>>
   >({});
 
+  // State for the main validation error message
+  const [validationError, setValidationError] = useState<string | undefined>();
+
   // Load user data from store when component mounts
   useEffect(() => {
     const state = reportStore.getState();
@@ -59,6 +62,7 @@ const UserData = () => {
         ...errors,
         [name]: undefined,
       });
+      setValidationError(undefined);
     }
   };
 
@@ -66,6 +70,7 @@ const UserData = () => {
     try {
       userDataSchema.parse(formData);
       setErrors({});
+      setValidationError(undefined);
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -76,6 +81,7 @@ const UserData = () => {
           }
         });
         setErrors(newErrors);
+        setValidationError("Please check the form for errors");
       }
       return false;
     }
@@ -102,6 +108,8 @@ const UserData = () => {
 
   return (
     <StepContainer
+      title="Enter Your Data"
+      description="Please enter your data to help us identify you."
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
           Back
@@ -112,6 +120,7 @@ const UserData = () => {
           Next
         </Button>
       }
+      error={validationError}
     >
       <div className="space-y-4">
         <div className="grid gap-1.5">

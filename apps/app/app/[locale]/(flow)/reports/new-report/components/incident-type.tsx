@@ -17,6 +17,7 @@ const IncidentType = ({
     id: string;
     name: string;
   } | null>(null);
+  const [validationError, setValidationError] = useState<string | undefined>();
 
   // Get functions from reportStore
   const setIncidentType = reportStore((state) => state.setIncidentType);
@@ -47,6 +48,7 @@ const IncidentType = ({
 
   const handleSelect = (type: { id: string; name: string }) => {
     setSelectedType(type);
+    setValidationError(undefined);
     log("Incident type selected", type);
   };
 
@@ -70,21 +72,27 @@ const IncidentType = ({
       // Skip to description step (4) if there are no subtypes, otherwise go to subtype step (3)
       setStep(hasSubtypes ? 3 : 4);
       log(`Going to ${hasSubtypes ? "subtype" : "description"} step`);
+    } else {
+      // Show error if no type is selected
+      setValidationError("Please select an incident type before proceeding");
     }
   };
 
   return (
     <StepContainer
+      title="Select Incident Type"
+      description="Select the type of incident you are reporting."
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
           Back
         </Button>
       }
       nextButton={
-        <Button type="button" onClick={handleNext} disabled={!selectedType}>
+        <Button type="button" onClick={handleNext}>
           Next
         </Button>
       }
+      error={validationError}
     >
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground">

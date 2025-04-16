@@ -73,6 +73,8 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
 
   return (
     <StepContainer
+      title="Select Incident Subtype"
+      description="Select the subtype of incident you are reporting."
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
           Back

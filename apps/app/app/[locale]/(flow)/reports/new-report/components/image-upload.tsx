@@ -382,6 +382,8 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
 
   return (
     <StepContainer
+      title="Upload Image"
+      description="Upload an image to help us understand the incident better."
       nextButton={
         <Button type="button" onClick={handleNext} disabled={isProcessing}>
           {isProcessing

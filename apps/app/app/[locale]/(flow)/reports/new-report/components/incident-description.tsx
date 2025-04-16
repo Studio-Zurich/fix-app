@@ -95,6 +95,8 @@ const IncidentDescription = ({
 
   return (
     <StepContainer
+      title="Describe the Incident"
+      description="Provide a detailed description of the incident."
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
           Back
@@ -105,6 +107,7 @@ const IncidentDescription = ({
           Next
         </Button>
       }
+      error={validationError || undefined}
     >
       <div className="space-y-4 flex-1">
         {incidentTypeName && (
@@ -128,9 +131,7 @@ const IncidentDescription = ({
           />
           <div className="flex justify-between">
             <div>
-              {validationError && (
-                <p className="text-sm text-destructive">{validationError}</p>
-              )}
+              {/* Remove inline error since we're now using the StepContainer error prop */}
             </div>
             <p className="text-sm text-muted-foreground">
               {charactersLeft} characters left
