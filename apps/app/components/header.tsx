@@ -25,7 +25,9 @@ const Header = () => {
         <Button className="bg-[#ff781e] sm:hidden" size="icon">
           <Plus size={24} />
         </Button>
-        <Button className="bg-[#ff781e] hidden sm:block">New Report</Button>
+        <Button className="bg-[#ff781e] hidden sm:inline-flex">
+          New Report
+        </Button>
       </Link>
     </header>
   );

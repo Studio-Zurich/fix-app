@@ -1,4 +1,8 @@
+import PageHeader from "@/components/page-header";
 import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@repo/ui/badge";
+import { TypographyH2 } from "@repo/ui/headline";
+import { TypographyParagraph } from "@repo/ui/text";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -58,101 +62,27 @@ export default async function ReportPage({ params }: ReportPageProps) {
       return data.publicUrl;
     }) || [];
 
+  // Get status color based on status value
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "open":
+        return "bg-green-100 text-green-800";
+      case "in progress":
+        return "bg-blue-100 text-blue-800";
+      case "closed":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Report Details</h1>
-      <div className="text-sm text-gray-500 mb-4">Report ID: {report.id}</div>
+    <>
+      <PageHeader title="Report Details" description={report.id} />
 
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Report Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Status</p>
-            <p className="font-medium">{report.status}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Locale</p>
-            <p className="font-medium">{report.locale}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Created At</p>
-            <p className="font-medium">
-              {new Date(report.created_at).toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Updated At</p>
-            <p className="font-medium">
-              {new Date(report.updated_at).toLocaleString()}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Incident Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {report.incident_types && (
-            <div>
-              <p className="text-sm text-gray-500">Incident Type</p>
-              <p className="font-medium">{report.incident_types.name}</p>
-            </div>
-          )}
-          {report.incident_subtypes && (
-            <div>
-              <p className="text-sm text-gray-500">Incident Subtype</p>
-              <p className="font-medium">{report.incident_subtypes.name}</p>
-            </div>
-          )}
-          <div className="md:col-span-2">
-            <p className="text-sm text-gray-500">Description</p>
-            <p className="font-medium whitespace-pre-wrap">
-              {report.description}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Location Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Address</p>
-            <p className="font-medium">{report.location_address}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Coordinates</p>
-            <p className="font-medium">
-              {report.location_lat}, {report.location_lng}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Reporter Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Name</p>
-            <p className="font-medium">
-              {report.reporter_first_name} {report.reporter_last_name}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Email</p>
-            <p className="font-medium">{report.reporter_email}</p>
-          </div>
-          {report.reporter_phone && (
-            <div>
-              <p className="text-sm text-gray-500">Phone</p>
-              <p className="font-medium">{report.reporter_phone}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Report Images</h2>
+      {/* Images Section (Moved to top) */}
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>Report Images</TypographyH2>
         {imageUrls.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {imageUrls.map((url, index) => (
@@ -175,6 +105,168 @@ export default async function ReportPage({ params }: ReportPageProps) {
           <p className="text-gray-500">No images uploaded for this report.</p>
         )}
       </div>
-    </div>
+
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>Location Information</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Address
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.location_address}
+            </TypographyParagraph>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Coordinates
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.location_lat}, {report.location_lng}
+            </TypographyParagraph>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>Report Information</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Status
+            </TypographyParagraph>
+            <Badge className={getStatusColor(report.status)}>
+              {report.status}
+            </Badge>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Locale
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.locale}
+            </TypographyParagraph>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Created At
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {new Date(report.created_at).toLocaleString()}
+            </TypographyParagraph>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Updated At
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {new Date(report.updated_at).toLocaleString()}
+            </TypographyParagraph>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>Incident Information</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {report.incident_types && (
+            <div>
+              <TypographyParagraph
+                size="text-sm"
+                className="text-muted-foreground"
+              >
+                Incident Type
+              </TypographyParagraph>
+              <TypographyParagraph size="text-sm">
+                {report.incident_types.name}
+              </TypographyParagraph>
+            </div>
+          )}
+          {report.incident_subtypes && (
+            <div>
+              <TypographyParagraph
+                size="text-sm"
+                className="text-muted-foreground"
+              >
+                Incident Subtype
+              </TypographyParagraph>
+              <TypographyParagraph size="text-sm">
+                {report.incident_subtypes.name}
+              </TypographyParagraph>
+            </div>
+          )}
+          <div className="md:col-span-2">
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Description
+            </TypographyParagraph>
+            <TypographyParagraph className="whitespace-pre-wrap" size="text-sm">
+              {report.description}
+            </TypographyParagraph>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-4 space-y-4">
+        <TypographyH2>Reporter Information</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Name
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.reporter_first_name} {report.reporter_last_name}
+            </TypographyParagraph>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Email
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.reporter_email}
+            </TypographyParagraph>
+          </div>
+          {report.reporter_phone && (
+            <div>
+              <TypographyParagraph
+                size="text-sm"
+                className="text-muted-foreground"
+              >
+                Phone
+              </TypographyParagraph>
+              <TypographyParagraph size="text-sm">
+                {report.reporter_phone}
+              </TypographyParagraph>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
