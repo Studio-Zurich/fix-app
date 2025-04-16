@@ -11,6 +11,7 @@ interface LocationState {
 
 interface ReportState {
   step: number;
+  isSubmitted: boolean;
 
   // Step 1: Image Upload
   image_step: {
@@ -50,6 +51,7 @@ interface ReportState {
   };
 
   // Actions
+  setIsSubmitted: (isSubmitted: boolean) => void;
   setImageUrl: (url: string) => void;
   setDetectedLocation: (location: {
     latitude: number;
@@ -85,6 +87,7 @@ export const useLocationStore = create<LocationState>((set) => ({
 
 export const reportStore = create<ReportState>((set) => ({
   step: 0,
+  isSubmitted: false,
 
   // Step 1: Image Upload
   image_step: {
@@ -124,6 +127,12 @@ export const reportStore = create<ReportState>((set) => ({
   },
 
   // Actions
+  setIsSubmitted: (isSubmitted: boolean) =>
+    set((state) => ({
+      ...state,
+      isSubmitted,
+    })),
+
   setImageUrl: (url: string) =>
     set((state) => ({
       image_step: {

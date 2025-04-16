@@ -3,8 +3,9 @@ import { log } from "@/lib/logger";
 import { reportStore, useLocationStore } from "@/lib/store";
 import { GearFine, PencilSimple } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
-import { TypographyH2, TypographyH3 } from "@repo/ui/headline";
+import { TypographyH1, TypographyH2, TypographyH3 } from "@repo/ui/headline";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
+import { Progress } from "@repo/ui/progress";
 import { TypographyParagraph } from "@repo/ui/text";
 import { useLocale } from "next-intl";
 import { useActionState, useEffect, useMemo } from "react";
@@ -83,6 +84,12 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
 
   return (
     <>
+      {step !== 1 && (
+        <div className="px-[5vw] lg:px-6 py-2 text-center space-y-2">
+          <TypographyH1 size="text-lg">New Report</TypographyH1>
+          <Progress value={(step / 6) * 100} />
+        </div>
+      )}
       <form
         action={formAction}
         className="flex-1 h-full flex flex-col"
@@ -127,7 +134,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                 Please review your report before submitting.
               </TypographyParagraph>
             </div>
-            <div className="flex-1 flex flex-col space-y-6 pb-[66px]">
+            <div className="flex-1 flex flex-col space-y-6 pb-[66px] overflow-y-auto">
               {/* Hidden inputs for user data */}
               <input
                 type="hidden"
@@ -340,12 +347,11 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                   </TypographyParagraph>
                 )}
               </div>
-
-              <div className="fixed bottom-0 w-full left-0 bg-white border-t py-3 px-4">
-                <Button type="submit" className="w-full" disabled={pending}>
-                  Submit
-                </Button>
-              </div>
+            </div>
+            <div className="fixed bottom-0 w-full left-0 bg-white py-3 px-4">
+              <Button type="submit" className="w-full" disabled={pending}>
+                Submit
+              </Button>
             </div>
           </div>
         )}

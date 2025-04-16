@@ -88,31 +88,30 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
     <Card className="h-full flex flex-col">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">
-            {report.incident_type_id
-              ? getTranslatedType(report.incident_type_id)
-              : "Incident Report"}
-          </CardTitle>
+          <div>
+            <CardTitle className="text-lg">
+              {report.incident_type_id
+                ? getTranslatedType(report.incident_type_id)
+                : "Incident Report"}
+            </CardTitle>
+            {report.incident_type_id && report.incident_subtype_id && (
+              <TypographyParagraph
+                size="text-sm"
+                className="text-muted-foreground"
+              >
+                {getTranslatedSubtype(
+                  report.incident_type_id,
+                  report.incident_subtype_id
+                )}
+              </TypographyParagraph>
+            )}
+          </div>
           <Badge className={getStatusColor(report.status)}>
             {report.status}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col space-y-3 flex-grow">
-        {report.incident_type_id && report.incident_subtype_id && (
-          <div>
-            <TypographyH4 className="text-muted-foreground" size="text-sm">
-              Subtype
-            </TypographyH4>
-            <TypographyParagraph>
-              {getTranslatedSubtype(
-                report.incident_type_id,
-                report.incident_subtype_id
-              )}
-            </TypographyParagraph>
-          </div>
-        )}
-
         <div>
           <div className="flex items-center gap-1 text-sm text-gray-500 font-medium">
             <TypographyH4 className="text-muted-foreground" size="text-sm">

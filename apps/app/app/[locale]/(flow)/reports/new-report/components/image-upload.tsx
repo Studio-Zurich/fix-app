@@ -4,8 +4,10 @@ import { imageUploadSchema } from "@/lib/schemas";
 import { reportStore } from "@/lib/store";
 import { ExifData, ImageUploadProps } from "@/lib/types";
 import { Button } from "@repo/ui/button";
+import { TypographyParagraph } from "@repo/ui/text";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { uploadReportImage } from "../actions";
@@ -100,6 +102,7 @@ const readImageLocation = async (
 const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
   const [exifData, setExifData] = useState<ExifData | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -236,6 +239,15 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
     checkLocation();
   }, [selectedFile]);
 
+  // Cleanup preview URL when component unmounts or when file changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const validateFile = (file: File): string | null => {
     try {
       imageUploadSchema.parse({ image: file });
@@ -263,6 +275,13 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         fileSize: file.size,
         fileType: file.type,
       });
+
+      // Create preview URL for the selected file
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      const newPreviewUrl = URL.createObjectURL(file);
+      setPreviewUrl(newPreviewUrl);
 
       // Reset previous image info
       setPreviouslyUploaded(false);
@@ -380,6 +399,21 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
     }
   };
 
+  const handleRemoveFile = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setExifData(null);
+    setLocationSource(null);
+    setDetectedLocation({
+      latitude: null,
+      longitude: null,
+      address: "",
+    });
+  };
+
   return (
     <StepContainer
       title="Upload Image"
@@ -423,7 +457,7 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           />
           <Button asChild className="w-full" variant="outline">
             <label htmlFor="library-input" className="cursor-pointer w-full">
-              {previouslyUploaded ? "Choose New Image" : "Choose from Library"}
+              Choose from library
             </label>
           </Button>
         </div>
@@ -436,91 +470,115 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
 
       {/* Display previously uploaded image */}
       {previouslyUploaded && storeImageUrl && !selectedFile && (
-        <div className="mt-4 p-4 border rounded-md bg-gray-50">
-          <h3 className="text-lg font-medium mb-2">Current Image</h3>
-          <div className="relative">
-            <img
-              src={storeImageUrl}
-              alt="Uploaded image"
-              className="w-full h-48 object-cover rounded-md mb-2"
-            />
-          </div>
-          {uploadedFilename && (
-            <p className="text-sm text-gray-600">File: {uploadedFilename}</p>
-          )}
-          {locationSource === "store" && detectedLocation.address && (
-            <div className="mt-2 text-sm text-gray-500">
-              <p>Location information available</p>
-              <p className="mt-1 italic">{detectedLocation.address}</p>
-            </div>
-          )}
+        <div className="relative aspect-video w-full">
+          <Image
+            src={storeImageUrl}
+            alt="Uploaded image"
+            fill
+            className="object-contain rounded-md"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
         </div>
       )}
 
       {/* Display selected file if any */}
-      {selectedFile && (
-        <div className="mt-4 p-4 border rounded-md bg-gray-50">
-          <h3 className="text-lg font-medium mb-2">Selected Image</h3>
-          <p>
-            {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)}{" "}
-            MB)
-          </p>
-          {locationSource && locationSource !== "store" && (
-            <div className="mt-1 text-sm text-gray-500">
-              <p>
-                Location:{" "}
-                {locationSource === "image"
-                  ? "From image metadata"
-                  : "Using current location"}
-              </p>
-              {detectedLocation.address && (
-                <p className="mt-1 italic">{detectedLocation.address}</p>
-              )}
+      {selectedFile && previewUrl && (
+        <>
+          <div className="flex items-center justify-between mb-2">
+            <TypographyParagraph size="text-sm">
+              1 file selected
+            </TypographyParagraph>
+            <button
+              onClick={handleRemoveFile}
+              className="text-muted-foreground text-sm"
+            >
+              Clear all
+            </button>
+          </div>
+
+          <div className="relative">
+            <div className="relative aspect-square w-full mb-2">
+              <Image
+                src={previewUrl}
+                alt="Selected image preview"
+                fill
+                className="object-cover rounded-md"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <button
+                onClick={handleRemoveFile}
+                className="absolute top-2 right-2 w-8 h-8 bg-black bg-opacity-50 rounded-full flex items-center justify-center hover:bg-opacity-70 transition-colors"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
             </div>
-          )}
-        </div>
+
+            <TypographyParagraph
+              size="text-xs"
+              className="text-muted-foreground"
+            >
+              {selectedFile.name}
+              <br />({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+            </TypographyParagraph>
+          </div>
+        </>
       )}
 
-      {/* Display EXIF metadata */}
-      {/* DELETE LATER IN PRODUCTION */}
-      {exifData && (
-        <div className="mt-4 p-4 border rounded-md bg-gray-50">
-          <h3 className="text-lg font-medium mb-2">Image Metadata</h3>
+      {/* Debug metadata section */}
+      {process.env.NEXT_PUBLIC_ENABLE_LOGGING === "true" && (
+        <>
+          {exifData && (
+            <div className="mt-4 p-4 border rounded-md bg-gray-50">
+              <h3 className="text-lg font-medium mb-2">Image Metadata</h3>
 
-          {exifData.latitude && exifData.longitude ? (
-            <div className="mb-2">
-              <h4 className="font-medium">Location:</h4>
-              <p>Latitude: {exifData.latitude}</p>
-              <p>Longitude: {exifData.longitude}</p>
-              {locationSource === "browser" && (
-                <p className="text-sm">(from browser location)</p>
+              {exifData.latitude && exifData.longitude ? (
+                <div className="mb-2">
+                  <h4 className="font-medium">Location:</h4>
+                  <p>Latitude: {exifData.latitude}</p>
+                  <p>Longitude: {exifData.longitude}</p>
+                  {locationSource === "browser" && (
+                    <p className="text-sm">(from browser location)</p>
+                  )}
+                  {detectedLocation.address && (
+                    <p className="text-sm mt-1">
+                      Address: {detectedLocation.address}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-500">No location data found in image</p>
               )}
-              {detectedLocation.address && (
-                <p className="text-sm mt-1">
-                  Address: {detectedLocation.address}
-                </p>
+
+              {exifData.DateTimeOriginal && (
+                <div className="mb-2">
+                  <h4 className="font-medium">Date Taken:</h4>
+                  <p>{new Date(exifData.DateTimeOriginal).toLocaleString()}</p>
+                </div>
+              )}
+
+              {exifData.Make && (
+                <div className="mb-2">
+                  <h4 className="font-medium">Camera:</h4>
+                  <p>
+                    {exifData.Make} {exifData.Model}
+                  </p>
+                </div>
               )}
             </div>
-          ) : (
-            <p className="text-gray-500">No location data found in image</p>
           )}
-
-          {exifData.DateTimeOriginal && (
-            <div className="mb-2">
-              <h4 className="font-medium">Date Taken:</h4>
-              <p>{new Date(exifData.DateTimeOriginal).toLocaleString()}</p>
-            </div>
-          )}
-
-          {exifData.Make && (
-            <div className="mb-2">
-              <h4 className="font-medium">Camera:</h4>
-              <p>
-                {exifData.Make} {exifData.Model}
-              </p>
-            </div>
-          )}
-        </div>
+        </>
       )}
 
       {/* Hidden input to pass the filename to the form submission */}

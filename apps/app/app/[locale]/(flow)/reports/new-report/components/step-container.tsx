@@ -50,7 +50,7 @@ const StepContainer = ({
       )}
 
       {children}
-      <div className="fixed bottom-0 left-0 w-full bg-background h-min">
+      <div className="fixed bottom-0 left-0 w-full bg-background h-min z-50">
         <div
           className={`px-[5vw] md:px-6 py-2 flex items-center ${
             prevButton && nextButton ? "justify-between" : "justify-end"

@@ -128,17 +128,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>Report Information</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Status
-            </TypographyParagraph>
-            <Badge className={getStatusColor(report.status)}>
-              {report.status}
-            </Badge>
-          </div>
+          <Badge className={`${getStatusColor(report.status)} w-max`}>
+            {report.status}
+          </Badge>
 
           <div>
             <TypographyParagraph
