@@ -2,7 +2,6 @@ import PageHeader from "@/components/page-header";
 import ReportPreview from "@/components/report-preview";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@repo/ui/button";
 import { Metadata } from "next";
 
 interface ReportsPageProps {
@@ -58,11 +57,6 @@ export default async function ReportsPage({ params }: ReportsPageProps) {
             <ReportPreview report={report} />
           </Link>
         ))}
-      </div>
-      <div className="mt-6">
-        <Link href="/reports/new-report">
-          <Button className="w-full">New Report</Button>
-        </Link>
       </div>
     </>
   );
