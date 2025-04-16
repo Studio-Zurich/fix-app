@@ -1,6 +1,5 @@
+import { EmailProps } from "@/lib/types";
 import { Heading, Text } from "@react-email/components";
-import messages from "@repo/translations/messages";
-import { EmailProps } from "../../../archiv/old-app/lib/types";
 
 type ReportOverviewProps = Pick<
   EmailProps,
@@ -12,94 +11,57 @@ type ReportOverviewProps = Pick<
   | "userData"
 >;
 
-type IncidentTypeTranslation = {
-  name: string;
-  description: string;
-  subtypes?: {
-    [key: string]: {
-      name: string;
-      description: string;
-    };
-  };
-};
-
-type IncidentTypesTranslation = {
-  searchIncidentTypes: string;
-  [key: string]: IncidentTypeTranslation | string;
-};
-
 export const ReportOverview = ({
   imageCount,
-  locale,
   location,
   incidentType,
   description,
   userData,
 }: ReportOverviewProps) => {
-  const t = messages[locale].components.reportOverview;
-  const tTypes = messages[locale]
-    .incidentTypes as unknown as IncidentTypesTranslation;
-
-  const getIncidentTypeName = (typeName: string) => {
-    const typeTranslation = tTypes[typeName] as IncidentTypeTranslation;
-    return typeTranslation?.name || typeName;
-  };
-
-  const getIncidentSubtypeName = (typeName: string, subtypeName: string) => {
-    const typeTranslation = tTypes[typeName] as IncidentTypeTranslation;
-    return typeTranslation?.subtypes?.[subtypeName]?.name || subtypeName;
-  };
-
   return (
     <>
       {imageCount > 0 && (
         <>
-          <Heading style={heading}>{t.images}</Heading>
+          <Heading style={heading}>Images</Heading>
           <Text style={text}>
-            {imageCount} {imageCount === 1 ? t.imageUploaded : t.imagesUploaded}
+            {imageCount}{" "}
+            {imageCount === 1 ? "image uploaded" : "images uploaded"}
           </Text>
         </>
       )}
 
       {location && (
         <>
-          <Heading style={heading}>{t.location}</Heading>
+          <Heading style={heading}>Location</Heading>
           <Text style={text}>{location}</Text>
         </>
       )}
+
       {incidentType && (
         <>
-          <Heading style={heading}>{t.incidentType}</Heading>
+          <Heading style={heading}>Incident Type</Heading>
           <Text style={text}>
-            {getIncidentTypeName(incidentType.type.name)}
-            {incidentType.subtype &&
-              ` - ${getIncidentSubtypeName(
-                incidentType.type.name,
-                incidentType.subtype.name
-              )}`}
+            {incidentType.type.name}
+            {incidentType.subtype && ` - ${incidentType.subtype.name}`}
           </Text>
         </>
       )}
+
       {description && (
         <>
-          <Heading style={heading}>{t.description}</Heading>
+          <Heading style={heading}>Description</Heading>
           <Text style={text}>{description}</Text>
         </>
       )}
+
       {userData && (
         <>
-          <Heading style={heading}>{t.reporter}</Heading>
+          <Heading style={heading}>Reporter</Heading>
           <Text style={text}>
             {userData.firstName} {userData.lastName}
           </Text>
-          <Text style={text}>
-            {t.reporterEmail}: {userData.email}
-          </Text>
-          {userData.phone && (
-            <Text style={text}>
-              {t.reporterPhone}: {userData.phone}
-            </Text>
-          )}
+          <Text style={text}>Email: {userData.email}</Text>
+          {userData.phone && <Text style={text}>Phone: {userData.phone}</Text>}
         </>
       )}
     </>

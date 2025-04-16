@@ -3,7 +3,72 @@
 import { redirect } from "@/i18n/navigation";
 import { log, logError, logSuccess } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
+import { EmailSendParams, Locale } from "@/lib/types";
+import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
+import { ReportEmail as InternalReportEmail } from "@repo/transactional/emails/intern";
+import messages from "@repo/translations/messages";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Helper function for retrying email sending
+async function sendEmailWithRetry(params: EmailSendParams, maxRetries = 3) {
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await resend.emails.send(params);
+      return result;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      if (attempt < maxRetries) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.pow(2, attempt) * 1000)
+        );
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+// Helper function to get translated type name
+function getTranslatedType(typeId: string, locale: Locale) {
+  try {
+    const translations = messages[locale];
+    const translatedName =
+      translations.incidentTypes.types[
+        typeId as keyof typeof translations.incidentTypes.types
+      ]?.name;
+    return translatedName || typeId;
+  } catch (error) {
+    return typeId;
+  }
+}
+
+// Helper function to get translated subtype name
+function getTranslatedSubtype(
+  typeId: string,
+  subtypeId: string,
+  locale: Locale
+) {
+  try {
+    const translations = messages[locale];
+    const type =
+      translations.incidentTypes.types[
+        typeId as keyof typeof translations.incidentTypes.types
+      ];
+    if (type && "subtypes" in type) {
+      const subtypes = type.subtypes as Record<string, { name: string }>;
+      const translatedName = subtypes[subtypeId]?.name;
+      return translatedName || subtypeId;
+    }
+    return subtypeId;
+  } catch (error) {
+    return subtypeId;
+  }
+}
 
 export type ActionState = {
   success: boolean;
@@ -114,6 +179,63 @@ export async function submitReport(
         logError("Error handling image", imageError);
         // Continue with the redirect even if image handling fails
       }
+    }
+
+    // Prepare email data
+    const emailProps = {
+      imageCount: imageFilename ? 1 : 0,
+      locale: locale as Locale,
+      reportId,
+      location: (locationAddress as string) || "",
+      incidentType: {
+        type: {
+          id: incidentTypeId as string,
+          name: getTranslatedType(incidentTypeId as string, locale as Locale),
+          has_subtypes: Boolean(finalSubtypeId),
+        },
+        subtype: finalSubtypeId
+          ? {
+              id: finalSubtypeId as string,
+              name: getTranslatedSubtype(
+                incidentTypeId as string,
+                finalSubtypeId as string,
+                locale as Locale
+              ),
+            }
+          : undefined,
+      },
+      description: description as string,
+      userData: {
+        firstName: firstName as string,
+        lastName: lastName as string,
+        email: email as string,
+        phone: phone as string,
+      },
+    };
+
+    try {
+      // Send internal email
+      await sendEmailWithRetry({
+        from: "notifications@fixapp.ch",
+        to: "reports@fixapp.ch",
+        cc: "hello@studio-zurich.ch",
+        subject: "New Report Submitted",
+        react: InternalReportEmail(emailProps),
+      });
+
+      // Send external email
+      await sendEmailWithRetry({
+        from: "notifications@fixapp.ch",
+        to: email as string,
+        bcc: "reports@fixapp.ch",
+        subject: "Your Report Has Been Received",
+        react: ExternalReportEmail(emailProps),
+      });
+
+      logSuccess("Emails sent successfully", { reportId });
+    } catch (emailError) {
+      logError("Error sending emails", emailError);
+      // Continue with redirect even if email sending fails
     }
 
     log("Redirecting to report page", `/reports/${reportId}`);

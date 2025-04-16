@@ -71,3 +71,38 @@ export interface UserDataFormFields {
   reporter_email: string;
   reporter_phone: string;
 }
+
+// Email types
+export interface EmailProps {
+  imageCount: number;
+  locale: Locale;
+  reportId: string;
+  location: string;
+  incidentType: {
+    type: {
+      id: string;
+      name: string;
+      has_subtypes: boolean;
+    };
+    subtype?: {
+      id: string;
+      name: string;
+    };
+  };
+  description?: string;
+  userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
+}
+
+export interface EmailSendParams {
+  from: string;
+  to: string;
+  cc?: string;
+  bcc?: string;
+  subject: string;
+  react: React.ReactElement;
+}

@@ -56,7 +56,7 @@ export default async function LocaleLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <Header locale={locale} />
+            <Header />
             {children}
             <Footer locale={locale} />
           </NextIntlClientProvider>

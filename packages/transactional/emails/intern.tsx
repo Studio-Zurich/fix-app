@@ -1,5 +1,7 @@
+import { EmailProps } from "@/lib/types";
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
@@ -8,38 +10,29 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import messages from "@repo/translations/messages";
-import { EmailProps } from "../../../archiv/old-app/lib/types";
-
 import { ReportOverview } from "./report-overview";
 
-const defaultProps: EmailProps = {
-  imageCount: 0,
-  locale: "de",
-  reportId: "",
-};
-
 export const ReportEmail = ({
-  imageCount = defaultProps.imageCount,
-  locale = defaultProps.locale,
+  imageCount = 0,
+  locale = "de",
+  reportId,
   location,
   incidentType,
   description,
   userData,
 }: EmailProps) => {
-  const t = messages[locale].mails.internal;
+  const reportUrl = `https://app.fixapp.ch/${locale}/reports/${reportId}`;
 
   return (
     <Html>
       <Head />
-      <Preview>{t.subject}</Preview>
+      <Preview>New Report Submitted</Preview>
       <Body style={main}>
         <Container>
           <Section style={content}>
             <Heading style={header}>
-              {t.title}
-              <br />
-              {t.newReport}
+              New Report Submitted
+              <br />#{reportId}
             </Heading>
 
             <Section style={section}>
@@ -51,6 +44,12 @@ export const ReportEmail = ({
                 description={description}
                 userData={userData}
               />
+            </Section>
+
+            <Section style={buttonSection}>
+              <Button href={reportUrl} style={button}>
+                View Report
+              </Button>
             </Section>
           </Section>
 
@@ -92,10 +91,24 @@ const section = {
   marginTop: "20px",
 };
 
-const sectionHeader = {
-  fontSize: "20px",
-  lineHeight: "24px",
-  marginBottom: "10px",
+const buttonSection = {
+  padding: "0 20px",
+  marginTop: "20px",
+  textAlign: "center" as const,
+};
+
+const button = {
+  backgroundColor: "#000000",
+  borderRadius: "5px",
+  color: "#ffffff",
+  fontSize: "16px",
+  fontWeight: "bold",
+  textDecoration: "none",
+  textAlign: "center" as const,
+  display: "inline-block",
+  padding: "12px 24px",
+  marginTop: "16px",
+  marginBottom: "16px",
 };
 
 const text = {
