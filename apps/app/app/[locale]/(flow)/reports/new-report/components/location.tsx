@@ -351,6 +351,7 @@ const Location = () => {
           Next
         </Button>
       }
+      hideHeader={true}
     >
       <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-20">
         <Command shouldFilter={false}>

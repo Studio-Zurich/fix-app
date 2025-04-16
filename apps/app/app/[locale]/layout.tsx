@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-
 const brockmannRegular = localFont({
   src: "./../fonts/brockmann-regular.woff2",
   variable: "--font-brockmann-regular",

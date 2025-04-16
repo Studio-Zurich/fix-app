@@ -3,11 +3,12 @@ import { List } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { TypographySpan } from "@repo/ui/text";
 import { useTranslations } from "next-intl";
-import NextLink from "next/link";
+
+import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { Menu } from "./menu";
 
-const Header = ({ locale }: { locale: string }) => {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const t = useTranslations("Navigation");
   const navLinks = [{ title: t("how-it-works"), href: "/#how-it-works" }];
@@ -17,9 +18,9 @@ const Header = ({ locale }: { locale: string }) => {
       <header className="fixed top-8 w-full z-50">
         <div className="container ml-[5vw] lg:mx-auto px-[5vw] md:px-6 bg-[#343434]/40 backdrop-blur-[40px] rounded-full py-2 w-max lg:w-[calc(100vw-10vw)] md:w-[calc(100vw-3rem)]">
           <div className="flex justify-start space-x-4 lg:justify-between items-center">
-            <NextLink href="/">
+            <Link href="/">
               <span className="text-white">Fix</span>
-            </NextLink>
+            </Link>
             <button
               className="md:hidden mx-auto"
               onClick={() => setIsMenuOpen(true)}
@@ -29,11 +30,11 @@ const Header = ({ locale }: { locale: string }) => {
 
             <div className="hidden md:flex gap-8 items-center">
               {navLinks.map((link) => (
-                <NextLink key={link.href} href={link.href}>
+                <Link key={link.href} href={link.href}>
                   <TypographySpan className="text-background " size="text-base">
                     {link.title}
                   </TypographySpan>
-                </NextLink>
+                </Link>
               ))}
               <a
                 href="https://app.fixapp.ch"

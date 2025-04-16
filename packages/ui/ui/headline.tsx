@@ -92,7 +92,7 @@ const TypographyH4 = React.forwardRef<HTMLHeadingElement, TypographyH4Props>(
       <h4
         className={cn(
           headlineVariants({ weight, className }),
-          size ? size : "text-xl"
+          size ? size : "text-lg"
         )}
         ref={ref}
         {...props}
