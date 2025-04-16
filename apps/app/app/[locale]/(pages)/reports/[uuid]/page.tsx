@@ -4,6 +4,7 @@ import { Badge } from "@repo/ui/badge";
 import { TypographyH2 } from "@repo/ui/headline";
 import { TypographyParagraph } from "@repo/ui/text";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 
 interface ReportPageProps {
@@ -26,6 +27,7 @@ export async function generateMetadata({
 export default async function ReportPage({ params }: ReportPageProps) {
   const resolvedParams = await params;
   const supabase = await createClient();
+  const t = await getTranslations("incidentTypes");
 
   const { data: report, error } = await supabase
     .from("reports")
@@ -43,6 +45,32 @@ export default async function ReportPage({ params }: ReportPageProps) {
     console.error("Error fetching report:", error);
     return <div>Report not found</div>;
   }
+
+  // Get translated type name
+  const getTranslatedType = (typeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = t.raw(`types.${typeId}.name`);
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return report.incident_types?.name || "Unknown Type";
+    }
+  };
+
+  // Get translated subtype name
+  const getTranslatedSubtype = (typeId: string, subtypeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = t.raw(
+        `types.${typeId}.subtypes.${subtypeId}.name`
+      );
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return report.incident_subtypes?.name || "Unknown Subtype";
+    }
+  };
 
   // Get the list of images for this report
   const { data: imageList, error: imageError } = await supabase.storage
@@ -76,11 +104,56 @@ export default async function ReportPage({ params }: ReportPageProps) {
     }
   };
 
+  // Format date for display in Swiss German format (HH:MM, DD.MM.YYYY)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const timeFormat = new Intl.DateTimeFormat("de-CH", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+
+    const dateFormat = new Intl.DateTimeFormat("de-CH", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+
+    return `${timeFormat}, ${dateFormat}`;
+  };
+
   return (
     <>
       <PageHeader title="Report Details" description={report.id} />
 
-      {/* Images Section (Moved to top) */}
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>Report Information</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Status
+            </TypographyParagraph>
+            <Badge className={getStatusColor(report.status)}>
+              {report.status}
+            </Badge>
+          </div>
+
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Created At
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {formatDate(report.created_at)}
+            </TypographyParagraph>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>Report Images</TypographyH2>
         {imageUrls.length > 0 ? (
@@ -120,74 +193,13 @@ export default async function ReportPage({ params }: ReportPageProps) {
               {report.location_address}
             </TypographyParagraph>
           </div>
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Coordinates
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {report.location_lat}, {report.location_lng}
-            </TypographyParagraph>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>Report Information</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Status
-            </TypographyParagraph>
-            <Badge className={getStatusColor(report.status)}>
-              {report.status}
-            </Badge>
-          </div>
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Locale
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {report.locale}
-            </TypographyParagraph>
-          </div>
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Created At
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {new Date(report.created_at).toLocaleString()}
-            </TypographyParagraph>
-          </div>
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              Updated At
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {new Date(report.updated_at).toLocaleString()}
-            </TypographyParagraph>
-          </div>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>Incident Information</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {report.incident_types && (
+          {report.incident_type_id && (
             <div>
               <TypographyParagraph
                 size="text-sm"
@@ -196,11 +208,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 Incident Type
               </TypographyParagraph>
               <TypographyParagraph size="text-sm">
-                {report.incident_types.name}
+                {getTranslatedType(report.incident_type_id)}
               </TypographyParagraph>
             </div>
           )}
-          {report.incident_subtypes && (
+          {report.incident_type_id && report.incident_subtype_id && (
             <div>
               <TypographyParagraph
                 size="text-sm"
@@ -209,7 +221,10 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 Incident Subtype
               </TypographyParagraph>
               <TypographyParagraph size="text-sm">
-                {report.incident_subtypes.name}
+                {getTranslatedSubtype(
+                  report.incident_type_id,
+                  report.incident_subtype_id
+                )}
               </TypographyParagraph>
             </div>
           )}

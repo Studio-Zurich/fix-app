@@ -1,7 +1,10 @@
+"use client";
+
 import { Badge } from "@repo/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { TypographyH4 } from "@repo/ui/headline";
 import { TypographyParagraph } from "@repo/ui/text";
+import { useTranslations } from "next-intl";
 
 interface ReportPreviewProps {
   report: {
@@ -21,6 +24,35 @@ interface ReportPreviewProps {
 }
 
 const ReportPreview = ({ report }: ReportPreviewProps) => {
+  // Get translations
+  const t = useTranslations("incidentTypes");
+
+  // Get translated type name
+  const getTranslatedType = (typeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = t.raw(`types.${typeId}.name`);
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return report.incident_types?.name || "Incident Report";
+    }
+  };
+
+  // Get translated subtype name
+  const getTranslatedSubtype = (typeId: string, subtypeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = t.raw(
+        `types.${typeId}.subtypes.${subtypeId}.name`
+      );
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return report.incident_subtypes?.name || "";
+    }
+  };
+
   // Format status for display
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -57,7 +89,9 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">
-            {report.incident_types?.name || "Incident Report"}
+            {report.incident_type_id
+              ? getTranslatedType(report.incident_type_id)
+              : "Incident Report"}
           </CardTitle>
           <Badge className={getStatusColor(report.status)}>
             {report.status}
@@ -65,13 +99,16 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col space-y-3 flex-grow">
-        {report.incident_subtypes && (
+        {report.incident_type_id && report.incident_subtype_id && (
           <div>
             <TypographyH4 className="text-muted-foreground" size="text-sm">
               Subtype
             </TypographyH4>
             <TypographyParagraph>
-              {report.incident_subtypes.name}
+              {getTranslatedSubtype(
+                report.incident_type_id,
+                report.incident_subtype_id
+              )}
             </TypographyParagraph>
           </div>
         )}
