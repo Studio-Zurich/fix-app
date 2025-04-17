@@ -299,7 +299,7 @@
     },
     "mails": {
         "intern": {},
-        "exter": {}
+        "extern": {}
     },
     "responses": {
         "success": {},

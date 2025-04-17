@@ -68,6 +68,9 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
+      react-map-gl:
+        specifier: ^8.0.1
+        version: 8.0.3(mapbox-gl@3.11.0)(react-dom@19.1.0)(react@19.1.0)
       resend:
         specifier: ^4.3.0
         version: 4.3.0(react-dom@19.1.0)(react@19.1.0)
@@ -155,7 +158,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       react-map-gl:
         specifier: ^8.0.1
-        version: 8.0.3(react-dom@19.1.0)(react@19.1.0)
+        version: 8.0.3(mapbox-gl@3.11.0)(react-dom@19.1.0)(react@19.1.0)
       swiper:
         specifier: ^11.2.6
         version: 11.2.6
@@ -4888,7 +4891,7 @@ packages:
       - supports-color
     dev: true
 
-  /@vis.gl/react-mapbox@8.0.3(react-dom@19.1.0)(react@19.1.0):
+  /@vis.gl/react-mapbox@8.0.3(mapbox-gl@3.11.0)(react-dom@19.1.0)(react@19.1.0):
     resolution: {integrity: sha512-/0YcgWOYNU+gPuX5PCZ8ZjbV28d3hYewhGa8MK8q70LbEqhOZycdDP/1taS8ro6vkCpmmuAJUzL24f93Y1Fh/Q==}
     peerDependencies:
       mapbox-gl: '>=3.5.0'
@@ -4898,6 +4901,7 @@ packages:
       mapbox-gl:
         optional: true
     dependencies:
+      mapbox-gl: 3.11.0
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
     dev: false
@@ -9551,7 +9555,7 @@ packages:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
 
-  /react-map-gl@8.0.3(react-dom@19.1.0)(react@19.1.0):
+  /react-map-gl@8.0.3(mapbox-gl@3.11.0)(react-dom@19.1.0)(react@19.1.0):
     resolution: {integrity: sha512-RZ93PKfJtXGIfx+hT5drLeiEwrbQnMAhI8YWq02OwfFIEIEQU/KnlJlFCvFCS+ezj9VExl7gQHJu5b1TC+U3EA==}
     peerDependencies:
       mapbox-gl: '>=1.13.0'
@@ -9564,8 +9568,9 @@ packages:
       maplibre-gl:
         optional: true
     dependencies:
-      '@vis.gl/react-mapbox': 8.0.3(react-dom@19.1.0)(react@19.1.0)
+      '@vis.gl/react-mapbox': 8.0.3(mapbox-gl@3.11.0)(react-dom@19.1.0)(react@19.1.0)
       '@vis.gl/react-maplibre': 8.0.3(react-dom@19.1.0)(react@19.1.0)
+      mapbox-gl: 3.11.0
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
     dev: false
