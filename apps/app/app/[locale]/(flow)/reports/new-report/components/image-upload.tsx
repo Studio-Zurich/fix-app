@@ -7,6 +7,7 @@ import { Button } from "@repo/ui/button";
 import { TypographyParagraph } from "@repo/ui/text";
 import imageCompression from "browser-image-compression";
 import exifr from "exifr";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -100,6 +101,7 @@ const readImageLocation = async (
 };
 
 const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
+  const t = useTranslations("components.imageUpload");
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -416,15 +418,15 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
 
   return (
     <StepContainer
-      title="Upload Image"
-      description="Upload an image to help us understand the incident better."
+      title={t("title")}
+      description={t("description")}
       nextButton={
         <Button type="button" onClick={handleNext} disabled={isProcessing}>
           {isProcessing
-            ? "Processing..."
+            ? t("buttons.processing")
             : previouslyUploaded || selectedFile
-              ? "Continue"
-              : "Skip Upload"}
+              ? t("buttons.continue")
+              : t("buttons.skipUpload")}
         </Button>
       }
     >
@@ -441,7 +443,9 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           />
           <Button asChild className="w-full">
             <label htmlFor="camera-input" className="cursor-pointer w-full">
-              {previouslyUploaded ? "Take New Photo" : "Take Photo"}
+              {previouslyUploaded
+                ? t("buttons.takeNewPhoto")
+                : t("buttons.takePhoto")}
             </label>
           </Button>
         </div>
@@ -457,7 +461,7 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
           />
           <Button asChild className="w-full" variant="outline">
             <label htmlFor="library-input" className="cursor-pointer w-full">
-              Choose from library
+              {t("buttons.chooseFromLibrary")}
             </label>
           </Button>
         </div>
@@ -486,13 +490,13 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         <>
           <div className="flex items-center justify-between mb-2">
             <TypographyParagraph size="text-sm">
-              1 file selected
+              {t("fileInfo.filesSelected")}
             </TypographyParagraph>
             <button
               onClick={handleRemoveFile}
               className="text-muted-foreground text-sm"
             >
-              Clear all
+              {t("buttons.clearAll")}
             </button>
           </div>
 
@@ -530,7 +534,8 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
               className="text-muted-foreground"
             >
               {selectedFile.name}
-              <br />({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+              <br />({(selectedFile.size / 1024 / 1024).toFixed(2)}{" "}
+              {t("fileInfo.size")})
             </TypographyParagraph>
           </div>
         </>
@@ -541,36 +546,54 @@ const ImageUpload = ({ onImageSelected }: ImageUploadProps) => {
         <>
           {exifData && (
             <div className="mt-4 p-4 border rounded-md bg-gray-50">
-              <h3 className="text-lg font-medium mb-2">Image Metadata</h3>
+              <h3 className="text-lg font-medium mb-2">
+                {t("debug.metadata.title")}
+              </h3>
 
               {exifData.latitude && exifData.longitude ? (
                 <div className="mb-2">
-                  <h4 className="font-medium">Location:</h4>
-                  <p>Latitude: {exifData.latitude}</p>
-                  <p>Longitude: {exifData.longitude}</p>
+                  <h4 className="font-medium">
+                    {t("debug.metadata.location.title")}
+                  </h4>
+                  <p>
+                    {t("debug.metadata.location.latitude")}: {exifData.latitude}
+                  </p>
+                  <p>
+                    {t("debug.metadata.location.longitude")}:{" "}
+                    {exifData.longitude}
+                  </p>
                   {locationSource === "browser" && (
-                    <p className="text-sm">(from browser location)</p>
+                    <p className="text-sm">
+                      {t("debug.metadata.location.fromBrowser")}
+                    </p>
                   )}
                   {detectedLocation.address && (
                     <p className="text-sm mt-1">
-                      Address: {detectedLocation.address}
+                      {t("debug.metadata.location.address")}:{" "}
+                      {detectedLocation.address}
                     </p>
                   )}
                 </div>
               ) : (
-                <p className="text-gray-500">No location data found in image</p>
+                <p className="text-gray-500">
+                  {t("debug.metadata.location.noLocation")}
+                </p>
               )}
 
               {exifData.DateTimeOriginal && (
                 <div className="mb-2">
-                  <h4 className="font-medium">Date Taken:</h4>
+                  <h4 className="font-medium">
+                    {t("debug.metadata.dateTaken.title")}
+                  </h4>
                   <p>{new Date(exifData.DateTimeOriginal).toLocaleString()}</p>
                 </div>
               )}
 
               {exifData.Make && (
                 <div className="mb-2">
-                  <h4 className="font-medium">Camera:</h4>
+                  <h4 className="font-medium">
+                    {t("debug.metadata.camera.title")}
+                  </h4>
                   <p>
                     {exifData.Make} {exifData.Model}
                   </p>

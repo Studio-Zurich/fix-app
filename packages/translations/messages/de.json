@@ -1,4 +1,105 @@
 {
+    "pages": {
+        "reports": {
+            "newReport": {
+                "title": "Neuer Report"
+            },
+            "list": {
+                "title": "Aktuelle Reports",
+                "description": "Alle Meldungen anzeigen"
+            },
+            "detail": {
+                "title": "Report Details",
+                "sections": {
+                    "reportInfo": {
+                        "title": "Report Informationen",
+                        "createdAt": "Erstellt am"
+                    },
+                    "images": {
+                        "title": "Report Bilder",
+                        "noImages": "Keine Bilder für diesen Report hochgeladen."
+                    },
+                    "location": {
+                        "title": "Standort Informationen",
+                        "address": "Adresse"
+                    },
+                    "incident": {
+                        "title": "Vorfall Informationen",
+                        "type": "Vorfallstyp",
+                        "subtype": "Vorfallsuntertyp",
+                        "description": "Beschreibung"
+                    },
+                    "reporter": {
+                        "title": "Melder Informationen",
+                        "name": "Name",
+                        "email": "E-Mail",
+                        "phone": "Telefon"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "header": {
+            "appName": "Fix",
+            "newReport": "Neuer Report"
+        },
+        "reportPreview": {
+            "location": "Standort",
+            "created": "Erstellt",
+            "fallback": {
+                "type": "Vorfall Meldung"
+            },
+            "status": {
+                "open": "Offen",
+                "inProgress": "In Bearbeitung",
+                "closed": "Geschlossen"
+            }
+        },
+        "imageUpload": {
+            "title": "Bild hochladen",
+            "description": "Laden Sie ein Bild hoch, um uns den Vorfall besser zu verstehen.",
+            "buttons": {
+                "takePhoto": "Foto aufnehmen",
+                "takeNewPhoto": "Neues Foto aufnehmen",
+                "chooseFromLibrary": "Aus Galerie wählen",
+                "continue": "Weiter",
+                "skipUpload": "Überspringen",
+                "processing": "Verarbeitung...",
+                "clearAll": "Alle löschen"
+            },
+            "fileInfo": {
+                "filesSelected": "1 Datei ausgewählt",
+                "size": "MB"
+            },
+            "debug": {
+                "metadata": {
+                    "title": "Bild Metadaten",
+                    "location": {
+                        "title": "Standort:",
+                        "latitude": "Breitengrad",
+                        "longitude": "Längengrad",
+                        "fromBrowser": "(vom Browser-Standort)",
+                        "address": "Adresse",
+                        "noLocation": "Keine Standortdaten im Bild gefunden"
+                    },
+                    "dateTaken": {
+                        "title": "Aufnahmedatum:"
+                    },
+                    "camera": {
+                        "title": "Kamera:"
+                    }
+                }
+            }
+        }
+    },
+    "steps": {
+        "report-flow": {},
+        "image": {
+            "title": "Bild hochladen",
+            "description": "Bitte laden Sie ein Bild hoch, um das Problem zu dokumentieren."
+        }
+    },
     "incidentTypes": {
         "searchIncidentTypes": "Suchbegriffe eingeben",
         "types": {
@@ -195,5 +296,13 @@
                 }
             }
         }
+    },
+    "mails": {
+        "intern": {},
+        "exter": {}
+    },
+    "responses": {
+        "success": {},
+        "error": {}
     }
 }

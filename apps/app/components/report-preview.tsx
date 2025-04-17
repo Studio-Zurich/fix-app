@@ -26,6 +26,7 @@ interface ReportPreviewProps {
 const ReportPreview = ({ report }: ReportPreviewProps) => {
   // Get translations
   const t = useTranslations("incidentTypes");
+  const tc = useTranslations("components.reportPreview");
 
   // Get translated type name
   const getTranslatedType = (typeId: string) => {
@@ -35,7 +36,7 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
       return translatedName as string;
     } catch (error) {
       // Fall back to database name if translation not found
-      return report.incident_types?.name || "Incident Report";
+      return report.incident_types?.name || tc("fallback.type");
     }
   };
 
@@ -50,6 +51,20 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
     } catch (error) {
       // Fall back to database name if translation not found
       return report.incident_subtypes?.name || "";
+    }
+  };
+
+  // Get translated status
+  const getTranslatedStatus = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "open":
+        return tc("status.open");
+      case "in progress":
+        return tc("status.inProgress");
+      case "closed":
+        return tc("status.closed");
+      default:
+        return status;
     }
   };
 
@@ -92,7 +107,7 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
             <CardTitle className="text-lg">
               {report.incident_type_id
                 ? getTranslatedType(report.incident_type_id)
-                : "Incident Report"}
+                : tc("fallback.type")}
             </CardTitle>
             {report.incident_type_id && report.incident_subtype_id && (
               <TypographyParagraph
@@ -107,7 +122,7 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
             )}
           </div>
           <Badge className={getStatusColor(report.status)}>
-            {report.status}
+            {getTranslatedStatus(report.status)}
           </Badge>
         </div>
       </CardHeader>
@@ -115,7 +130,7 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
         <div>
           <div className="flex items-center gap-1 text-sm text-gray-500 font-medium">
             <TypographyH4 className="text-muted-foreground" size="text-sm">
-              Location
+              {tc("location")}
             </TypographyH4>
           </div>
           <p className="line-clamp-2">{report.location_address}</p>
@@ -124,7 +139,7 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
         <div className="mt-auto">
           <div className="flex items-center gap-1 text-sm text-gray-500">
             <TypographyH4 className="text-muted-foreground" size="text-sm">
-              Created
+              {tc("created")}
             </TypographyH4>
           </div>
           <TypographyParagraph>

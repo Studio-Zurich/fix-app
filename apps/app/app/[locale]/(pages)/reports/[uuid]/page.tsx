@@ -18,16 +18,18 @@ export async function generateMetadata({
   params,
 }: ReportPageProps): Promise<Metadata> {
   const resolvedParams = await params;
+  const t = await getTranslations("pages.reports.detail");
   return {
-    title: `Report ${resolvedParams.uuid}`,
-    description: "View or edit incident report",
+    title: `${t("title")} ${resolvedParams.uuid}`,
+    description: t("title"),
   };
 }
 
 export default async function ReportPage({ params }: ReportPageProps) {
   const resolvedParams = await params;
   const supabase = await createClient();
-  const t = await getTranslations("incidentTypes");
+  const t = await getTranslations("pages.reports.detail");
+  const tIncidentTypes = await getTranslations("incidentTypes");
 
   const { data: report, error } = await supabase
     .from("reports")
@@ -50,7 +52,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
   const getTranslatedType = (typeId: string) => {
     try {
       // Try to get translated name from translations
-      const translatedName = t.raw(`types.${typeId}.name`);
+      const translatedName = tIncidentTypes.raw(`types.${typeId}.name`);
       return translatedName as string;
     } catch (error) {
       // Fall back to database name if translation not found
@@ -62,7 +64,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
   const getTranslatedSubtype = (typeId: string, subtypeId: string) => {
     try {
       // Try to get translated name from translations
-      const translatedName = t.raw(
+      const translatedName = tIncidentTypes.raw(
         `types.${typeId}.subtypes.${subtypeId}.name`
       );
       return translatedName as string;
@@ -123,10 +125,10 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <>
-      <PageHeader title="Report Details" description={report.id} />
+      <PageHeader title={t("title")} description={report.id} />
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>Report Information</TypographyH2>
+        <TypographyH2>{t("sections.reportInfo.title")}</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Badge className={`${getStatusColor(report.status)} w-max`}>
             {report.status}
@@ -137,7 +139,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
               size="text-sm"
               className="text-muted-foreground"
             >
-              Created At
+              {t("sections.reportInfo.createdAt")}
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {formatDate(report.created_at)}
@@ -147,7 +149,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>Report Images</TypographyH2>
+        <TypographyH2>{t("sections.images.title")}</TypographyH2>
         {imageUrls.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {imageUrls.map((url, index) => (
@@ -167,19 +169,19 @@ export default async function ReportPage({ params }: ReportPageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No images uploaded for this report.</p>
+          <p className="text-gray-500">{t("sections.images.noImages")}</p>
         )}
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>Location Information</TypographyH2>
+        <TypographyH2>{t("sections.location.title")}</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <TypographyParagraph
               size="text-sm"
               className="text-muted-foreground"
             >
-              Address
+              {t("sections.location.address")}
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {report.location_address}
@@ -189,7 +191,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>Incident Information</TypographyH2>
+        <TypographyH2>{t("sections.incident.title")}</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {report.incident_type_id && (
             <div>
@@ -197,7 +199,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 size="text-sm"
                 className="text-muted-foreground"
               >
-                Incident Type
+                {t("sections.incident.type")}
               </TypographyParagraph>
               <TypographyParagraph size="text-sm">
                 {getTranslatedType(report.incident_type_id)}
@@ -210,7 +212,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 size="text-sm"
                 className="text-muted-foreground"
               >
-                Incident Subtype
+                {t("sections.incident.subtype")}
               </TypographyParagraph>
               <TypographyParagraph size="text-sm">
                 {getTranslatedSubtype(
@@ -225,7 +227,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
               size="text-sm"
               className="text-muted-foreground"
             >
-              Description
+              {t("sections.incident.description")}
             </TypographyParagraph>
             <TypographyParagraph className="whitespace-pre-wrap" size="text-sm">
               {report.description}
@@ -235,14 +237,14 @@ export default async function ReportPage({ params }: ReportPageProps) {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4">
-        <TypographyH2>Reporter Information</TypographyH2>
+        <TypographyH2>{t("sections.reporter.title")}</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <TypographyParagraph
               size="text-sm"
               className="text-muted-foreground"
             >
-              Name
+              {t("sections.reporter.name")}
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {report.reporter_first_name} {report.reporter_last_name}
@@ -253,7 +255,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
               size="text-sm"
               className="text-muted-foreground"
             >
-              Email
+              {t("sections.reporter.email")}
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {report.reporter_email}
@@ -265,7 +267,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 size="text-sm"
                 className="text-muted-foreground"
               >
-                Phone
+                {t("sections.reporter.phone")}
               </TypographyParagraph>
               <TypographyParagraph size="text-sm">
                 {report.reporter_phone}

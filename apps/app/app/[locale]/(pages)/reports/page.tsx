@@ -3,6 +3,7 @@ import ReportPreview from "@/components/report-preview";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 interface ReportsPageProps {
   params: Promise<{
@@ -14,14 +15,16 @@ export async function generateMetadata({
   params,
 }: ReportsPageProps): Promise<Metadata> {
   await params;
+  const t = await getTranslations("pages.reports.list");
   return {
-    title: "Reports",
-    description: "View all incident reports",
+    title: t("title"),
+    description: t("description"),
   };
 }
 
 export default async function ReportsPage({ params }: ReportsPageProps) {
   await params;
+  const t = await getTranslations("pages.reports.list");
   const supabase = await createClient();
 
   // Fetch reports with their incident types and subtypes
@@ -43,10 +46,7 @@ export default async function ReportsPage({ params }: ReportsPageProps) {
 
   return (
     <>
-      <PageHeader
-        title="Current Reports"
-        description="View all incident reports"
-      />
+      <PageHeader title={t("title")} description={t("description")} />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {reports.map((report) => (
           <Link

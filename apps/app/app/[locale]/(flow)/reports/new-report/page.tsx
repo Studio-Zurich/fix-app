@@ -1,6 +1,16 @@
 import { log } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
+import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import ReportFlow from "./components/report-flow";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pages.reports.newReport");
+  return {
+    title: t("title"),
+    description: t("title"),
+  };
+}
 
 export default async function NewReportPage() {
   const supabase = await createClient();
