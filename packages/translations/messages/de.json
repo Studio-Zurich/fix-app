@@ -142,7 +142,8 @@
             "description": "Geben Sie eine detaillierte Beschreibung des Vorfalls an.",
             "buttons": {
                 "back": "Zurück",
-                "next": "Weiter"
+                "next": "Weiter",
+                "skip": "Überspringen"
             },
             "placeholder": "Beschreiben Sie den Vorfall im Detail...",
             "charactersLeft": "Zeichen übrig",

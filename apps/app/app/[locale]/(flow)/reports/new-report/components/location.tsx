@@ -413,7 +413,7 @@ const Location = () => {
             )}
         </Command>
       </div>
-      <div className="h-svh w-full rounded-md overflow-hidden border relative">
+      <div className="h-svh w-full overflow-hidden relative">
         <div ref={mapContainer} className="h-full w-full" />
 
         {/* Centered pin */}

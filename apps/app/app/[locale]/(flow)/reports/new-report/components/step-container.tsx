@@ -16,7 +16,7 @@ const StepContainer = ({
 }: {
   children: React.ReactNode;
   prevButton?: React.ReactNode;
-  nextButton: React.ReactNode;
+  nextButton?: React.ReactNode;
   error?: string;
   title: string;
   description: string;

@@ -142,7 +142,8 @@
             "description": "Provide a detailed description of the incident.",
             "buttons": {
                 "back": "Back",
-                "next": "Next"
+                "next": "Next",
+                "skip": "Skip"
             },
             "placeholder": "Describe what happened in detail...",
             "charactersLeft": "characters left",

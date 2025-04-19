@@ -52,6 +52,12 @@ const IncidentDescription = ({
   };
 
   const validateDescription = (): boolean => {
+    // If description is empty, consider it valid since it's optional
+    if (!description.trim()) {
+      setValidationError(null);
+      return true;
+    }
+
     try {
       incidentDescriptionSchema.parse({ description });
       setValidationError(null);
@@ -108,7 +114,7 @@ const IncidentDescription = ({
       }
       nextButton={
         <Button type="button" onClick={handleNext}>
-          {t("buttons.next")}
+          {description.trim() ? t("buttons.next") : t("buttons.skip")}
         </Button>
       }
       error={validationError || undefined}

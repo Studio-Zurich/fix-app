@@ -30,7 +30,8 @@ export const incidentDescriptionSchema = z.object({
   description: z
     .string()
     .min(10, "Description must be at least 10 characters long")
-    .max(500, "Description must be less than 500 characters long"),
+    .max(500, "Description must be less than 500 characters long")
+    .optional(),
 });
 
 // Schema for user data
