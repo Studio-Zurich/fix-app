@@ -91,13 +91,124 @@
                     }
                 }
             }
-        }
-    },
-    "steps": {
-        "report-flow": {},
-        "image": {
-            "title": "Bild hochladen",
-            "description": "Bitte laden Sie ein Bild hoch, um das Problem zu dokumentieren."
+        },
+        "location": {
+            "title": "Standort auswählen",
+            "description": "Wählen Sie den Standort des Vorfalls aus.",
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter",
+                "getLocation": "Standort abrufen"
+            },
+            "search": {
+                "placeholder": "Suchen",
+                "noResults": "Keine Ergebnisse"
+            },
+            "alert": {
+                "title": "Achtung!",
+                "outsideSwitzerland": "Der ausgewählte Standort liegt außerhalb der Schweiz. Bitte wählen Sie einen Standort innerhalb der Schweiz."
+            },
+            "locationDialog": {
+                "title": "Erkannten Standort verwenden?",
+                "description": "Wir haben einen Standort aus Ihrem Bild erkannt. Möchten Sie diesen Standort verwenden?",
+                "confirm": "Ja, diesen Standort verwenden",
+                "reject": "Nein, anderen Standort auswählen"
+            }
+        },
+        "incidentType": {
+            "title": "Vorfallstyp auswählen",
+            "description": "Wählen Sie den Typ des Vorfalls aus, den Sie melden.",
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter"
+            },
+            "validation": {
+                "noTypeSelected": "Bitte wählen Sie einen Vorfallstyp aus, bevor Sie fortfahren"
+            }
+        },
+        "incidentSubtype": {
+            "title": "Untertyp des Vorfalls auswählen",
+            "description": "Wählen Sie den Untertyp des Vorfalls aus, den Sie melden.",
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter"
+            },
+            "validation": {
+                "noSubtypeSelected": "Bitte wählen Sie einen Untertyp des Vorfalls aus, bevor Sie fortfahren"
+            }
+        },
+        "incidentDescription": {
+            "title": "Vorfall beschreiben",
+            "description": "Geben Sie eine detaillierte Beschreibung des Vorfalls an.",
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter"
+            },
+            "placeholder": "Beschreiben Sie den Vorfall im Detail...",
+            "charactersLeft": "Zeichen übrig",
+            "guidelines": {
+                "title": "Richtlinien:",
+                "beSpecific": "Beschreiben Sie genau, was Sie beobachtet haben",
+                "noPersonalInfo": "Geben Sie keine persönlichen Daten an",
+                "beRespectful": "Bleiben Sie respektvoll und professionell"
+            }
+        },
+        "userData": {
+            "title": "Ihre Daten eingeben",
+            "description": "Bitte geben Sie Ihre Daten ein, damit wir Sie identifizieren können.",
+            "buttons": {
+                "back": "Zurück",
+                "next": "Weiter"
+            },
+            "fields": {
+                "firstName": {
+                    "label": "Vorname"
+                },
+                "lastName": {
+                    "label": "Nachname"
+                },
+                "email": {
+                    "label": "E-Mail"
+                },
+                "phone": {
+                    "label": "Telefon (optional)"
+                }
+            },
+            "validation": {
+                "formError": "Bitte überprüfen Sie das Formular auf Fehler"
+            }
+        },
+        "reportFlow": {
+            "title": "Neuer Report",
+            "summary": {
+                "title": "Zusammenfassung",
+                "description": "Bitte überprüfen Sie Ihren Bericht vor dem Absenden.",
+                "images": {
+                    "title": "Bilder"
+                },
+                "location": {
+                    "title": "Standort"
+                },
+                "incidentType": {
+                    "title": "Vorfallstyp"
+                },
+                "incidentDescription": {
+                    "title": "Beschreibung des Vorfalls"
+                },
+                "contactInfo": {
+                    "title": "Kontaktinformationen"
+                }
+            },
+            "buttons": {
+                "submit": "Absenden"
+            },
+            "debug": {
+                "formState": "Formularstatus:",
+                "pending": "Ausstehend:",
+                "yes": "Ja",
+                "no": "Nein",
+                "completeStoreState": "Vollständiger Store-Status:"
+            }
         }
     },
     "incidentTypes": {

@@ -26,8 +26,8 @@ const StepContainer = ({
   return (
     <div
       className={cn(
-        "flex-1 relative space-y-8 h-svh overflow-hidden flex flex-col",
-        hideHeader ? "" : "px-[5vw] lg:px-6",
+        "flex-1 relative space-y-8  overflow-hidden flex flex-col",
+        hideHeader ? "" : "max-h-[calc(100svh-60px)] px-[5vw] lg:px-6",
         className
       )}
     >

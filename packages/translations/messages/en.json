@@ -91,13 +91,124 @@
                     }
                 }
             }
-        }
-    },
-    "steps": {
-        "report-flow": {},
-        "image": {
-            "title": "Upload Image",
-            "description": "Please upload an image to document the issue."
+        },
+        "location": {
+            "title": "Select Location",
+            "description": "Select the location of the incident.",
+            "buttons": {
+                "back": "Back",
+                "next": "Next",
+                "getLocation": "Get location"
+            },
+            "search": {
+                "placeholder": "Search",
+                "noResults": "No results"
+            },
+            "alert": {
+                "title": "Heads up!",
+                "outsideSwitzerland": "The selected location is outside Switzerland. Please select a location within Switzerland."
+            },
+            "locationDialog": {
+                "title": "Use detected location?",
+                "description": "We detected a location from your image. Would you like to use this location?",
+                "confirm": "Yes, use this location",
+                "reject": "No, let me select location"
+            }
+        },
+        "incidentType": {
+            "title": "Select Incident Type",
+            "description": "Select the type of incident you are reporting.",
+            "buttons": {
+                "back": "Back",
+                "next": "Next"
+            },
+            "validation": {
+                "noTypeSelected": "Please select an incident type before proceeding"
+            }
+        },
+        "incidentSubtype": {
+            "title": "Select Incident Subtype",
+            "description": "Select the subtype of incident you are reporting.",
+            "buttons": {
+                "back": "Back",
+                "next": "Next"
+            },
+            "validation": {
+                "noSubtypeSelected": "Please select an incident subtype before proceeding"
+            }
+        },
+        "incidentDescription": {
+            "title": "Describe the Incident",
+            "description": "Provide a detailed description of the incident.",
+            "buttons": {
+                "back": "Back",
+                "next": "Next"
+            },
+            "placeholder": "Describe what happened in detail...",
+            "charactersLeft": "characters left",
+            "guidelines": {
+                "title": "Guidelines:",
+                "beSpecific": "Be specific about what you observed",
+                "noPersonalInfo": "Do not include personal information",
+                "beRespectful": "Be respectful and professional"
+            }
+        },
+        "userData": {
+            "title": "Enter Your Data",
+            "description": "Please enter your data to help us identify you.",
+            "buttons": {
+                "back": "Back",
+                "next": "Next"
+            },
+            "fields": {
+                "firstName": {
+                    "label": "First Name"
+                },
+                "lastName": {
+                    "label": "Last Name"
+                },
+                "email": {
+                    "label": "Email"
+                },
+                "phone": {
+                    "label": "Phone (optional)"
+                }
+            },
+            "validation": {
+                "formError": "Please check the form for errors"
+            }
+        },
+        "reportFlow": {
+            "title": "New Report",
+            "summary": {
+                "title": "Summary",
+                "description": "Please review your report before submitting.",
+                "images": {
+                    "title": "Images"
+                },
+                "location": {
+                    "title": "Location"
+                },
+                "incidentType": {
+                    "title": "Incident Type"
+                },
+                "incidentDescription": {
+                    "title": "Incident Description"
+                },
+                "contactInfo": {
+                    "title": "Contact Info"
+                }
+            },
+            "buttons": {
+                "submit": "Submit"
+            },
+            "debug": {
+                "formState": "Form State:",
+                "pending": "Pending:",
+                "yes": "Yes",
+                "no": "No",
+                "completeStoreState": "Complete Store State:"
+            }
         }
     },
     "incidentTypes": {

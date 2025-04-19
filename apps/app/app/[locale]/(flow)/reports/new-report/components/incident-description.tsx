@@ -7,6 +7,7 @@ import { Button } from "@repo/ui/button";
 import { TypographyH3 } from "@repo/ui/headline";
 import { TypographyParagraph } from "@repo/ui/text";
 import { Textarea } from "@repo/ui/textarea";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import StepContainer from "./step-container";
@@ -14,6 +15,7 @@ import StepContainer from "./step-container";
 const IncidentDescription = ({
   maxCharacters = 500,
 }: IncidentDescriptionProps) => {
+  const t = useTranslations("components.incidentDescription");
   const [description, setDescription] = useState("");
   const [charactersLeft, setCharactersLeft] = useState(maxCharacters);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -97,16 +99,16 @@ const IncidentDescription = ({
 
   return (
     <StepContainer
-      title="Describe the Incident"
-      description="Provide a detailed description of the incident."
+      title={t("title")}
+      description={t("description")}
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
-          Back
+          {t("buttons.back")}
         </Button>
       }
       nextButton={
         <Button type="button" onClick={handleNext}>
-          Next
+          {t("buttons.next")}
         </Button>
       }
       error={validationError || undefined}
@@ -125,7 +127,7 @@ const IncidentDescription = ({
 
         <div className="space-y-2">
           <Textarea
-            placeholder="Describe what happened in detail..."
+            placeholder={t("placeholder")}
             value={description}
             onChange={handleDescriptionChange}
             rows={6}
@@ -136,20 +138,19 @@ const IncidentDescription = ({
               className="text-muted-foreground"
               size="text-sm"
             >
-              {charactersLeft} characters left
+              {charactersLeft} {t("charactersLeft")}
             </TypographyParagraph>
           </div>
         </div>
 
         <div className="space-y-1">
           <TypographyParagraph className="text-muted-foreground">
-            Guidelines:
+            {t("guidelines.title")}
           </TypographyParagraph>
           <ul className="list-disc list-inside pl-2 text-sm text-muted-foreground">
-            <li>Be specific about what you observed</li>
-            <li>Do not include personal information</li>
-            <li>Be respectful and professional</li>
-            <li>Avoid offensive or inappropriate language</li>
+            <li>{t("guidelines.beSpecific")}</li>
+            <li>{t("guidelines.noPersonalInfo")}</li>
+            <li>{t("guidelines.beRespectful")}</li>
           </ul>
         </div>
 

@@ -54,8 +54,7 @@
                 "title": "Guidelines",
                 "specific": "Be as specific as possible",
                 "noPersonalInfo": "No personal information",
-                "respectful": "Stay respectful",
-                "noOffensive": "No offensive content"
+                "respectful": "Stay respectful"
             },
             "errors": {
                 "invalidFileType": "Invalid file type. Only JPEG, PNG and GIF are allowed",

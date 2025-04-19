@@ -11,14 +11,14 @@ import { useEffect, useState } from "react";
 import StepContainer from "./step-container";
 
 const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
+  const t = useTranslations("components.incidentSubtype");
+  const tIncident = useTranslations("incidentTypes"); // For accessing incident type names
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubtype, setSelectedSubtype] = useState<{
     id: string;
     name: string;
   } | null>(null);
-
-  // Get translations
-  const t = useTranslations("incidentTypes");
+  const [validationError, setValidationError] = useState<string | undefined>();
 
   // Get functions from reportStore
   const setIncidentSubtype = reportStore((state) => state.setIncidentSubtype);
@@ -57,10 +57,10 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
 
       if (parentType) {
         // Try to get the translation from the parent type's subtypes
-        const translatedName = t.raw(
+        const translatedName = tIncident.raw(
           `types.${parentType}.subtypes.${subtypeId}.name`
         );
-        const translatedDescription = t.raw(
+        const translatedDescription = tIncident.raw(
           `types.${parentType}.subtypes.${subtypeId}.description`
         );
 
@@ -99,6 +99,7 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
 
   const handleSelect = (subtype: { id: string; name: string }) => {
     setSelectedSubtype(subtype);
+    setValidationError(undefined); // Clear validation error on select
     log("Incident subtype selected", subtype);
   };
 
@@ -116,29 +117,37 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
 
       // Move to the description step
       setStep(4);
+    } else {
+      // Show error if no subtype is selected
+      setValidationError(t("validation.noSubtypeSelected"));
     }
   };
 
   return (
     <StepContainer
-      title="Select Incident Subtype"
-      description="Select the subtype of incident you are reporting."
+      title={t("title")}
+      description={t("description")}
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
-          Back
+          {t("buttons.back")}
         </Button>
       }
       nextButton={
-        <Button type="button" onClick={handleNext} disabled={!selectedSubtype}>
-          Next
+        <Button
+          type="button"
+          onClick={handleNext}
+          disabled={!selectedSubtype} // Disable if no subtype is selected
+        >
+          {t("buttons.next")}
         </Button>
       }
+      error={validationError}
     >
       <div className="relative">
         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
         <Input
-          placeholder={t("searchIncidentTypes")}
+          placeholder={tIncident("searchIncidentTypes")} // Use tIncident for this specific key
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9"

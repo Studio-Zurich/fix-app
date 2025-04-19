@@ -26,6 +26,7 @@ import {
 } from "@repo/ui/command";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import StepContainer from "./step-container";
 
@@ -33,6 +34,7 @@ import StepContainer from "./step-container";
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
 const Location = () => {
+  const t = useTranslations("components.location");
   const [address, setAddress] = useState("");
   const [coordinates, setCoordinates] = useState<{
     lat: number;
@@ -335,11 +337,11 @@ const Location = () => {
 
   return (
     <StepContainer
-      title="Select Location"
-      description="Select the location of the incident."
+      title={t("title")}
+      description={t("description")}
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
-          Back
+          {t("buttons.back")}
         </Button>
       }
       nextButton={
@@ -348,7 +350,7 @@ const Location = () => {
           onClick={handleNext}
           disabled={!coordinates || isOutsideSwitzerland}
         >
-          Next
+          {t("buttons.next")}
         </Button>
       }
       hideHeader={true}
@@ -357,7 +359,7 @@ const Location = () => {
         <Command shouldFilter={false}>
           <div className="flex items-center w-full justify-between gap-4">
             <CommandInput
-              placeholder="search"
+              placeholder={t("search.placeholder")}
               value={searchValue}
               onValueChange={handleSearch}
               className="h-11"
@@ -375,7 +377,9 @@ const Location = () => {
               }}
               disabled={isGettingLocation}
             >
-              <span className="hidden sm:block">Get location</span>
+              <span className="hidden sm:block">
+                {t("buttons.getLocation")}
+              </span>
               <Crosshair className="sm:hidden" size={20} />
             </Button>
           </div>
@@ -383,7 +387,7 @@ const Location = () => {
             isFocused && (
               <CommandList>
                 {suggestions.length === 0 ? (
-                  <CommandEmpty>no results</CommandEmpty>
+                  <CommandEmpty>{t("search.noResults")}</CommandEmpty>
                 ) : (
                   <CommandGroup>
                     {suggestions.map((suggestion) => (
@@ -442,10 +446,8 @@ const Location = () => {
           className="absolute bottom-[calc(66px+1rem)] left-1/2 transform -translate-x-1/2 w-[90%] max-w-md z-40 bg-background"
         >
           <Warning className="h-5 w-5" />
-          <AlertTitle>Heads up!</AlertTitle>
-          <AlertDescription>
-            {MAP_CONSTANTS.OUTSIDE_SWITZERLAND_ERROR}
-          </AlertDescription>
+          <AlertTitle>{t("alert.title")}</AlertTitle>
+          <AlertDescription>{t("alert.outsideSwitzerland")}</AlertDescription>
         </Alert>
       )}
 
@@ -456,19 +458,18 @@ const Location = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Use detected location?</AlertDialogTitle>
+            <AlertDialogTitle>{t("locationDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              We detected a location from your image. Would you like to use this
-              location?
+              {t("locationDialog.description")}
               {detectedLocation.address && detectedLocation.address}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleLocationReject}>
-              No, let me select location
+              {t("locationDialog.reject")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleLocationConfirm}>
-              Yes, use this location
+              {t("locationDialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

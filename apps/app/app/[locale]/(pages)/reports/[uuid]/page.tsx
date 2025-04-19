@@ -1,7 +1,11 @@
 import PageHeader from "@/components/page-header";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@repo/ui/badge";
+
+import { reportStore } from "@/lib/store";
+import { GearFine } from "@phosphor-icons/react/dist/ssr";
 import { TypographyH2 } from "@repo/ui/headline";
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
 import { TypographyParagraph } from "@repo/ui/text";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -125,7 +129,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <>
-      <PageHeader title={t("title")} description={report.id} />
+      <PageHeader title={t("title")} description="" />
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>{t("sections.reportInfo.title")}</TypographyH2>
@@ -143,6 +147,17 @@ export default async function ReportPage({ params }: ReportPageProps) {
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {formatDate(report.created_at)}
+            </TypographyParagraph>
+          </div>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              ID
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.id}
             </TypographyParagraph>
           </div>
         </div>
@@ -235,47 +250,23 @@ export default async function ReportPage({ params }: ReportPageProps) {
           </div>
         </div>
       </div>
-
-      <div className="bg-white rounded-lg shadow p-4 space-y-4">
-        <TypographyH2>{t("sections.reporter.title")}</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              {t("sections.reporter.name")}
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {report.reporter_first_name} {report.reporter_last_name}
-            </TypographyParagraph>
-          </div>
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              {t("sections.reporter.email")}
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {report.reporter_email}
-            </TypographyParagraph>
-          </div>
-          {report.reporter_phone && (
-            <div>
-              <TypographyParagraph
-                size="text-sm"
-                className="text-muted-foreground"
-              >
-                {t("sections.reporter.phone")}
-              </TypographyParagraph>
-              <TypographyParagraph size="text-sm">
-                {report.reporter_phone}
-              </TypographyParagraph>
+      {process.env.NEXT_PUBLIC_ENABLE_LOGGING === "true" && (
+        <Popover>
+          <PopoverTrigger className="fixed bottom-1/3 right-0 bg-background rounded-l-md p-1">
+            <GearFine size={32} />
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="text-sm font-mono">
+              <div className="mt-4">
+                <p className="font-bold mb-2">Debug</p>
+                <pre className="text-xs overflow-auto max-h-[300px] p-2 bg-gray-100 rounded">
+                  {JSON.stringify(reportStore.getState(), null, 2)}
+                </pre>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+          </PopoverContent>
+        </Popover>
+      )}
     </>
   );
 }

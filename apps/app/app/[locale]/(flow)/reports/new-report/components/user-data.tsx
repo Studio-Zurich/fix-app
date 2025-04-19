@@ -6,11 +6,13 @@ import { UserDataFormFields } from "@/lib/types";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import StepContainer from "./step-container";
 
 const UserData = () => {
+  const t = useTranslations("components.userData");
   // Get functions from reportStore
   const setUserData = reportStore((state) => state.setUserData);
   const setStep = (step: number) => reportStore.setState({ step });
@@ -81,7 +83,7 @@ const UserData = () => {
           }
         });
         setErrors(newErrors);
-        setValidationError("Please check the form for errors");
+        setValidationError(t("validation.formError"));
       }
       return false;
     }
@@ -108,23 +110,25 @@ const UserData = () => {
 
   return (
     <StepContainer
-      title="Enter Your Data"
-      description="Please enter your data to help us identify you."
+      title={t("title")}
+      description={t("description")}
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
-          Back
+          {t("buttons.back")}
         </Button>
       }
       nextButton={
         <Button type="button" onClick={handleNext}>
-          Next
+          {t("buttons.next")}
         </Button>
       }
       error={validationError}
     >
       <div className="space-y-4">
         <div className="grid gap-1.5">
-          <Label htmlFor="reporter_first_name">Vorname</Label>
+          <Label htmlFor="reporter_first_name">
+            {t("fields.firstName.label")}
+          </Label>
           <Input
             type="text"
             id="reporter_first_name"
@@ -142,7 +146,9 @@ const UserData = () => {
         </div>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="reporter_last_name">Nachname</Label>
+          <Label htmlFor="reporter_last_name">
+            {t("fields.lastName.label")}
+          </Label>
           <Input
             type="text"
             id="reporter_last_name"
@@ -160,7 +166,7 @@ const UserData = () => {
         </div>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="reporter_email">E-Mail</Label>
+          <Label htmlFor="reporter_email">{t("fields.email.label")}</Label>
           <Input
             type="email"
             id="reporter_email"
@@ -176,7 +182,7 @@ const UserData = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="reporter_phone">Telefon (optional)</Label>
+          <Label htmlFor="reporter_phone">{t("fields.phone.label")}</Label>
           <Input
             type="tel"
             id="reporter_phone"

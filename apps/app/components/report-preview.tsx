@@ -128,12 +128,13 @@ const ReportPreview = ({ report }: ReportPreviewProps) => {
       </CardHeader>
       <CardContent className="flex flex-col space-y-3 flex-grow">
         <div>
-          <div className="flex items-center gap-1 text-sm text-gray-500 font-medium">
-            <TypographyH4 className="text-muted-foreground" size="text-sm">
-              {tc("location")}
-            </TypographyH4>
-          </div>
-          <p className="line-clamp-2">{report.location_address}</p>
+          <TypographyH4 className="text-muted-foreground" size="text-sm">
+            {tc("location")}
+          </TypographyH4>
+
+          <TypographyParagraph className="line-clamp-2">
+            {report.location_address}
+          </TypographyParagraph>
         </div>
 
         <div className="mt-auto">

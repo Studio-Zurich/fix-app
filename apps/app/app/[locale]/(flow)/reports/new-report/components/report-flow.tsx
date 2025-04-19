@@ -7,7 +7,7 @@ import { TypographyH1, TypographyH2, TypographyH3 } from "@repo/ui/headline";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
 import { Progress } from "@repo/ui/progress";
 import { TypographyParagraph } from "@repo/ui/text";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useEffect, useMemo } from "react";
 import { ActionState, submitReport } from "../actions";
 import ImageUpload from "./image-upload";
@@ -34,6 +34,7 @@ interface ReportFlowProps {
 }
 
 const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
+  const t = useTranslations("components.reportFlow");
   // Use the useActionState hook to handle form submission
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     submitReport,
@@ -58,6 +59,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
       incident_subtype_id: state.incident_step.incident_subtype_id,
       incident_subtype_name: state.incident_step.incident_subtype_name,
       description: state.incident_step.description,
+
       // Location data
       location_lat: state.location_step.set_location.latitude,
       location_lng: state.location_step.set_location.longitude,
@@ -86,7 +88,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
     <>
       {step !== 1 && (
         <div className="px-[5vw] lg:px-6 py-2 text-center space-y-2">
-          <TypographyH1 size="text-lg">New Report</TypographyH1>
+          <TypographyH1 size="text-lg">{t("title")}</TypographyH1>
           <Progress value={(step / 6) * 100} />
         </div>
       )}
@@ -129,9 +131,9 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
         {step === 6 && (
           <div className="flex-1 relative space-y-8 h-svh overflow-hidden flex flex-col px-[5vw] lg:px-6">
             <div className="space-y-2 mt-4">
-              <TypographyH2>Summary</TypographyH2>
+              <TypographyH2>{t("summary.title")}</TypographyH2>
               <TypographyParagraph className="text-muted-foreground">
-                Please review your report before submitting.
+                {t("summary.description")}
               </TypographyParagraph>
             </div>
             <div className="flex-1 flex flex-col space-y-6 pb-[66px] overflow-y-auto">
@@ -209,7 +211,9 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               {storeData.imageUrl && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <TypographyH3 size="text-lg">Images</TypographyH3>
+                    <TypographyH3 size="text-lg">
+                      {t("summary.images.title")}
+                    </TypographyH3>
                     <Button
                       type="button"
                       variant="ghost"
@@ -235,7 +239,9 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               {/* Location Summary */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <TypographyH3 size="text-lg">Location</TypographyH3>
+                  <TypographyH3 size="text-lg">
+                    {t("summary.location.title")}
+                  </TypographyH3>
                   <Button
                     type="button"
                     variant="ghost"
@@ -257,7 +263,9 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               {/* Incident Type Summary */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <TypographyH3 size="text-lg">Incident Type</TypographyH3>
+                  <TypographyH3 size="text-lg">
+                    {t("summary.incidentType.title")}
+                  </TypographyH3>
                   <Button
                     type="button"
                     variant="ghost"
@@ -290,7 +298,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <TypographyH3 size="text-lg">
-                      Incident Description
+                      {t("summary.incidentDescription.title")}
                     </TypographyH3>
                     <Button
                       type="button"
@@ -314,7 +322,9 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
               {/* User Data Summary */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <TypographyH3 size="text-lg">Contact Info</TypographyH3>
+                  <TypographyH3 size="text-lg">
+                    {t("summary.contactInfo.title")}
+                  </TypographyH3>
                   <Button
                     type="button"
                     variant="ghost"
@@ -350,7 +360,7 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
             </div>
             <div className="fixed bottom-0 w-full left-0 bg-white py-3 px-4">
               <Button type="submit" className="w-full" disabled={pending}>
-                Submit
+                {t("buttons.submit")}
               </Button>
             </div>
           </div>
@@ -365,14 +375,18 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
           <PopoverContent>
             <div className="text-sm font-mono">
               <p>
-                <strong>Form State:</strong> {JSON.stringify(state, null, 2)}
+                <strong>{t("debug.formState")}</strong>{" "}
+                {JSON.stringify(state, null, 2)}
               </p>
               <p>
-                <strong>Pending:</strong> {pending ? "Yes" : "No"}
+                <strong>{t("debug.pending")}</strong>{" "}
+                {pending ? t("debug.yes") : t("debug.no")}
               </p>
 
               <div className="mt-4">
-                <p className="font-bold mb-2">Complete Store State:</p>
+                <p className="font-bold mb-2">
+                  {t("debug.completeStoreState")}
+                </p>
                 <pre className="text-xs overflow-auto max-h-[300px] p-2 bg-gray-100 rounded">
                   {JSON.stringify(reportStore.getState(), null, 2)}
                 </pre>

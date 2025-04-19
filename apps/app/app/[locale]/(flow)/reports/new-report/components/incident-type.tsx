@@ -14,15 +14,14 @@ const IncidentType = ({
   incidentTypes,
   incidentSubtypes = [],
 }: IncidentTypeProps) => {
+  const t = useTranslations("components.incidentType");
+  const tIncident = useTranslations("incidentTypes"); // For accessing incident type names
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<{
     id: string;
     name: string;
   } | null>(null);
   const [validationError, setValidationError] = useState<string | undefined>();
-
-  // Get translations
-  const t = useTranslations("incidentTypes");
 
   // Get functions from reportStore
   const setIncidentType = reportStore((state) => state.setIncidentType);
@@ -50,8 +49,10 @@ const IncidentType = ({
   const getTranslatedType = (typeId: string) => {
     try {
       // Try to get translated name directly using the UUID
-      const translatedName = t.raw(`types.${typeId}.name`);
-      const translatedDescription = t.raw(`types.${typeId}.description`);
+      const translatedName = tIncident.raw(`types.${typeId}.name`);
+      const translatedDescription = tIncident.raw(
+        `types.${typeId}.description`
+      );
 
       if (translatedName) {
         return {
@@ -111,22 +112,22 @@ const IncidentType = ({
       log(`Going to ${hasSubtypes ? "subtype" : "description"} step`);
     } else {
       // Show error if no type is selected
-      setValidationError("Please select an incident type before proceeding");
+      setValidationError(t("validation.noTypeSelected"));
     }
   };
 
   return (
     <StepContainer
-      title="Select Incident Type"
-      description="Select the type of incident you are reporting."
+      title={t("title")}
+      description={t("description")}
       prevButton={
         <Button type="button" variant="outline" onClick={handleBack}>
-          Back
+          {t("buttons.back")}
         </Button>
       }
       nextButton={
         <Button type="button" onClick={handleNext}>
-          Next
+          {t("buttons.next")}
         </Button>
       }
       error={validationError}
@@ -134,7 +135,7 @@ const IncidentType = ({
       <div className="relative">
         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder={t("searchIncidentTypes")}
+          placeholder={tIncident("searchIncidentTypes")} // Use tIncident for this specific key
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9"
