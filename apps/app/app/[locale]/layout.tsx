@@ -3,6 +3,7 @@ import "@repo/ui/globals.css";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 
+import { Toaster } from "@repo/ui/sonner";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 const brockmannRegular = localFont({
@@ -51,6 +52,7 @@ export default async function LocaleLayout({
       <body
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} ${brockmannSemiBold.variable} ${brockmannBold.variable} antialiased`}
       >
+        <Toaster />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

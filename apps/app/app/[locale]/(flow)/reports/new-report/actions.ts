@@ -240,9 +240,8 @@ export async function submitReport(
 
     log("Redirecting to report page", `/reports/${reportId}`);
 
-    // Uncomment redirect to restore functionality
     redirect({
-      href: `/reports/${reportId}`,
+      href: `/reports/${reportId}?success=true`,
       locale: locale as string,
     });
 

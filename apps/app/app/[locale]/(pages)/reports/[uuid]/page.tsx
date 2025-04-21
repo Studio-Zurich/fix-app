@@ -10,6 +10,7 @@ import { TypographyParagraph } from "@repo/ui/text";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import Notification from "./components/notification";
 
 interface ReportPageProps {
   params: Promise<{
@@ -130,6 +131,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
   return (
     <>
       <PageHeader title={t("title")} description="" />
+      <Notification />
 
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>{t("sections.reportInfo.title")}</TypographyH2>

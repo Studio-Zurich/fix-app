@@ -414,7 +414,9 @@
         "extern": {}
     },
     "responses": {
-        "success": {},
+        "success": {
+            "reportSubmitted": "Report erfolgreich übermittelt"
+        },
         "error": {}
     }
 }
