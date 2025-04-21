@@ -50,9 +50,15 @@ export const ReportEmail = ({
                 description={description}
                 userData={userData}
               />
-              <Button href={reportUrl} style={button}>
-                View Your Report
-              </Button>
+              <Section style={buttonSection}>
+                <Button
+                  href={reportUrl}
+                  style={button}
+                  className="dark:bg-white dark:text-black"
+                >
+                  View Your Report
+                </Button>
+              </Section>
             </Section>
           </Section>
 
@@ -100,6 +106,12 @@ const thankYouSection = {
   textAlign: "center" as const,
 };
 
+const buttonSection = {
+  padding: "0 20px",
+  marginTop: "20px",
+  textAlign: "center" as const,
+};
+
 const button = {
   backgroundColor: "#000000",
   borderRadius: "5px",
@@ -110,8 +122,11 @@ const button = {
   textAlign: "center" as const,
   display: "inline-block",
   padding: "12px 24px",
-  marginTop: "16px",
-  marginBottom: "16px",
+  dark: {
+    backgroundColor: "#ffffff",
+    color: "#000000",
+  },
+  margin: "16px auto",
 };
 
 const text = {

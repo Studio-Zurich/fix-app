@@ -47,7 +47,11 @@ export const ReportEmail = ({
             </Section>
 
             <Section style={buttonSection}>
-              <Button href={reportUrl} style={button}>
+              <Button
+                href={reportUrl}
+                style={button}
+                className="dark:bg-white dark:text-black"
+              >
                 View Report
               </Button>
             </Section>
@@ -107,8 +111,11 @@ const button = {
   textAlign: "center" as const,
   display: "inline-block",
   padding: "12px 24px",
-  marginTop: "16px",
-  marginBottom: "16px",
+  dark: {
+    backgroundColor: "#ffffff",
+    color: "#000000",
+  },
+  margin: "16px auto",
 };
 
 const text = {
