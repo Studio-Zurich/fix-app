@@ -72,6 +72,7 @@ interface ReportState {
     lng: number;
     address: string;
   }) => void;
+  resetReport: () => void;
 }
 
 export const useLocationStore = create<LocationState>((set) => ({
@@ -85,11 +86,11 @@ export const useLocationStore = create<LocationState>((set) => ({
     set({ detectedLocation: { latitude: null, longitude: null } }),
 }));
 
-export const reportStore = create<ReportState>((set) => ({
+// Initial state for the report store
+const initialReportState = {
   step: 0,
   isSubmitted: false,
 
-  // Step 1: Image Upload
   image_step: {
     imageUrl: null,
     detected_location: {
@@ -99,7 +100,6 @@ export const reportStore = create<ReportState>((set) => ({
     },
   },
 
-  // Step 2: User Information
   user_step: {
     reporter_first_name: "",
     reporter_last_name: "",
@@ -107,7 +107,6 @@ export const reportStore = create<ReportState>((set) => ({
     reporter_phone: "",
   },
 
-  // Step 3: Incident Information
   incident_step: {
     incident_type_id: "",
     incident_type_name: "",
@@ -116,7 +115,6 @@ export const reportStore = create<ReportState>((set) => ({
     description: "",
   },
 
-  // Step 4: Location Information
   location_step: {
     set_location: {
       latitude: null,
@@ -125,6 +123,10 @@ export const reportStore = create<ReportState>((set) => ({
     },
     hasUsedAlertDialog: false,
   },
+};
+
+export const reportStore = create<ReportState>((set) => ({
+  ...initialReportState,
 
   // Actions
   setIsSubmitted: (isSubmitted: boolean) =>
@@ -207,4 +209,7 @@ export const reportStore = create<ReportState>((set) => ({
         },
       },
     })),
+
+  // Reset function to clear all report data
+  resetReport: () => set(initialReportState),
 }));

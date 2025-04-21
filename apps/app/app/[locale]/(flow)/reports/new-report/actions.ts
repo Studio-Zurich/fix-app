@@ -2,7 +2,6 @@
 
 import { redirect } from "@/i18n/navigation";
 import { log, logError, logSuccess } from "@/lib/logger";
-import { reportStore } from "@/lib/store";
 import { createClient } from "@/lib/supabase/server";
 import { EmailSendParams, Locale } from "@/lib/types";
 import { ReportEmail as ExternalReportEmail } from "@repo/transactional/emails/extern";
@@ -239,14 +238,9 @@ export async function submitReport(
       // Continue with redirect even if email sending fails
     }
 
-    reportStore.setState((state) => ({
-      ...state,
-      isSubmitted: true,
-      step: 0,
-    }));
-
     log("Redirecting to report page", `/reports/${reportId}`);
 
+    // Uncomment redirect to restore functionality
     redirect({
       href: `/reports/${reportId}`,
       locale: locale as string,

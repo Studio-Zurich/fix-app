@@ -43,6 +43,30 @@ const ReportFlow = ({ incidentTypes, incidentSubtypes }: ReportFlowProps) => {
   const locale = useLocale();
   const detectedLocation = useLocationStore((state) => state.detectedLocation);
   const step = reportStore((state) => state.step);
+  const isSubmitted = reportStore((state) => state.isSubmitted);
+  const resetReport = reportStore((state) => state.resetReport);
+
+  // Check if the report was submitted via the store flag
+  useEffect(() => {
+    const storeState = reportStore.getState();
+
+    if (storeState.isSubmitted) {
+      log("Report was submitted via store flag, resetting flow state");
+      resetReport();
+    }
+  }, [resetReport]);
+
+  // NEW: Check if the server action returned success and reset the report
+  useEffect(() => {
+    if (state.success) {
+      log("Form submission was successful, resetting report");
+      resetReport();
+
+      // Optionally navigate to a success page or show a success message
+      // This could redirect to the home page or somewhere else
+      // window.location.href = '/';
+    }
+  }, [state.success, resetReport]);
 
   // Get user data from the store - memoized to prevent infinite loops
   const storeData = useMemo(() => {
