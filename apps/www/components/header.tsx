@@ -28,7 +28,7 @@ const Header = () => {
               <List className="text-white" size={24} />
             </button>
 
-            <div className="hidden md:flex gap-8 items-center">
+            <div className="hidden md:flex md:justify-between gap-8 items-center w-full">
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
                   <TypographySpan className="text-background " size="text-base">
@@ -37,24 +37,21 @@ const Header = () => {
                 </Link>
               ))}
               <a
-                href="https://app.fixapp.ch"
+                href="https://app.fixapp.ch/reports/new-report"
                 target="_blank"
-                className="cursor-pointer"
+                className="cursor-pointer hidden md:block"
               >
-                <Button
-                  className="hidden md:flex cursor-pointer"
-                  variant="secondary"
-                >
+                <Button className="cursor-pointer" variant="secondary">
                   Report
                 </Button>
               </a>
             </div>
           </div>
         </div>
-        <a href="https://app.fixapp.ch" target="_blank">
+        <a href="https://app.fixapp.ch/reports/new-report" target="_blank">
           <Button
             variant="secondary"
-            className="fixed top-7 right-[5vw] lg:hidden"
+            className="fixed top-7 right-[5vw] md:hidden"
           >
             Report
           </Button>
