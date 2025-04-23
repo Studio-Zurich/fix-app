@@ -30,10 +30,7 @@ export const ReportEmail = ({
       <Body style={main}>
         <Container>
           <Section style={content}>
-            <Heading style={header}>
-              New Report Submitted
-              <br />#{reportId}
-            </Heading>
+            <Heading style={header}>New Report Submitted</Heading>
 
             <Section style={section}>
               <ReportOverview
@@ -43,6 +40,7 @@ export const ReportEmail = ({
                 incidentType={incidentType}
                 description={description}
                 userData={userData}
+                reportId={reportId}
               />
             </Section>
 

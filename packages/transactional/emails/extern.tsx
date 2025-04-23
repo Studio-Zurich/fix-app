@@ -30,10 +30,7 @@ export const ReportEmail = ({
       <Body style={main}>
         <Container>
           <Section style={content}>
-            <Heading style={header}>
-              Thank You For Your Report
-              <br />#{reportId}
-            </Heading>
+            <Heading style={header}>Thank You For Your Report</Heading>
             <Section style={thankYouSection}>
               <Text style={text}>
                 Thank you for submitting your report and helping us make our

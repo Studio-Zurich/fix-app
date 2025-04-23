@@ -9,6 +9,7 @@ type ReportOverviewProps = Pick<
   | "incidentType"
   | "description"
   | "userData"
+  | "reportId"
 >;
 
 export const ReportOverview = ({
@@ -17,6 +18,7 @@ export const ReportOverview = ({
   incidentType,
   description,
   userData,
+  reportId,
 }: ReportOverviewProps) => {
   return (
     <>
@@ -62,6 +64,13 @@ export const ReportOverview = ({
           </Text>
           <Text style={text}>Email: {userData.email}</Text>
           {userData.phone && <Text style={text}>Phone: {userData.phone}</Text>}
+        </>
+      )}
+
+      {reportId && (
+        <>
+          <Heading style={heading}>Report ID</Heading>
+          <Text style={text}>{reportId}</Text>
         </>
       )}
     </>
