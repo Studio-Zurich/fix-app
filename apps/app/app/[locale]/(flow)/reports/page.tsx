@@ -31,7 +31,8 @@ export default async function ReportsPage({ params }: ReportsPageProps) {
       `
       *,
       incident_types:incident_type_id (name),
-      incident_subtypes:incident_subtype_id (name)
+      incident_subtypes:incident_subtype_id (name),
+      description
     `
     )
     .order("created_at", { ascending: false });

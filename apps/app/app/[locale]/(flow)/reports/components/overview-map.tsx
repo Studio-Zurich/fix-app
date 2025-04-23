@@ -11,6 +11,9 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/command";
+import { TypographyH3 } from "@repo/ui/headline";
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
+import { TypographyParagraph } from "@repo/ui/text";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
@@ -30,6 +33,7 @@ interface Report {
   incident_type_id: string;
   incident_subtype_id?: string;
   created_at: string;
+  description?: string;
   [key: string]: unknown;
 }
 
@@ -48,6 +52,8 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [userLocationMarker, setUserLocationMarker] =
     useState<mapboxgl.Marker | null>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -149,6 +155,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         el.style.alignItems = "center";
         el.style.justifyContent = "center";
         el.style.fontSize = "20px";
+        el.style.cursor = "pointer";
         el.innerHTML = getReportIcon(
           report.incident_type_id,
           report.incident_subtype_id
@@ -158,6 +165,12 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         const marker = new mapboxgl.Marker(el)
           .setLngLat([report.location_lng, report.location_lat])
           .addTo(map.current!);
+
+        // Add click event to show popover
+        el.addEventListener("click", () => {
+          setSelectedReport(report);
+          setIsPopoverOpen(true);
+        });
 
         newMarkers.push(marker);
       }
@@ -202,6 +215,10 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
         duration: MAP_CONSTANTS.FLY_TO_DURATION,
       });
+
+      // Show popover for the selected report
+      setSelectedReport(report);
+      setIsPopoverOpen(true);
     }
     setIsFocused(false);
   };
@@ -382,6 +399,66 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
       </div>
       <div className="h-svh w-full overflow-hidden relative">
         <div ref={mapContainer} className="h-full w-full" />
+
+        {/* Report Popover */}
+        {selectedReport && (
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <PopoverTrigger asChild>
+              <div
+                className="absolute"
+                style={{
+                  left: map.current
+                    ? map.current.project([
+                        selectedReport.location_lng,
+                        selectedReport.location_lat,
+                      ]).x
+                    : 0,
+                  top: map.current
+                    ? map.current.project([
+                        selectedReport.location_lng,
+                        selectedReport.location_lat,
+                      ]).y - 40
+                    : 0,
+                  pointerEvents: "none",
+                }}
+              />
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="flex flex-col gap-2">
+                <div className="text-2xl">
+                  {getReportIcon(
+                    selectedReport.incident_type_id,
+                    selectedReport.incident_subtype_id
+                  )}
+                </div>
+                <TypographyH3 size="text-sm">
+                  {getTranslatedType(selectedReport.incident_type_id)}
+                  {selectedReport.incident_subtype_id && (
+                    <>
+                      ,{" "}
+                      {getTranslatedSubtype(
+                        selectedReport.incident_type_id,
+                        selectedReport.incident_subtype_id
+                      )}
+                    </>
+                  )}
+                </TypographyH3>
+
+                {selectedReport.description && (
+                  <TypographyParagraph size="text-xs">
+                    {selectedReport.description}
+                  </TypographyParagraph>
+                )}
+                <TypographyParagraph
+                  size="text-xs"
+                  className="text-muted-foreground"
+                >
+                  {selectedReport.location_address || "No address available"}
+                </TypographyParagraph>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
     </>
   );
