@@ -26,6 +26,8 @@ interface Report {
   location_address: string;
   incident_types: { name: string };
   incident_subtypes: { name: string };
+  incident_type_id: string;
+  incident_subtype_id?: string;
   created_at: string;
   [key: string]: unknown;
 }
@@ -35,7 +37,8 @@ interface OverviewMapProps {
 }
 
 const OverviewMap = ({ reports }: OverviewMapProps) => {
-  const t = useTranslations("components.map");
+  const t = useTranslations("components.location");
+  const incidentTypesT = useTranslations("incidentTypes");
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
@@ -44,6 +47,38 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+
+  // Get translated type name
+  const getTranslatedType = (typeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = incidentTypesT.raw(`types.${typeId}.name`);
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return (
+        reports.find((r) => r.incident_type_id === typeId)?.incident_types
+          ?.name || "Unknown"
+      );
+    }
+  };
+
+  // Get translated subtype name
+  const getTranslatedSubtype = (typeId: string, subtypeId: string) => {
+    try {
+      // Try to get translated name from translations
+      const translatedName = incidentTypesT.raw(
+        `types.${typeId}.subtypes.${subtypeId}.name`
+      );
+      return translatedName as string;
+    } catch (error) {
+      // Fall back to database name if translation not found
+      return (
+        reports.find((r) => r.incident_subtype_id === subtypeId)
+          ?.incident_subtypes?.name || ""
+      );
+    }
+  };
 
   // Initialize the map when the component mounts
   useEffect(() => {
@@ -239,8 +274,16 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
                     >
                       <MapPin className="w-4 h-4 text-primary" weight="fill" />
                       <span className="text-sm">
-                        {report.incident_types?.name || "Unknown"} –{" "}
-                        {report.incident_subtypes?.name || "Unknown"} –{" "}
+                        {report.incident_type_id
+                          ? getTranslatedType(report.incident_type_id)
+                          : report.incident_types?.name || "Unknown"}{" "}
+                        –{" "}
+                        {report.incident_type_id && report.incident_subtype_id
+                          ? getTranslatedSubtype(
+                              report.incident_type_id,
+                              report.incident_subtype_id
+                            )
+                          : report.incident_subtypes?.name || "Unknown"}{" "}
                         {report.location_address || "Unknown location"}
                       </span>
                     </CommandItem>

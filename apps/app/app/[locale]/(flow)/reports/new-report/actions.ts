@@ -216,7 +216,7 @@ export async function submitReport(
     try {
       // Send internal email
       await sendEmailWithRetry({
-        from: "notifications@fixapp.ch",
+        from: "FIX App <notifications@fixapp.ch>",
         to: "reports@fixapp.ch",
         cc: "hello@studio-zurich.ch",
         subject: "New Report Submitted",
@@ -225,7 +225,7 @@ export async function submitReport(
 
       // Send external email
       await sendEmailWithRetry({
-        from: "notifications@fixapp.ch",
+        from: "FIX App <notifications@fixapp.ch>",
         to: email as string,
         bcc: "reports@fixapp.ch",
         subject: "Your Report Has Been Received",
