@@ -1,8 +1,9 @@
 "use client";
-import { Button } from "@repo/ui/button";
-
+import { Link } from "@/i18n/navigation";
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
+import { reportStore } from "@/lib/store";
 import { Crosshair } from "@phosphor-icons/react";
+import { Button } from "@repo/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -325,6 +326,13 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     };
   }, [userLocationMarker]);
 
+  const handleNewReport = () => {
+    // Get the resetReport function from the store
+    const resetReport = reportStore.getState().resetReport;
+    // Call it to ensure a fresh start
+    resetReport();
+  };
+
   return (
     <>
       <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-20">
@@ -410,7 +418,15 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
       </div>
       <div className="h-svh w-full overflow-hidden relative">
         <div ref={mapContainer} className="h-full w-full" />
-
+        <Link
+          href="/reports/new-report"
+          className="absolute bottom-5 left-5 w-[calc(100%-2.5rem)] z-20 cursor-pointer"
+          onClick={handleNewReport}
+        >
+          <Button className="w-full cursor-pointer">
+            {t("buttons.newReport")}
+          </Button>
+        </Link>
         {/* Report Popover */}
         {selectedReport && (
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
