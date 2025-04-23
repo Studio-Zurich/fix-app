@@ -35,11 +35,12 @@ interface OverviewMapProps {
 }
 
 const OverviewMap = ({ reports }: OverviewMapProps) => {
-  const t = useTranslations("components.location");
+  const t = useTranslations("components.map");
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -58,9 +59,6 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         zoom: DEFAULT_LOCATION.zoom,
       });
 
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
       // Clean up on unmount
       return () => {
         if (map.current) {
@@ -70,6 +68,42 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
       };
     }
   }, []);
+
+  // Add markers for all reports
+  useEffect(() => {
+    if (!map.current) return;
+
+    // Clear existing markers
+    markers.forEach((marker) => marker.remove());
+    const newMarkers: mapboxgl.Marker[] = [];
+
+    // Add markers for all reports
+    reports.forEach((report) => {
+      if (report.location_lat && report.location_lng) {
+        // Create a DOM element for the marker
+        const el = document.createElement("div");
+        el.className = "marker";
+        el.style.width = "20px";
+        el.style.height = "20px";
+        el.style.borderRadius = "50%";
+        el.style.backgroundColor = "#FF8C00"; // Orange color
+        el.style.border = "2px solid white";
+
+        // Create and add the marker
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([report.location_lng, report.location_lat])
+          .addTo(map.current!);
+
+        newMarkers.push(marker);
+      }
+    });
+
+    setMarkers(newMarkers);
+
+    return () => {
+      newMarkers.forEach((marker) => marker.remove());
+    };
+  }, [reports]);
 
   // Handle search input
   const handleSearch = (value: string) => {
@@ -137,6 +171,16 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     }
   };
 
+  // Get the most recent reports (up to 5)
+  const getRecentReports = () => {
+    return [...reports]
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+      .slice(0, 5);
+  };
+
   return (
     <>
       <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-20">
@@ -147,10 +191,23 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
               value={searchValue}
               onValueChange={handleSearch}
               className="h-11"
-              onFocus={() => setIsFocused(true)}
+              onFocus={() => {
+                setIsFocused(true);
+                // Show recent reports when clicking on the input field with empty search
+                if (searchValue.length === 0) {
+                  setFilteredReports(getRecentReports());
+                }
+              }}
               onBlur={() => {
                 // Small delay to allow clicking on suggestions
                 setTimeout(() => setIsFocused(false), 200);
+              }}
+              onClick={() => {
+                // Show recent reports when clicking on the input field
+                if (searchValue.length === 0) {
+                  setFilteredReports(getRecentReports());
+                  setIsFocused(true);
+                }
               }}
             />
             <Button
@@ -167,33 +224,31 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
               <Crosshair className="sm:hidden" size={20} />
             </Button>
           </div>
-          {searchValue.length >= MAP_CONSTANTS.MIN_SEARCH_LENGTH &&
-            isFocused && (
-              <CommandList>
-                {filteredReports.length === 0 ? (
-                  <CommandEmpty>{t("search.noResults")}</CommandEmpty>
-                ) : (
-                  <CommandGroup>
-                    {filteredReports.map((report) => (
-                      <CommandItem
-                        key={report.id}
-                        value={report.location_address || ""}
-                        onSelect={() => handleReportSelect(report)}
-                        className="flex items-center gap-2 px-4 py-2"
-                      >
-                        <MapPin
-                          className="w-4 h-4 text-primary"
-                          weight="fill"
-                        />
-                        <span className="text-sm">
-                          {report.location_address || "Unknown location"}
-                        </span>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
-              </CommandList>
-            )}
+          {isFocused && (
+            <CommandList>
+              {filteredReports.length === 0 ? (
+                <CommandEmpty>{t("search.noResults")}</CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {filteredReports.map((report) => (
+                    <CommandItem
+                      key={report.id}
+                      value={report.location_address || ""}
+                      onSelect={() => handleReportSelect(report)}
+                      className="flex items-center gap-2 px-4 py-2"
+                    >
+                      <MapPin className="w-4 h-4 text-primary" weight="fill" />
+                      <span className="text-sm">
+                        {report.incident_types?.name || "Unknown"} –{" "}
+                        {report.incident_subtypes?.name || "Unknown"} –{" "}
+                        {report.location_address || "Unknown location"}
+                      </span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          )}
         </Command>
       </div>
       <div className="h-svh w-full overflow-hidden relative">

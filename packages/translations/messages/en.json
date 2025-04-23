@@ -44,6 +44,16 @@
             "appName": "FIX",
             "newReport": "New Report"
         },
+        "map": {
+            "search": {
+                "placeholder": "Search Reports",
+                "noResults": "No results found"
+            },
+            "buttons": {
+                "newReport": "New Report",
+                "getLocation": "Get location"
+            }
+        },
         "reportPreview": {
             "location": "Location",
             "created": "Created",
