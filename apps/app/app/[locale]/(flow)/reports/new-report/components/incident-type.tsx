@@ -5,6 +5,7 @@ import { IncidentTypeProps } from "@/lib/types";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
+import { CommandItem } from "@repo/ui/command";
 import { Input } from "@repo/ui/input";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -16,6 +17,7 @@ const IncidentType = ({
 }: IncidentTypeProps) => {
   const t = useTranslations("components.incidentType");
   const tIncident = useTranslations("incidentTypes"); // For accessing incident type names
+  const incidentTypesT = useTranslations("incidentTypes");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<{
     id: string;
@@ -116,6 +118,16 @@ const IncidentType = ({
     }
   };
 
+  // Get icon for a type
+  const getTypeIcon = (typeId: string) => {
+    try {
+      const typeIcon = incidentTypesT.raw(`types.${typeId}.icon`);
+      return (typeIcon as string) || "📍";
+    } catch (error) {
+      return "📍";
+    }
+  };
+
   return (
     <StepContainer
       title={t("title")}
@@ -186,7 +198,16 @@ const IncidentType = ({
                   htmlFor={type.id}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  {translatedType?.name || type.name}
+                  <CommandItem
+                    value={type.name}
+                    onSelect={() => handleSelect(type)}
+                    className="flex items-center gap-2 px-4 py-2"
+                  >
+                    <span className="text-base">{getTypeIcon(type.id)}</span>
+                    <span className="text-sm">
+                      {translatedType?.name || type.name}
+                    </span>
+                  </CommandItem>
                 </label>
                 {translatedType?.description && (
                   <p className="text-sm text-muted-foreground">

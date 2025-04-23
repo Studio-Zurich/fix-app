@@ -52,6 +52,12 @@
             "buttons": {
                 "newReport": "Neuer Report",
                 "getLocation": "Standort abrufen"
+            },
+            "errors": {
+                "permissionDenied": "Standortzugriff verweigert",
+                "positionUnavailable": "Standortinformation nicht verfügbar",
+                "timeout": "Standortanfrage zeitüberschritten",
+                "notSupported": "Geolocation wird von diesem Browser nicht unterstützt"
             }
         },
         "reportPreview": {
@@ -226,192 +232,235 @@
         "searchIncidentTypes": "Suchbegriffe eingeben",
         "types": {
             "f084e16d-b4eb-48eb-9ba0-a2cff5af5236": {
+                "icon": "🐶",
                 "name": "Tiere",
                 "description": "Melden Sie Probleme mit Tieren",
                 "subtypes": {
                     "2873e5ac-dd07-43e8-97eb-a64ee95df334": {
+                        "icon": "💀",
                         "name": "Totes Tier",
                         "description": "Melden Sie ein totes Tier"
                     },
                     "79256bc3-c953-42bd-bfc6-ac1c42ad6995": {
+                        "icon": "🔊",
                         "name": "Tierlärm",
                         "description": "Melden Sie Probleme mit Tierlärm"
                     }
                 }
             },
             "057f163e-06ba-43e2-8559-f537c77ec404": {
+                "icon": "⚡️",
                 "name": "Energie",
                 "description": "Melden Sie energiebezogene Probleme",
                 "subtypes": {
                     "ad2a4779-c8f4-4655-b9e3-653e7e87e3c7": {
+                        "icon": "🔥",
                         "name": "Gasprobleme",
                         "description": "Melden Sie Probleme mit der Gasversorgung"
                     },
                     "b8adbd5b-ff8d-4577-8568-19879d2115c5": {
+                        "icon": "💡",
                         "name": "Stromprobleme",
                         "description": "Melden Sie Probleme mit der Elektrizität"
                     }
                 }
             },
             "08aac3b7-8aec-428c-9f97-78210ccdcf83": {
+                "icon": "🌳",
                 "name": "Vegetation",
                 "description": "Melden Sie Vegetationsprobleme",
                 "subtypes": {
                     "139725d5-5a45-4693-a3e9-697214173480": {
+                        "icon": "🌿",
                         "name": "Allgemeine Vegetation",
                         "description": "Melden Sie allgemeine Vegetationsprobleme"
                     },
                     "360959bf-fc6e-4de8-a6fb-17c397c2ee58": {
+                        "icon": "🌱",
                         "name": "Überwucherte Vegetation",
                         "description": "Melden Sie überwucherte Vegetation"
                     },
                     "cb1ed876-3943-4e68-be6d-39b8a02130ae": {
+                        "icon": "🪵",
                         "name": "Umgestürzter Baum",
                         "description": "Melden Sie einen umgestürzten Baum"
                     }
                 }
             },
             "13775358-37ad-4796-8677-1cfc290d6f4b": {
+                "icon": "🔄",
                 "name": "Sharing-Dienste",
                 "description": "Melden Sie Probleme mit Sharing-Diensten",
                 "subtypes": {
                     "c1088b36-f61c-47fe-aa6d-3c780e0ee0f2": {
+                        "icon": "🛴",
                         "name": "E-Scooter",
                         "description": "Melden Sie Probleme mit E-Scootern"
                     },
                     "2623a5b7-6be9-467c-8fad-5a3325726282": {
+                        "icon": "🚲",
                         "name": "Leihfahrrad",
                         "description": "Melden Sie Probleme mit Leihfahrrädern"
                     },
                     "df726760-de18-47d7-82be-7e7ee426b874": {
+                        "icon": "⚠️",
                         "name": "Illegales Parken",
                         "description": "Melden Sie illegal geparkte Sharing-Fahrzeuge"
                     }
                 }
             },
             "4f842366-fbd4-443b-a47d-ded89ee8a30d": {
+                "icon": "💧",
                 "name": "Wasser",
                 "description": "Melden Sie wasserbezogene Probleme",
                 "subtypes": {
                     "b5a88866-be8b-4a48-bde6-5c919581c1a8": {
+                        "icon": "🌊",
                         "name": "Allgemeines Wasserproblem",
                         "description": "Melden Sie allgemeine Wasserprobleme"
                     },
                     "8bd8537e-6529-4b0f-b805-fbf1d3342de8": {
+                        "icon": "🚰",
                         "name": "Hydrant",
                         "description": "Melden Sie Probleme mit Hydranten"
                     },
                     "ae32815c-f826-4fa2-a965-b842bbd79877": {
+                        "icon": "⛲️",
                         "name": "Trinkbrunnen",
                         "description": "Melden Sie Probleme mit Trinkbrunnen"
                     },
                     "91bfa798-d194-4a6e-9b13-e83dcd4245e4": {
+                        "icon": "💦",
                         "name": "Wasseraustritt",
                         "description": "Melden Sie Wasseraustritte"
                     },
                     "4e074598-fd24-417a-8b4e-0dcae1ac5f81": {
+                        "icon": "🕳️",
                         "name": "Gully",
                         "description": "Melden Sie verstopfte Gullys"
                     }
                 }
             },
             "7661c5e9-292a-4f02-901f-e30a4c057bd1": {
+                "icon": "🚗",
                 "name": "Fahrzeuge",
                 "description": "Melden Sie fahrzeugbezogene Probleme",
                 "subtypes": {
                     "af8cb373-48b2-47ff-897d-99dec0a269d3": {
+                        "icon": "🚘",
                         "name": "Allgemeines Fahrzeugproblem",
                         "description": "Melden Sie allgemeine Fahrzeugprobleme"
                     },
                     "0667ca65-16bf-43be-a41a-f686b75fe214": {
+                        "icon": "🚫",
                         "name": "Verlassenes Fahrzeug",
                         "description": "Melden Sie ein verlassenes Fahrzeug"
                     }
                 }
             },
             "79dde61e-a76a-4eb4-bd61-57fea9961a06": {
+                "icon": "🎨",
                 "name": "Vandalismus",
                 "description": "Melden Sie Vandalismusvorfälle"
             },
             "af6dddc4-3c06-4eef-986b-58e579588596": {
+                "icon": "🚌",
                 "name": "Transport",
                 "description": "Melden Sie Probleme mit öffentlichen Verkehrsmitteln",
                 "subtypes": {
                     "96bf01ac-b993-459b-8a6b-175bdfd4f4a0": {
+                        "icon": "🚏",
                         "name": "Bushaltestelle",
                         "description": "Melden Sie Probleme mit Bushaltestellen"
                     },
                     "aebabe2c-9b82-4aae-883b-8d35afe25b4f": {
+                        "icon": "🚉",
                         "name": "Bahnhof",
                         "description": "Melden Sie Probleme mit Bahnhöfen"
                     },
                     "c5db6e81-1de5-47ca-94be-7d568a79fbf9": {
+                        "icon": "🚊",
                         "name": "Straßenbahnhaltestelle",
                         "description": "Melden Sie Probleme mit Straßenbahnhaltestellen"
                     }
                 }
             },
             "e01b2d33-42a5-49d2-aaf5-34f7e8e8af69": {
+                "icon": "🏛️",
                 "name": "Einrichtungen",
                 "description": "Melden Sie Probleme mit öffentlichen Einrichtungen",
                 "subtypes": {
                     "e968ee7c-34f0-4d2c-b3a4-3810c963882f": {
+                        "icon": "🏢",
                         "name": "Allgemeine Einrichtungen",
                         "description": "Melden Sie allgemeine Probleme mit Einrichtungen"
                     },
                     "a3c1d39c-19d5-4577-b366-1eb9a7e30154": {
+                        "icon": "🎡",
                         "name": "Spielplatz",
                         "description": "Melden Sie Probleme mit Spielplätzen"
                     },
                     "4af3df2d-c91a-4296-b829-235741b81511": {
+                        "icon": "🚽",
                         "name": "Öffentliche Toilette",
                         "description": "Melden Sie Probleme mit öffentlichen Toiletten"
                     }
                 }
             },
             "e449512e-f862-48b5-89eb-2f32da0bdebf": {
+                "icon": "🗑️",
                 "name": "Abfall",
                 "description": "Melden Sie abfallbezogene Probleme",
                 "subtypes": {
                     "932ea78f-57d1-42fb-9398-237e4d1f719e": {
+                        "icon": "♻️",
                         "name": "Allgemeiner Abfall",
                         "description": "Melden Sie allgemeine Abfallprobleme"
                     },
                     "7b6f6775-21be-4fca-b1eb-056836dbff79": {
+                        "icon": "🗑️",
                         "name": "Überfüllter Abfalleimer",
                         "description": "Melden Sie einen überfüllten Abfalleimer"
                     },
                     "f8a5488a-3f09-4a23-9920-11571e634809": {
+                        "icon": "🗑️",
                         "name": "Beschädigter Abfalleimer",
                         "description": "Melden Sie einen beschädigten Abfalleimer"
                     }
                 }
             },
             "0297ba3c-7216-40c1-8b4e-de67cb37fcd2": {
+                "icon": "🏗️",
                 "name": "Infrastruktur",
                 "description": "Melden Sie Infrastrukturprobleme",
                 "subtypes": {
                     "c1b6cd7b-d2f7-4578-9f92-fa7b25f945af": {
+                        "icon": "🛣️",
                         "name": "Beschädigte Straße",
                         "description": "Melden Sie Straßenschäden"
                     },
                     "be266932-ca43-4e2c-b2a8-e18435cf9e5f": {
+                        "icon": "🛣️",
                         "name": "Beschädigter Weg",
                         "description": "Melden Sie beschädigte Gehwege oder Pfade"
                     },
                     "73cf10b4-7642-44eb-a7dc-9e7c4260e121": {
+                        "icon": "🚸",
                         "name": "Beschädigtes Schild",
                         "description": "Melden Sie beschädigte Schilder"
                     },
                     "41ca014b-e91b-4957-9317-ce0fae48b3bd": {
+                        "icon": "💡",
                         "name": "Beschädigte Beleuchtung",
                         "description": "Melden Sie Probleme mit Straßenbeleuchtung"
                     },
                     "e8fbd814-0327-439c-b987-931a0d879703": {
+                        "icon": "🚦",
                         "name": "Beschädigte Ampel",
                         "description": "Melden Sie Probleme mit Ampeln"
                     },
                     "d8ac2edb-bb35-47a9-a759-09507b1447c1": {
+                        "icon": "🧹",
                         "name": "Straßenreinigung",
                         "description": "Melden Sie Probleme mit der Straßenreinigung"
                     }

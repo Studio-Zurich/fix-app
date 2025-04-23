@@ -2,7 +2,7 @@
 import { Button } from "@repo/ui/button";
 
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
-import { Crosshair, MapPin } from "@phosphor-icons/react";
+import { Crosshair } from "@phosphor-icons/react";
 import {
   Command,
   CommandEmpty,
@@ -15,6 +15,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 // Set the Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
@@ -37,16 +38,37 @@ interface OverviewMapProps {
 }
 
 const OverviewMap = ({ reports }: OverviewMapProps) => {
-  const t = useTranslations("components.location");
+  const t = useTranslations("components.map");
+
   const incidentTypesT = useTranslations("incidentTypes");
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
+  const [userLocationMarker, setUserLocationMarker] =
+    useState<mapboxgl.Marker | null>(null);
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+
+  // Get icon for a report
+  const getReportIcon = (typeId: string, subtypeId?: string) => {
+    try {
+      if (subtypeId) {
+        // Try to get subtype icon
+        const subtypeIcon = incidentTypesT.raw(
+          `types.${typeId}.subtypes.${subtypeId}.icon`
+        );
+        if (subtypeIcon) return subtypeIcon as string;
+      }
+      // Fall back to type icon
+      const typeIcon = incidentTypesT.raw(`types.${typeId}.icon`);
+      return (typeIcon as string) || "📍"; // Default to a pin if no icon found
+    } catch (error) {
+      return "📍"; // Default to a pin if there's an error
+    }
+  };
 
   // Get translated type name
   const getTranslatedType = (typeId: string) => {
@@ -118,11 +140,19 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         // Create a DOM element for the marker
         const el = document.createElement("div");
         el.className = "marker";
-        el.style.width = "20px";
-        el.style.height = "20px";
+        el.style.width = "30px";
+        el.style.height = "30px";
         el.style.borderRadius = "50%";
-        el.style.backgroundColor = "#FF8C00"; // Orange color
-        el.style.border = "2px solid white";
+        el.style.backgroundColor = "white";
+        el.style.border = "0px solid #FF8C00";
+        el.style.display = "flex";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.fontSize = "20px";
+        el.innerHTML = getReportIcon(
+          report.incident_type_id,
+          report.incident_subtype_id
+        );
 
         // Create and add the marker
         const marker = new mapboxgl.Marker(el)
@@ -185,6 +215,29 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
           const { latitude, longitude } = position.coords;
 
           if (map.current) {
+            // Remove existing user location marker if it exists
+            if (userLocationMarker) {
+              userLocationMarker.remove();
+            }
+
+            // Create a DOM element for the user location marker
+            const el = document.createElement("div");
+            el.className = "user-location-marker";
+            el.style.width = "20px";
+            el.style.height = "20px";
+            el.style.borderRadius = "50%";
+            el.style.backgroundColor = "#4285F4"; // Blue color for user location
+            el.style.border = "2px solid white";
+            el.style.boxShadow = "0 0 0 2px rgba(66, 133, 244, 0.5)";
+
+            // Create and add the user location marker
+            const newUserLocationMarker = new mapboxgl.Marker(el)
+              .setLngLat([longitude, latitude])
+              .addTo(map.current);
+
+            setUserLocationMarker(newUserLocationMarker);
+
+            // Center map on user location
             map.current.flyTo({
               center: [longitude, latitude],
               zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
@@ -195,13 +248,32 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
           setIsGettingLocation(false);
         },
         (error) => {
-          console.error("Error getting location", error);
+          // Handle geolocation errors without throwing console errors
+          let errorMessage = "Unknown error";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "User denied the request for geolocation";
+              toast.error(t("errors.permissionDenied"));
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information is unavailable";
+              toast.error(t("errors.positionUnavailable"));
+              break;
+            case error.TIMEOUT:
+              errorMessage = "The request to get user location timed out";
+              toast.error(t("errors.timeout"));
+              break;
+          }
+          // Log without throwing console error
+          console.log("Geolocation error:", errorMessage);
           setIsGettingLocation(false);
         },
         MAP_CONSTANTS.GEOLOCATION_OPTIONS
       );
     } else {
-      console.error("Geolocation not supported");
+      // Log without throwing console error
+      console.log("Geolocation is not supported by this browser");
+      toast.error(t("errors.notSupported"));
       setIsGettingLocation(false);
     }
   };
@@ -215,6 +287,15 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
       )
       .slice(0, 5);
   };
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (userLocationMarker) {
+        userLocationMarker.remove();
+      }
+    };
+  }, [userLocationMarker]);
 
   return (
     <>
@@ -272,7 +353,12 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
                       onSelect={() => handleReportSelect(report)}
                       className="flex items-center gap-2 px-4 py-2"
                     >
-                      <MapPin className="w-4 h-4 text-primary" weight="fill" />
+                      <span className="text-base">
+                        {getReportIcon(
+                          report.incident_type_id,
+                          report.incident_subtype_id
+                        )}
+                      </span>
                       <span className="text-sm">
                         {report.incident_type_id
                           ? getTranslatedType(report.incident_type_id)
