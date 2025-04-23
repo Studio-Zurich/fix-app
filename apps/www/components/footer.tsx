@@ -14,7 +14,7 @@ const Footer = ({ locale }: { locale: string }) => {
     <footer className="pt-16 pb-24 bg-foreground dark:bg-background relative">
       <div className="container mx-auto px-[5vw] md:px-6 grid md:grid-cols-2 gap-8">
         <NextLink href="/">
-          <span className="text-white font-medium">Fix App</span>
+          <span className="text-white font-medium">FIX App</span>
         </NextLink>
         <div>
           <TypographyH3

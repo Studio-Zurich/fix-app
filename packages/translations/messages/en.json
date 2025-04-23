@@ -20,13 +20,13 @@
                         "noImages": "No images uploaded for this report."
                     },
                     "location": {
-                        "title": "Location Information",
+                        "title": "Location",
                         "address": "Address"
                     },
                     "incident": {
-                        "title": "Incident Information",
+                        "title": "Incident Type",
                         "type": "Incident Type",
-                        "subtype": "Incident Subtype",
+                        "subtype": "Category",
                         "description": "Description"
                     },
                     "reporter": {
@@ -41,7 +41,7 @@
     },
     "components": {
         "header": {
-            "appName": "Fix",
+            "appName": "FIX",
             "newReport": "New Report"
         },
         "reportPreview": {

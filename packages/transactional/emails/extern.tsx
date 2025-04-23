@@ -63,7 +63,7 @@ export const ReportEmail = ({
           </Section>
 
           <Text style={footer}>
-            info@fixapp.ch <br />© {new Date().getFullYear()} | Fix App |
+            info@fixapp.ch <br />© {new Date().getFullYear()} | FIX App |
             www.fixapp.ch
           </Text>
         </Container>

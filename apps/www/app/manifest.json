@@ -1,6 +1,6 @@
 {
-  "name": "Fix App",
-  "short_name": "Fix App",
+  "name": "FIX App",
+  "short_name": "FIX App",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

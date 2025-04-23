@@ -136,9 +136,17 @@ export default async function ReportPage({ params }: ReportPageProps) {
       <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
         <TypographyH2>{t("sections.reportInfo.title")}</TypographyH2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Badge className={`${getStatusColor(report.status)} w-max`}>
-            {report.status}
-          </Badge>
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              Status
+            </TypographyParagraph>
+            <Badge className={`${getStatusColor(report.status)} w-max`}>
+              {report.status}
+            </Badge>
+          </div>
 
           <div>
             <TypographyParagraph
@@ -160,48 +168,6 @@ export default async function ReportPage({ params }: ReportPageProps) {
             </TypographyParagraph>
             <TypographyParagraph size="text-sm">
               {report.id}
-            </TypographyParagraph>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>{t("sections.images.title")}</TypographyH2>
-        {imageUrls.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {imageUrls.map((url, index) => (
-              <div
-                key={index}
-                className="relative aspect-square border rounded-md overflow-hidden"
-              >
-                <Image
-                  src={url}
-                  alt={`Report image ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={index === 0}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">{t("sections.images.noImages")}</p>
-        )}
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
-        <TypographyH2>{t("sections.location.title")}</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <TypographyParagraph
-              size="text-sm"
-              className="text-muted-foreground"
-            >
-              {t("sections.location.address")}
-            </TypographyParagraph>
-            <TypographyParagraph size="text-sm">
-              {report.location_address}
             </TypographyParagraph>
           </div>
         </div>
@@ -251,6 +217,46 @@ export default async function ReportPage({ params }: ReportPageProps) {
             </TypographyParagraph>
           </div>
         </div>
+      </div>
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>{t("sections.location.title")}</TypographyH2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <TypographyParagraph
+              size="text-sm"
+              className="text-muted-foreground"
+            >
+              {t("sections.location.address")}
+            </TypographyParagraph>
+            <TypographyParagraph size="text-sm">
+              {report.location_address}
+            </TypographyParagraph>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg shadow p-4 space-y-4 mb-8">
+        <TypographyH2>{t("sections.images.title")}</TypographyH2>
+        {imageUrls.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {imageUrls.map((url, index) => (
+              <div
+                key={index}
+                className="relative aspect-square overflow-hidden"
+              >
+                <Image
+                  src={url}
+                  alt={`Report image ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={index === 0}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">{t("sections.images.noImages")}</p>
+        )}
       </div>
       {process.env.NEXT_PUBLIC_ENABLE_LOGGING === "true" && (
         <Popover>

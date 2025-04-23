@@ -27,7 +27,7 @@ const brockmannBold = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Fix App",
+  title: "FIX App",
   description: "Deine Stadt, Deine Initiative",
 };
 
@@ -47,7 +47,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <head>
-        <meta name="apple-mobile-web-app-title" content="Fix App" />
+        <meta name="apple-mobile-web-app-title" content="FIX App" />
       </head>
       <body
         className={`${brockmannRegular.variable} ${brockmannMedium.variable} ${brockmannSemiBold.variable} ${brockmannBold.variable} antialiased`}

@@ -20,13 +20,13 @@
                         "noImages": "Keine Bilder für diesen Report hochgeladen."
                     },
                     "location": {
-                        "title": "Standort Informationen",
+                        "title": "Standort",
                         "address": "Adresse"
                     },
                     "incident": {
-                        "title": "Vorfall Informationen",
-                        "type": "Vorfallstyp",
-                        "subtype": "Vorfallsuntertyp",
+                        "title": "Vorfallstyp",
+                        "type": "Art des Vorfalls",
+                        "subtype": "Kategorie",
                         "description": "Beschreibung"
                     },
                     "reporter": {
@@ -41,7 +41,7 @@
     },
     "components": {
         "header": {
-            "appName": "Fix",
+            "appName": "FIX",
             "newReport": "Neuer Report"
         },
         "reportPreview": {
