@@ -59,8 +59,8 @@ export default function CookieBanner({ locale }: CookieBannerProps) {
   const [cookiePreferences, setCookiePreferences] = useState<CookiePreferences>(
     {
       essential: true, // essential cookies are always enabled
-      analytics: false,
-      marketing: false,
+      analytics: true,
+      marketing: true,
     }
   );
   const [open, setOpen] = useState(false);
@@ -132,7 +132,7 @@ export default function CookieBanner({ locale }: CookieBannerProps) {
   return (
     <>
       <Dialog open={open}>
-        <DialogContent>
+        <DialogContent className="left-auto top-auto bottom-10 right-10 z-50 grid w-full translate-x-[0%] translate-y-[0%]">
           <Card key="1" className="w-full max-w-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center">
@@ -197,7 +197,7 @@ export default function CookieBanner({ locale }: CookieBannerProps) {
             <CardFooter>
               <DialogClose asChild>
                 <Button
-                  className="ml-auto"
+                  className="ml-auto bg-[#ff781e] hover:bg-[#ff781e]/80"
                   type="button"
                   onClick={handleSavePreferences}
                 >
