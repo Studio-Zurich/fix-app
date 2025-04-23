@@ -9,8 +9,9 @@ type ReportOverviewProps = Pick<
   | "incidentType"
   | "description"
   | "userData"
-  | "reportId"
->;
+> & {
+  reportId?: string;
+};
 
 export const ReportOverview = ({
   imageCount,

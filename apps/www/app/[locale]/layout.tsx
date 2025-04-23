@@ -8,6 +8,7 @@ import { getMessages } from "next-intl/server";
 import localFont from "next/font/local";
 import { notFound } from "next/navigation";
 
+import CookieBanner from "@/components/cookie-banner";
 import "@repo/ui/globals.css";
 
 const brockmannRegular = localFont({
@@ -59,6 +60,7 @@ export default async function LocaleLayout({
             <Header />
             {children}
             <Footer locale={locale} />
+            <CookieBanner locale={locale} />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
