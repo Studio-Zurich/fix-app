@@ -210,15 +210,26 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
   // Handle report selection
   const handleReportSelect = (report: Report) => {
     if (map.current && report.location_lat && report.location_lng) {
+      // Store the selected report but don't open the popover yet
+      setSelectedReport(report);
+
+      // Add a one-time event listener for when the fly animation completes
+      const handleMoveEnd = () => {
+        // Open the popover after the fly animation completes
+        setIsPopoverOpen(true);
+        // Remove the event listener after it's been triggered
+        map.current?.off("moveend", handleMoveEnd);
+      };
+
+      // Add the event listener before starting the fly animation
+      map.current.on("moveend", handleMoveEnd);
+
+      // Start the fly animation
       map.current.flyTo({
         center: [report.location_lng, report.location_lat],
         zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
         duration: MAP_CONSTANTS.FLY_TO_DURATION,
       });
-
-      // Show popover for the selected report
-      setSelectedReport(report);
-      setIsPopoverOpen(true);
     }
     setIsFocused(false);
   };
@@ -302,7 +313,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
-      .slice(0, 5);
+      .slice(0, 10);
   };
 
   // Clean up on unmount

@@ -46,7 +46,7 @@
         },
         "map": {
             "search": {
-                "placeholder": "Reports suchen",
+                "placeholder": "Aktuelle Reports durchsuchen",
                 "noResults": "Keine Ergebnisse gefunden"
             },
             "buttons": {
