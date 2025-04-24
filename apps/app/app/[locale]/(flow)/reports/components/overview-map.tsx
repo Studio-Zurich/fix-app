@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
 import { reportStore } from "@/lib/store";
 import { Crosshair } from "@phosphor-icons/react";
+import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import {
   Command,
@@ -14,7 +15,7 @@ import {
 } from "@repo/ui/command";
 import { TypographyH3 } from "@repo/ui/headline";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/popover";
-import { TypographyParagraph } from "@repo/ui/text";
+import { TypographyParagraph, TypographySpan } from "@repo/ui/text";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
@@ -55,6 +56,8 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     useState<mapboxgl.Marker | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [showAllFilters, setShowAllFilters] = useState(true);
 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -141,8 +144,26 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     markers.forEach((marker) => marker.remove());
     const newMarkers: mapboxgl.Marker[] = [];
 
-    // Add markers for all reports
-    reports.forEach((report) => {
+    // Filter reports based on selected filters
+    const filteredReportsToShow = reports.filter((report) => {
+      // If "All" is selected or no filters are selected, show all reports
+      if (showAllFilters || selectedFilters.length === 0) {
+        return true;
+      }
+
+      // If report has a subtype and it's in the selected filters, show it
+      if (
+        report.incident_subtype_id &&
+        selectedFilters.includes(report.incident_subtype_id)
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    // Add markers for filtered reports
+    filteredReportsToShow.forEach((report) => {
       if (report.location_lat && report.location_lng) {
         // Create a DOM element for the marker
         const el = document.createElement("div");
@@ -182,7 +203,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     return () => {
       newMarkers.forEach((marker) => marker.remove());
     };
-  }, [reports]);
+  }, [reports, selectedFilters, showAllFilters]);
 
   // Handle search input
   const handleSearch = (value: string) => {
@@ -333,6 +354,57 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     resetReport();
   };
 
+  // Get unique subtypes from reports
+  const getUniqueSubtypes = () => {
+    const uniqueSubtypes = new Map<
+      string,
+      { id: string; name: string; icon: string; typeId: string }
+    >();
+
+    reports.forEach((report) => {
+      if (report.incident_subtype_id && report.incident_type_id) {
+        const subtypeId = report.incident_subtype_id;
+        if (!uniqueSubtypes.has(subtypeId)) {
+          const icon = getReportIcon(report.incident_type_id, subtypeId);
+          const name = getTranslatedSubtype(report.incident_type_id, subtypeId);
+          uniqueSubtypes.set(subtypeId, {
+            id: subtypeId,
+            name,
+            icon,
+            typeId: report.incident_type_id,
+          });
+        }
+      }
+    });
+
+    return Array.from(uniqueSubtypes.values());
+  };
+
+  // Handle filter badge click
+  const handleFilterClick = (subtypeId: string | null) => {
+    if (subtypeId === null) {
+      // "All" badge clicked
+      setShowAllFilters(true);
+      setSelectedFilters([]);
+    } else {
+      // Specific subtype badge clicked
+      setShowAllFilters(false);
+
+      if (selectedFilters.includes(subtypeId)) {
+        // Remove from selected filters
+        setSelectedFilters(selectedFilters.filter((id) => id !== subtypeId));
+
+        // If no filters selected, show all
+        if (selectedFilters.length === 1) {
+          setShowAllFilters(true);
+        }
+      } else {
+        // Add to selected filters
+        setSelectedFilters([...selectedFilters, subtypeId]);
+      }
+    }
+  };
+
   return (
     <>
       <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-20">
@@ -415,6 +487,40 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
             </CommandList>
           )}
         </Command>
+      </div>
+      <div className="absolute top-[calc(20px+52px+10px)] left-0 w-full z-20 overflow-hidden">
+        <div
+          className="ml-5 flex space-x-2 overflow-x-auto"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+          {/* "All" badge */}
+          <Badge
+            className={`bg-background text-foreground cursor-pointer border ${showAllFilters ? "border-primary" : "border-transparent"} flex items-center whitespace-nowrap`}
+            onClick={() => handleFilterClick(null)}
+          >
+            <TypographySpan size="text-xs" className="mr-1">
+              🔍
+            </TypographySpan>
+            <TypographySpan size="text-xs">All</TypographySpan>
+          </Badge>
+
+          {/* Dynamic badges for each unique subtype */}
+          {getUniqueSubtypes().map((subtype) => (
+            <Badge
+              key={subtype.id}
+              className={`bg-background text-foreground cursor-pointer border last:mr-5 ${selectedFilters.includes(subtype.id) ? "border-primary" : "border-transparent"} flex items-center whitespace-nowrap`}
+              onClick={() => handleFilterClick(subtype.id)}
+            >
+              <TypographySpan size="text-xs" className="mr-1">
+                {subtype.icon}
+              </TypographySpan>
+              <TypographySpan size="text-xs">{subtype.name}</TypographySpan>
+            </Badge>
+          ))}
+        </div>
       </div>
       <div className="h-svh w-full overflow-hidden relative">
         <div ref={mapContainer} className="h-full w-full" />
