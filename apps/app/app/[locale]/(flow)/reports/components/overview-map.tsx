@@ -498,7 +498,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
         >
           {/* "All" badge */}
           <Badge
-            className={`bg-background text-foreground cursor-pointer border ${showAllFilters ? "border-primary" : "border-transparent"} flex items-center whitespace-nowrap`}
+            className={`bg-background py-2.5 px-4 text-foreground cursor-pointer border ${showAllFilters ? "border-[#FF8C00] bg-[#FF8C00] text-background" : "border-transparent"} flex items-center whitespace-nowrap`}
             onClick={() => handleFilterClick(null)}
           >
             <TypographySpan size="text-xs" className="mr-1">
@@ -511,7 +511,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
           {getUniqueSubtypes().map((subtype) => (
             <Badge
               key={subtype.id}
-              className={`bg-background text-foreground cursor-pointer border last:mr-5 ${selectedFilters.includes(subtype.id) ? "border-primary" : "border-transparent"} flex items-center whitespace-nowrap`}
+              className={`bg-background p-3 text-foreground cursor-pointer border last:mr-5 ${selectedFilters.includes(subtype.id) ? "border-[#FF8C00] bg-[#FF8C00] text-background" : "border-transparent"} flex items-center whitespace-nowrap`}
               onClick={() => handleFilterClick(subtype.id)}
             >
               <TypographySpan size="text-xs" className="mr-1">
