@@ -5,7 +5,6 @@ import { IncidentTypeProps } from "@/lib/types";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { Checkbox } from "@repo/ui/checkbox";
-import { CommandItem } from "@repo/ui/command";
 import { Input } from "@repo/ui/input";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -198,16 +197,12 @@ const IncidentType = ({
                   htmlFor={type.id}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  <CommandItem
-                    value={type.name}
-                    onSelect={() => handleSelect(type)}
-                    className="flex items-center gap-2 px-4 py-2"
-                  >
+                  <div className="flex items-center gap-2 pr-4 py-1">
                     <span className="text-base">{getTypeIcon(type.id)}</span>
                     <span className="text-sm">
                       {translatedType?.name || type.name}
                     </span>
-                  </CommandItem>
+                  </div>
                 </label>
                 {translatedType?.description && (
                   <p className="text-sm text-muted-foreground">
