@@ -71,11 +71,11 @@ const AboutUsSection = () => {
                   <Component className={text.className} size={text.size}>
                     {t(text.key)}
                   </Component>
-                  <a href="https://app.fixapp.ch" target="_blank">
-                    <Button
-                      className="mt-8 bg-transparent border border-[#64d25f] text-[#64d25f] shadow-none cursor-pointer hover:bg-[#64d25f] hover:text-white transition-all duration-300"
-                      onClick={() => router.push("/report")}
-                    >
+                  <a
+                    href="https://app.fixapp.ch/reports/new-report"
+                    target="_blank"
+                  >
+                    <Button className="mt-8 border border-[#64d25f] shadow-none cursor-pointer bg-[#64d25f] hover:bg-[#64d25f]/90 text-white transition-all duration-300">
                       {t("outroButton")}
                     </Button>
                   </a>

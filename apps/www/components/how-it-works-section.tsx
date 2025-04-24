@@ -4,6 +4,7 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { Button } from "@repo/ui/button";
 import { TypographyH2, TypographyH3 } from "@repo/ui/headline";
 import { TypographyParagraph, TypographySpan } from "@repo/ui/text";
+import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import NextLink from "next/link";
 import { useState } from "react";
@@ -11,7 +12,17 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-const ProcessFlow = ({ activeStep, t }: { activeStep: number; t: any }) => (
+import { AnimatedCheckmark } from "./ui/animated-icons";
+
+type TranslationFunction = (key: string) => string;
+
+const ProcessFlow = ({
+  activeStep,
+  t,
+}: {
+  activeStep: number;
+  t: TranslationFunction;
+}) => (
   <div className="relative p-8 bg-[#ff781e]/20 rounded-3xl h-full">
     <TypographyH3 size="text-xl font-semibold mb-4">
       {t("processFlow.title")}
@@ -94,13 +105,33 @@ const HowItWorksSection = () => {
               </TypographySpan>
             </div>
 
-            <div className="absolute bottom-8 left-6 flex justify-between items-center gap-4 z-10">
-              <button className="swiper-button-prev">
-                <CaretLeft size={24} weight="bold" className="text-white" />
-              </button>
-              <button className="swiper-button-next">
-                <CaretRight size={24} weight="bold" className="text-white" />
-              </button>
+            <div className="absolute bottom-8 left-6 space-y-4 md:space-y-0 z-10">
+              {/* Mobile step indicator with animated checkmark */}
+              <div className="md:hidden text-white">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`step-${activeStep}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <AnimatedCheckmark />
+                    <TypographyParagraph size="text-sm text-white">
+                      {t(`processFlow.step${activeStep + 1}`)}
+                    </TypographyParagraph>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="flex justify-between items-center w-max gap-4">
+                <button className="swiper-button-prev">
+                  <CaretLeft size={24} weight="bold" className="text-white" />
+                </button>
+                <button className="swiper-button-next">
+                  <CaretRight size={24} weight="bold" className="text-white" />
+                </button>
+              </div>
             </div>
 
             <div className="w-[calc(100vw-10vw)] lg:w-full -ml-[5vw] lg:ml-0">
@@ -131,15 +162,20 @@ const HowItWorksSection = () => {
             </div>
           </div>
         </div>
-        <ProcessFlow activeStep={activeStep} t={t} />
+        {/* Hide ProcessFlow on mobile */}
+        <div className="hidden md:block">
+          <ProcessFlow activeStep={activeStep} t={t} />
+        </div>
       </div>
       <div className="flex justify-center mt-16">
         <NextLink
-          href="https://app.fixapp.ch"
+          href="https://app.fixapp.ch/reports/new-report"
           target="_blank"
           className="cursor-pointer"
         >
-          <Button className="w-32 cursor-pointer">Report</Button>
+          <Button className="bg-[#ff781e] text-background hover:bg-[#ff781e]/90 w-32 cursor-pointer">
+            Report
+          </Button>
         </NextLink>
       </div>
     </section>

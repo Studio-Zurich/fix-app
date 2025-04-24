@@ -132,7 +132,7 @@ export default function CookieBanner({ locale }: CookieBannerProps) {
   return (
     <>
       <Dialog open={open}>
-        <DialogContent className="left-auto top-auto bottom-10 right-10 z-50 grid w-full translate-x-[0%] translate-y-[0%]">
+        <DialogContent className="left-auto top-auto bottom-0 md:bottom-10 right-0 md:right-10 z-50 grid w-full translate-x-[0%] translate-y-[0%] p-0">
           <Card key="1" className="w-full max-w-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center">
