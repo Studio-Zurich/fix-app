@@ -19,7 +19,9 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom/client";
 import { toast } from "sonner";
+import MapMarker from "./map-marker";
 import QuickAddButton from "./quick-add-button";
 
 // Set the Mapbox access token
@@ -165,31 +167,43 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     // Add markers for filtered reports
     filteredReportsToShow.forEach((report) => {
       if (report.location_lat && report.location_lng) {
-        // Create a DOM element for the marker
-        const el = document.createElement("div");
-        el.className = "marker";
-        el.style.width = "30px";
-        el.style.height = "30px";
-        el.style.borderRadius = "50%";
-        el.style.backgroundColor = "white";
-        el.style.border = "0px solid #FF8C00";
-        el.style.display = "flex";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.fontSize = "20px";
-        el.style.cursor = "pointer";
-        el.innerHTML = getReportIcon(
+        // Create a container for the marker
+        const container = document.createElement("div");
+
+        // Get the icon HTML
+        const iconHtml = getReportIcon(
           report.incident_type_id,
           report.incident_subtype_id
         );
 
+        // Render the MapMarker component with the icon as children
+        const root = ReactDOM.createRoot(container);
+        root.render(
+          <MapMarker>
+            <div
+              style={{
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "14px",
+                backgroundColor: "white",
+                borderRadius: "100%",
+                padding: "1px",
+              }}
+              dangerouslySetInnerHTML={{ __html: iconHtml }}
+            />
+          </MapMarker>
+        );
+
         // Create and add the marker
-        const marker = new mapboxgl.Marker(el)
+        const marker = new mapboxgl.Marker(container)
           .setLngLat([report.location_lng, report.location_lat])
           .addTo(map.current!);
 
         // Add click event to show popover
-        el.addEventListener("click", () => {
+        container.addEventListener("click", () => {
           setSelectedReport(report);
           setIsPopoverOpen(true);
         });
