@@ -13,6 +13,7 @@ import StepContainer from "./step-container";
 const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
   const t = useTranslations("components.incidentSubtype");
   const tIncident = useTranslations("incidentTypes"); // For accessing incident type names
+  const incidentTypesT = useTranslations("incidentTypes");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubtype, setSelectedSubtype] = useState<{
     id: string;
@@ -85,6 +86,27 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
       name: dbSubtype.name,
       description: dbSubtype.description,
     };
+  };
+
+  // Get icon for a subtype
+  const getSubtypeIcon = (subtypeId: string) => {
+    try {
+      // First, find the parent type ID
+      const parentType = incidentSubtypes.find(
+        (subtype) => subtype.id === subtypeId
+      )?.incident_type_id;
+
+      if (parentType) {
+        // Try to get the icon from the parent type's subtypes
+        const subtypeIcon = incidentTypesT.raw(
+          `types.${parentType}.subtypes.${subtypeId}.icon`
+        );
+        return (subtypeIcon as string) || "📍";
+      }
+      return "📍";
+    } catch (error) {
+      return "📍";
+    }
   };
 
   // Filter subtypes based on the selected incident type and search query
@@ -198,7 +220,14 @@ const IncidentSubtype = ({ incidentSubtypes }: IncidentSubtypeProps) => {
                   htmlFor={subtype.id}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  {translatedSubtype?.name || subtype.name}
+                  <div className="flex items-center gap-2 pr-4 py-1">
+                    <span className="text-base">
+                      {getSubtypeIcon(subtype.id)}
+                    </span>
+                    <span className="text-sm">
+                      {translatedSubtype?.name || subtype.name}
+                    </span>
+                  </div>
                 </label>
                 {translatedSubtype?.description && (
                   <p className="text-sm text-muted-foreground">
