@@ -17,9 +17,9 @@ const Header = () => {
     <>
       <header className="fixed top-8 w-full z-50">
         <div className="container ml-[5vw] lg:mx-auto px-[5vw] md:px-6 bg-[#343434]/40 backdrop-blur-[40px] rounded-full py-2 w-max lg:w-[calc(100vw-10vw)] md:w-[calc(100vw-3rem)]">
-          <div className="flex justify-start space-x-4 lg:justify-between items-center">
+          <div className="flex justify-start space-x-4 md:space-x-16 lg:justify-between items-center">
             <Link href="/">
-              <span className="text-white">FIX App</span>
+              <span className="text-white whitespace-nowrap">FIX App</span>
             </Link>
             <button
               className="md:hidden mx-auto"
