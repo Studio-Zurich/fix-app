@@ -1,7 +1,6 @@
 "use client";
-import { Link } from "@/i18n/navigation";
 import { DEFAULT_LOCATION, MAP_CONSTANTS } from "@/lib/constants";
-import { reportStore } from "@/lib/store";
+
 import { Crosshair } from "@phosphor-icons/react";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
@@ -21,6 +20,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import QuickAddButton from "./quick-add-button";
 
 // Set the Mapbox access token
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
@@ -347,13 +347,6 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
     };
   }, [userLocationMarker]);
 
-  const handleNewReport = () => {
-    // Get the resetReport function from the store
-    const resetReport = reportStore.getState().resetReport;
-    // Call it to ensure a fresh start
-    resetReport();
-  };
-
   // Get unique subtypes from reports
   const getUniqueSubtypes = () => {
     const uniqueSubtypes = new Map<
@@ -524,15 +517,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
       </div>
       <div className="h-svh w-full overflow-hidden relative">
         <div ref={mapContainer} className="h-full w-full" />
-        <Link
-          href="/reports/new-report"
-          className="absolute bottom-5 left-5 w-[calc(100%-2.5rem)] z-20 cursor-pointer"
-          onClick={handleNewReport}
-        >
-          <Button className="w-full cursor-pointer">
-            {t("buttons.newReport")}
-          </Button>
-        </Link>
+        <QuickAddButton />
         {/* Report Popover */}
         {selectedReport && (
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>

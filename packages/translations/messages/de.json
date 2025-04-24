@@ -58,6 +58,11 @@
                 "positionUnavailable": "Standortinformation nicht verfügbar",
                 "timeout": "Standortanfrage zeitüberschritten",
                 "notSupported": "Geolocation wird von diesem Browser nicht unterstützt"
+            },
+            "quickAdd": {
+                "title": "Schnell hinzufügen",
+                "newReport": "Neuer Report",
+                "categories": "Häufige Kategorien"
             }
         },
         "reportPreview": {

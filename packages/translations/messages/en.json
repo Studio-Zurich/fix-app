@@ -58,6 +58,11 @@
                 "positionUnavailable": "Location information unavailable",
                 "timeout": "Location request timed out",
                 "notSupported": "Geolocation is not supported by this browser"
+            },
+            "quickAdd": {
+                "title": "Quick Add",
+                "newReport": "New Report",
+                "categories": "Frequent Categories"
             }
         },
         "reportPreview": {
