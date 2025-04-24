@@ -407,7 +407,7 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
 
   return (
     <>
-      <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-20">
+      <div className="absolute top-5 left-5 w-[calc(100%-2.5rem)] bg-background px-3 py-2 z-40">
         <Command shouldFilter={false}>
           <div className="flex items-center w-full justify-between gap-4">
             <CommandInput
@@ -459,9 +459,9 @@ const OverviewMap = ({ reports }: OverviewMapProps) => {
                       key={report.id}
                       value={report.location_address || ""}
                       onSelect={() => handleReportSelect(report)}
-                      className="flex items-center gap-2 px-4 py-2"
+                      className="flex items-center px-0 py-2 !bg-transparent hover:!bg-transparent"
                     >
-                      <span className="text-base">
+                      <span className="text-base mr-3">
                         {getReportIcon(
                           report.incident_type_id,
                           report.incident_subtype_id
