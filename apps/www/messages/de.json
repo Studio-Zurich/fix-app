@@ -48,7 +48,7 @@
         "description2": "Alles begann mit einem einsamen Fahrrad in Zug. Tag für Tag stand es unter einem Baum, trotzte Sonne, Regen und Schnee. Vier Wochen lang blieb es unentdeckt - bis es eines Tages einfach verschwand.",
         "outro": "Wurde es gestohlen? Hatte der Besitzer nach ihm gesucht? Wusste die Polizei überhaupt, dass es da war?",
         "outro2": "Niemand hatte die Antwort.",
-        "outroButton": "Deine erste Meldung"
+        "outroButton": "Report erstellen"
     },
     "FaqSection": {
         "title": "Häufig gestellte Fragen",
@@ -58,12 +58,32 @@
                 "answer": "Du kannst einen Vorfall einfach über unsere Web-App melden. Beschreibe das Problem, füge einen Standort hinzu und lade optional ein Foto hoch."
             },
             {
-                "question": "Wie lange dauert die Bearbeitung meiner Meldung?",
+                "question": "Wie lange dauert die Bearbeitung?",
                 "answer": "Meldungen werden in der Regel innerhalb von 24-48 Stunden bearbeitet. Dringende Angelegenheiten können je nach Schweregrad schneller bearbeitet werden."
             },
             {
                 "question": "Ist der Service in meiner Region verfügbar?",
-                "answer": "Unser Service ist derzeit im Kanton Zug verfügbar."
+                "answer": "Unser Service ist derzeit in der Schweiz verfügbar."
+            },
+            {
+                "question": "Erhalte ich eine Bestätigung?",
+                "answer": "Ja, Du erhältst eine Bestätigungs-E-Mail, sobald Deine Meldung erfolgreich eingereicht wurde."
+            },
+            {
+                "question": "Kann ich meinen Vorfall später einsehen?",
+                "answer": "Ja, Du kannst Deine eingereichten Meldungen jederzeit über Den Link in der Bestätigungs-E-Mail einsehen."
+            },
+            {
+                "question": "Ich finde keine passende Kategorie, was soll ich machen?",
+                "answer": "Wenn Du keine exakte Übereinstimmung findest, wähle die Kategorie, die am besten zu Deiner Situation passt. Du kannst weitere Details im Beschreibungsfeld hinzufügen."
+            },
+            {
+                "question": "Muss ich alle Felder ausfüllen?",
+                "answer": "Nur der Vorfallstyp, der Standort und Deine Daten sind erforderlich. Das Foto und die Beschreibung sind optional, aber hilfreich für ein besseres Verständnis der Situation."
+            },
+            {
+                "question": "Kann ich meine Meldung nach der Einreichung noch bearbeiten?",
+                "answer": "Nach der Einreichung können Meldungen nicht mehr bearbeitet werden. Falls Du Änderungen vornehmen möchtest, kontaktiere bitte unser Support-Team."
             }
         ]
     }

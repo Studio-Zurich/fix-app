@@ -1,12 +1,10 @@
 "use client";
 
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
-import { Button } from "@repo/ui/button";
 import { TypographyH2, TypographyH3 } from "@repo/ui/headline";
 import { TypographyParagraph, TypographySpan } from "@repo/ui/text";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import NextLink from "next/link";
 import { useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -167,7 +165,7 @@ const HowItWorksSection = () => {
           <ProcessFlow activeStep={activeStep} t={t} />
         </div>
       </div>
-      <div className="flex justify-center mt-16">
+      {/* <div className="flex justify-center mt-16">
         <NextLink
           href="https://app.fixapp.ch/reports/new-report"
           target="_blank"
@@ -177,7 +175,7 @@ const HowItWorksSection = () => {
             Report
           </Button>
         </NextLink>
-      </div>
+      </div> */}
     </section>
   );
 };

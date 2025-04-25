@@ -108,7 +108,7 @@
         "description2": "It all began with a lone bicycle in Zug. Day after day, it sat under a tree, enduring sun, rain, and snow. Four weeks went by unnoticed - until one day it simply vanished.",
         "outro": "Was it stolen? Did the owner search for it? Did the police even know it was there?",
         "outro2": "No one had the answer.",
-        "outroButton": "Your first report"
+        "outroButton": "Create a report"
     },
     "FaqSection": {
         "title": "Frequently Asked Questions",
@@ -118,12 +118,32 @@
                 "answer": "You can easily report an incident through our web application. Simply describe the issue, add a location, and optionally upload a photo."
             },
             {
-                "question": "How long does it take to process my report?",
+                "question": "How long does it take to process?",
                 "answer": "Reports are typically processed within 24-48 hours. Urgent matters may be handled more quickly depending on their severity."
             },
             {
                 "question": "Is the service available in my area?",
-                "answer": "Our service is currently available in the Canton of Zug."
+                "answer": "Our service is currently available in Switzerland."
+            },
+            {
+                "question": "Will I receive a confirmation?",
+                "answer": "Yes, you will receive a confirmation email once your report has been submitted successfully."
+            },
+            {
+                "question": "Can I view my incident report later?",
+                "answer": "Yes, you can access your submitted reports through the link in the confirmation email."
+            },
+            {
+                "question": "I can't find a suitable category, what should I do?",
+                "answer": "If you can't find an exact match, choose the category that best fits your situation. You can provide more details in the description field."
+            },
+            {
+                "question": "Do I need to fill in all fields?",
+                "answer": "Only the incident type, location, and your data are required. Photos and description are optional but helpful for better understanding of the situation."
+            },
+            {
+                "question": "Can I edit my report after submission?",
+                "answer": "Once submitted, reports cannot be edited. If you need to make changes, please contact our support team."
             }
         ]
     }
