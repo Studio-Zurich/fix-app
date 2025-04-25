@@ -77,7 +77,7 @@ const Vision = () => {
       <div className="flex flex-col md:flex-row gap-8 text-center">
         <div className="w-full text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="leading-tight text-[#64d25f] text-center text-2xl lg:text-3xl">
+            <div className="leading-tight text-foreground text-center text-2xl lg:text-3xl">
               <div className="flex flex-wrap justify-center">
                 {words.map((word, i) => {
                   const start = i / totalWords;
@@ -95,7 +95,7 @@ const Vision = () => {
               </div>
             </div>
 
-            <div className="leading-tight text-[#64d25f] text-center text-2xl lg:text-3xl mt-8">
+            <div className="leading-tight text-foreground text-center text-2xl lg:text-3xl mt-8">
               <div className="flex flex-wrap justify-center">
                 {words2.map((word, i) => {
                   const start = (words2StartIndex + i) / totalWords;
@@ -113,7 +113,7 @@ const Vision = () => {
               </div>
             </div>
 
-            <div className="leading-tight text-[#64d25f] text-center text-2xl lg:text-3xl mt-8">
+            <div className="leading-tight text-foreground text-center text-2xl lg:text-3xl mt-8">
               <div className="flex flex-wrap justify-center">
                 {outroWords.map((word, i) => {
                   const start = (outroStartIndex + i) / totalWords;
@@ -131,7 +131,7 @@ const Vision = () => {
               </div>
             </div>
 
-            <div className="leading-tight text-[#64d25f] text-center text-2xl lg:text-3xl mt-8">
+            <div className="leading-tight text-foreground text-center text-2xl lg:text-3xl mt-8">
               <div className="flex flex-wrap justify-center">
                 {outro2Words.map((word, i) => {
                   const start = (outro2StartIndex + i) / totalWords;
@@ -158,7 +158,7 @@ const Vision = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <a href="https://app.fixapp.ch/reports/new-report" target="_blank">
-            <Button className="border border-[#64d25f] shadow-none cursor-pointer bg-[#64d25f] hover:bg-[#64d25f]/90 text-white transition-all duration-300">
+            <Button className="border border-[#ff781e] shadow-none cursor-pointer bg-[#ff781e] hover:bg-[#ff781e]/90 text-white transition-all duration-300">
               {t("outroButton")}
             </Button>
           </a>

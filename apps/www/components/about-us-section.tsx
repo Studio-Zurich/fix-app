@@ -20,7 +20,7 @@ const AboutUsSection = () => {
     {
       key: "title",
       component: TypographyH2,
-      className: "text-center text-[#64d25f]",
+      className: "text-center text-[#ff781e]",
       size: "text-4xl",
     },
     {
@@ -75,7 +75,7 @@ const AboutUsSection = () => {
                     href="https://app.fixapp.ch/reports/new-report"
                     target="_blank"
                   >
-                    <Button className="mt-8 border border-[#64d25f] shadow-none cursor-pointer bg-[#64d25f] hover:bg-[#64d25f]/90 text-white transition-all duration-300">
+                    <Button className="mt-8 border border-[#ff781e] shadow-none cursor-pointer bg-[#ff781e] hover:bg-[#ff781e]/90 text-white transition-all duration-300">
                       {t("outroButton")}
                     </Button>
                   </a>
