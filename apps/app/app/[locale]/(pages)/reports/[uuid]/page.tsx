@@ -101,11 +101,10 @@ export default async function ReportPage({ params }: ReportPageProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "open":
+        return "bg-orange-100 text-orange-800";
+      case "reported":
         return "bg-green-100 text-green-800";
-      case "in progress":
-        return "bg-blue-100 text-blue-800";
-      case "closed":
-        return "bg-gray-100 text-gray-800";
+
       default:
         return "bg-gray-100 text-gray-800";
     }
