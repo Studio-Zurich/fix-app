@@ -219,7 +219,7 @@ export async function submitReport(
         from: "FIX App <notifications@fixapp.ch>",
         to: "reports@fixapp.ch",
         cc: "hello@studio-zurich.ch",
-        subject: "New Report Submitted",
+        subject: "Neuer Report erstellt",
         react: InternalReportEmail(emailProps),
       });
 

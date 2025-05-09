@@ -26,16 +26,16 @@ export const ReportEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>New Report Submitted</Preview>
+      <Preview>Neuer Report erstellt</Preview>
       <Body style={main}>
         <Container>
           <Section style={content}>
-            <Heading style={header}>New Report Submitted</Heading>
+            <Heading style={header}>Neuer Report erstellt</Heading>
 
             <Section style={section}>
               <ReportOverview
                 imageCount={imageCount}
-                locale={locale}
+                locale={"de"}
                 location={location}
                 incidentType={incidentType}
                 description={description}
@@ -50,7 +50,7 @@ export const ReportEmail = ({
                 style={button}
                 className="dark:bg-white dark:text-black"
               >
-                View Report
+                Report anzeigen
               </Button>
             </Section>
           </Section>
