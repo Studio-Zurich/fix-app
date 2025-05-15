@@ -1,5 +1,6 @@
 "use client";
 import HeroImage from "@/public/images/hero.jpg";
+import { Button } from "@repo/ui/button";
 import { TypographyH1 } from "@repo/ui/headline";
 import { TypographyParagraph } from "@repo/ui/text";
 import { AnimatePresence, motion } from "framer-motion";
@@ -39,6 +40,18 @@ const Hero = () => {
         <TypographyH1 className="text-background text-center mb-8">
           {t("title")}
         </TypographyH1>
+        <a
+          href="https://app.fixapp.ch/reports/new-report"
+          target="_blank"
+          className="cursor-pointer"
+        >
+          <Button
+            variant="secondary"
+            className="hidden md:inline-flex cursor-pointer"
+          >
+            Report
+          </Button>
+        </a>
         <div className="absolute bottom-[10svh] left-1/2 -translate-x-1/2 text-white text-center w-full max-w-[calc(100vw-10vw)] md:max-w-1/2">
           <AnimatePresence mode="wait">
             {!showCheck ? (
