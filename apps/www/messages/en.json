@@ -15,7 +15,11 @@
         "close": "Close",
         "imprint": "Imprint",
         "privacy": "Privacy",
-        "how-it-works": "How it works"
+        "how-it-works": "How it works",
+        "report": "Report",
+        "links": "Links",
+        "legal": "Legal",
+        "getInTouch": "Get in touch"
     },
     "components": {
         "reportFlow": {
@@ -146,5 +150,19 @@
                 "answer": "Once submitted, reports cannot be edited. If you need to make changes, please contact our support team."
             }
         ]
+    },
+    "Imprint": {
+        "title": "Imprint",
+        "companyName": "FIX App GmbH i.G.",
+        "legalForm": "Legal Form",
+        "commercialRegister": "Commercial Register",
+        "vatNumber": "VAT Number",
+        "supervisoryAuthority": "Supervisory Authority",
+        "contact": "Contact",
+        "address": "Address",
+        "email": "Email",
+        "legalFormValue": "Limited Liability Company (GmbH) in formation",
+        "commercialRegisterValue": "Commercial Register Office of the Canton of Zug",
+        "supervisoryAuthorityValue": "Commercial Register Office of the Canton of Zug"
     }
 }

@@ -15,7 +15,71 @@
         "close": "Schließen",
         "imprint": "Impressum",
         "privacy": "Datenschutz",
-        "how-it-works": "Wie es funktioniert"
+        "how-it-works": "Wie es funktioniert",
+        "report": "Melden",
+        "links": "Links",
+        "legal": "Rechtliches",
+        "getInTouch": "Kontakt"
+    },
+    "components": {
+        "reportFlow": {
+            "imageUpload": {
+                "step": "Bild hochladen",
+                "description": "Mache ein Foto oder wähle ein Bild aus"
+            },
+            "locationMap": {
+                "step": "Standort auswählen",
+                "description": "Bewege die Karte, um die Position zu ändern",
+                "moveMap": "Bewege die Karte, um die Position zu ändern",
+                "searchPlaceholder": "Adresse eingeben",
+                "noResults": "Keine Ergebnisse gefunden",
+                "getLocation": "Aktueller Standort",
+                "locationDialog": {
+                    "title": "Standort gefunden",
+                    "description": "Wir haben einen Standort in deinem Bild erkannt. Möchtest du diesen Standort verwenden?",
+                    "confirm": "Standort verwenden",
+                    "reject": "Anderen Standort wählen"
+                }
+            },
+            "takePhotoOrChooseImage": "Mache ein Foto oder wähle ein Bild aus",
+            "uploading": "Wird hochgeladen...",
+            "uploadImage": "Bild hochladen",
+            "filesSelected": "{count} Datei ausgewählt",
+            "filesSelectedPlural": "{count} Dateien ausgewählt",
+            "clearAll": "Alle löschen",
+            "remove": "Entfernen",
+            "selectLocation": "Standort auswählen",
+            "selectedLocation": "Ausgewählter Standort: {address}",
+            "selectIncidentType": "Vorfallstyp auswählen",
+            "addDescription": "Beschreibung hinzufügen",
+            "descriptionPlaceholder": "Beschreibe den Vorfall...",
+            "charactersLeft": "Noch {count} Zeichen übrig",
+            "descriptionGuidelines": {
+                "title": "Richtlinien",
+                "specific": "Sei so genau wie möglich",
+                "noPersonalInfo": "Keine persönlichen Informationen",
+                "respectful": "Bleibe respektvoll"
+            },
+            "errors": {
+                "invalidFileType": "Ungültiger Dateityp. Nur JPEG, PNG und GIF sind erlaubt",
+                "uploadFailed": "Upload fehlgeschlagen",
+                "fileTooLarge": "Datei überschreitet die maximale Größe von 5MB",
+                "tooManyFiles": "Zu viele Dateien. Maximum ist {max}",
+                "noFilesSelected": "Keine Dateien ausgewählt",
+                "databaseError": "Datenbankfehler",
+                "someUploadsFailed": "Einige Uploads sind fehlgeschlagen",
+                "noLocationSelected": "Bitte wähle einen Standort aus",
+                "noIncidentTypeSelected": "Bitte wähle einen Vorfallstyp aus"
+            }
+        },
+        "reportOverview": {
+            "imagesUploaded": "Bilder hochgeladen",
+            "image": "Bild",
+            "images": "Bilder",
+            "location": "Standort",
+            "incidentType": "Vorfallstyp",
+            "description": "Beschreibung"
+        }
     },
     "how-it-works-section": {
         "title": "Wie es funktioniert",
@@ -86,5 +150,19 @@
                 "answer": "Nach der Einreichung können Meldungen nicht mehr bearbeitet werden. Falls Du Änderungen vornehmen möchtest, kontaktiere bitte unser Support-Team."
             }
         ]
+    },
+    "Imprint": {
+        "title": "Impressum",
+        "companyName": "FIX App GmbH i.G.",
+        "legalForm": "Rechtsform",
+        "commercialRegister": "Handelsregister",
+        "vatNumber": "UID-Nr.",
+        "supervisoryAuthority": "Aufsichtsbehörde",
+        "contact": "Kontakt",
+        "address": "Adresse",
+        "email": "E-Mail",
+        "legalFormValue": "Gesellschaft mit beschränkter Haftung (GmbH) in Gründung",
+        "commercialRegisterValue": "Handelsregisteramt des Kantons Zug",
+        "supervisoryAuthorityValue": "Handelsregisteramt des Kantons Zug"
     }
 }
