@@ -2,7 +2,6 @@
 
 @import "tailwindcss";
 
-
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -162,4 +161,13 @@
 .swiper-button-prev::after,
 .swiper-button-next::after {
   content: "" !important;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
