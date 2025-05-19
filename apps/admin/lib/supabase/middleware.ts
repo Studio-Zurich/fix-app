@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { routing } from "../../i18n/routing";
 
 export async function updateSession(
   request: NextRequest,
@@ -31,7 +32,10 @@ export async function updateSession(
 
   // Get current URL and path
   const url = new URL(request.url);
-  const locale = url.pathname.split("/")[1]; // Get locale from URL (en or de)
+
+  // Get locale from URL or use default locale
+  const pathParts = url.pathname.split("/").filter(Boolean);
+  const locale = pathParts[0] || routing.defaultLocale;
 
   // Check if the path is already the login page or auth-related pages
   const isLoginPage = url.pathname.includes(`/${locale}/login`);
@@ -39,7 +43,7 @@ export async function updateSession(
 
   // If user is not authenticated and not already on login page or auth callback, redirect to login
   if (!user && !isLoginPage && !isAuthCallback) {
-    const redirectUrl = new URL(`/${locale}/login`, request.url);
+    const redirectUrl = new URL(`/${locale}/login`, url.origin);
     return NextResponse.redirect(redirectUrl);
   }
 
