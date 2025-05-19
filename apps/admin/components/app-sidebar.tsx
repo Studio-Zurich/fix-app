@@ -4,11 +4,8 @@ import {
   BarChartIcon,
   CameraIcon,
   ClipboardListIcon,
-  DatabaseIcon,
   FileCodeIcon,
-  FileIcon,
   FileTextIcon,
-  FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
   ListIcon,
@@ -54,11 +51,7 @@ const data = {
       url: "#",
       icon: BarChartIcon,
     },
-    {
-      title: "Projekte",
-      url: "#",
-      icon: FolderIcon,
-    },
+
     {
       title: "Abteilungen",
       url: "#",
@@ -132,19 +125,9 @@ const data = {
   ],
   documents: [
     {
-      name: "Datenbank",
-      url: "#",
-      icon: DatabaseIcon,
-    },
-    {
       name: "Berichte",
       url: "#",
       icon: ClipboardListIcon,
-    },
-    {
-      name: "Vorlagen",
-      url: "#",
-      icon: FileIcon,
     },
   ],
 };
