@@ -34,80 +34,80 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "FIX App",
+    email: "info@fixapp.ch",
+    avatar: "/",
   },
   navMain: [
     {
-      title: "Dashboard",
+      title: "Übersicht",
       url: "#",
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Lifecycle",
+      title: "Meldungen",
       url: "#",
       icon: ListIcon,
     },
     {
-      title: "Analytics",
+      title: "Statistik",
       url: "#",
       icon: BarChartIcon,
     },
     {
-      title: "Projects",
+      title: "Projekte",
       url: "#",
       icon: FolderIcon,
     },
     {
-      title: "Team",
+      title: "Abteilungen",
       url: "#",
       icon: UsersIcon,
     },
   ],
   navClouds: [
     {
-      title: "Capture",
+      title: "Erfassung",
       icon: CameraIcon,
       isActive: true,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Neue Meldungen",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Archiviert",
           url: "#",
         },
       ],
     },
     {
-      title: "Proposal",
+      title: "Anträge",
       icon: FileTextIcon,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Laufende Anträge",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Abgeschlossen",
           url: "#",
         },
       ],
     },
     {
-      title: "Prompts",
+      title: "Formulare",
       icon: FileCodeIcon,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Infrastruktur",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Wartung",
           url: "#",
         },
       ],
@@ -115,34 +115,34 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Settings",
+      title: "Einstellungen",
       url: "#",
       icon: SettingsIcon,
     },
     {
-      title: "Get Help",
+      title: "Hilfe",
       url: "#",
       icon: HelpCircleIcon,
     },
     {
-      title: "Search",
+      title: "Suche",
       url: "#",
       icon: SearchIcon,
     },
   ],
   documents: [
     {
-      name: "Data Library",
+      name: "Datenbank",
       url: "#",
       icon: DatabaseIcon,
     },
     {
-      name: "Reports",
+      name: "Berichte",
       url: "#",
       icon: ClipboardListIcon,
     },
     {
-      name: "Word Assistant",
+      name: "Vorlagen",
       url: "#",
       icon: FileIcon,
     },
