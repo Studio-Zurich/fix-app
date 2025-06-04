@@ -86,24 +86,39 @@
         "description": "Help make your community better by reporting issues that need attention. Together we can create a safer and more pleasant environment for everyone.",
         "steps": {
             "step1": {
-                "title": "Report an Issue",
-                "description": "Spot a problem? Report it in seconds. Your quick action keeps the community safe."
+                "title": "It all starts with you!",
+                "description": "You see something that needs attention, you report it. Your quick action is the first step to making your community better."
             },
             "step2": {
-                "title": "Track Progress",
-                "description": "Watch as your report turns into action. You'll receive an update once the issue is resolved."
+                "title": "Information on its way",
+                "description": "That sends a little bird our way with all the information you entered. Your report is now in our system."
             },
             "step3": {
-                "title": "See Results",
-                "description": "Problem solved! Your report made the neighborhood better for everyone."
+                "title": "Smart routing in action",
+                "description": "Our smart routing system sends it to the right department and Kanton. We make sure the right people get notified."
+            },
+            "step4": {
+                "title": "Work in progress",
+                "description": "They received your report and work on it. If they need more info, they will reach out to you directly."
+            },
+            "step5": {
+                "title": "Ding, Ding! Update time",
+                "description": "You get an auto update when it's complete. Stay informed about the progress of your report."
+            },
+            "step6": {
+                "title": "Voila, community improved!",
+                "description": "You've done a little more for your community. Thank you for making a difference!"
             }
         },
         "processFlow": {
             "title": "Community Impact",
             "description": "With FIX, anyone can quickly report local infrastructure issues, ensuring the right authorities take action-whether it's a blocked pathway, a safety hazard, or a lost item. By bridging the gap between the public and local services, FIX helps keep Swiss communities cleaner, safer, and better connected.",
-            "step1": "Report helps to react quickly",
-            "step2": "Track the progress",
-            "step3": "Community improved!"
+            "step1": "You spot and report",
+            "step2": "Information sent",
+            "step3": "Smart routing active",
+            "step4": "Authorities working",
+            "step5": "Updates received",
+            "step6": "Community improved!"
         }
     },
     "AboutUsSection": {
@@ -153,16 +168,139 @@
     },
     "Imprint": {
         "title": "Imprint",
+        "company": {
+            "title": "Company",
+            "name": "FIX GmbH",
+            "address": "Waldhof 7",
+            "city": "6300 Zug",
+            "country": "Switzerland"
+        },
+        "representatives": {
+            "title": "Authorized Representatives",
+            "ceo": "CEO",
+            "ceoName": "Remigi Rageth",
+            "cto": "CTO",
+            "ctoName": "Alexander Schmidtpeter"
+        },
+        "register": {
+            "title": "Commercial Register",
+            "uid": "UID",
+            "uidValue": "in formation"
+        },
+        "contact": {
+            "title": "Contact",
+            "phone": "Phone",
+            "phoneValue": "+41795898252",
+            "email": "Email",
+            "emailValue": "info@fixapp.ch",
+            "web": "Web",
+            "webValue": "https://www.fixapp.ch"
+        },
+        "disclaimer": {
+            "title": "Disclaimer",
+            "content": {
+                "title": "Content",
+                "text": "Despite careful content control, we assume no liability for the timeliness, completeness and accuracy of the information provided. Any liability claims against us relating to material or immaterial damage caused by the use or non-use of the content provided or by the use of incorrect and incomplete information are fundamentally excluded."
+            },
+            "externalLinks": {
+                "title": "External Links",
+                "text": "Our website contains links to external third-party websites over whose content we have no influence. Therefore, we cannot assume any liability for this external content. The respective provider or operator of the pages is always responsible for the content of the linked pages."
+            },
+            "copyright": {
+                "title": "Copyright",
+                "text": "The content and works created by the site operators on this website are subject to Swiss copyright law. Third-party contributions are marked as such. Reproduction, editing, distribution and any kind of exploitation outside the limits of copyright require our written consent."
+            },
+            "changes": {
+                "title": "Changes and Errors",
+                "text": "We expressly reserve the right to change, supplement, delete parts of the pages or the entire offer at any time or to temporarily or permanently discontinue publication. Should individual formulations or representations of this disclaimer be ineffective, the remaining provisions remain unaffected."
+            }
+        }
+    },
+    "Privacy": {
+        "title": "Privacy Policy",
         "companyName": "FIX App GmbH i.G.",
         "legalForm": "Legal Form",
         "commercialRegister": "Commercial Register",
         "vatNumber": "VAT Number",
         "supervisoryAuthority": "Supervisory Authority",
         "contact": "Contact",
-        "address": "Address",
         "email": "Email",
         "legalFormValue": "Limited Liability Company (GmbH) in formation",
         "commercialRegisterValue": "Commercial Register Office of the Canton of Zug",
-        "supervisoryAuthorityValue": "Commercial Register Office of the Canton of Zug"
+        "supervisoryAuthorityValue": "Commercial Register Office of the Canton of Zug",
+        "responsibleParty": {
+            "title": "1. Responsible Party",
+            "companyName": "FIX GmbH i.G",
+            "address": "Waldhof 7",
+            "city": "6300 Zug",
+            "country": "Switzerland",
+            "email": "Email",
+            "emailValue": "privacy@fixapp.ch",
+            "website": "Website",
+            "websiteValue": "https://www.fixapp.ch"
+        },
+        "generalInfo": {
+            "title": "2. General Information",
+            "content": "The protection of your personal data is important to us. We treat your personal data confidentially and in accordance with legal data protection regulations and this privacy policy."
+        },
+        "dataCollection": {
+            "title": "3. Collection and Processing of Personal Data",
+            "intro": "We collect and process personal data when you:",
+            "activities": {
+                "website": "visit our website",
+                "service": "use our service to report problems",
+                "contact": "contact us via the contact form",
+                "services": "use our services"
+            },
+            "dataTypes": {
+                "intro": "The collected data includes in particular",
+                "name": "Name, first name",
+                "email": "Email address",
+                "phone": "Phone number",
+                "ip": "IP address",
+                "location": "Geo-location",
+                "usage": "Usage data (e.g. visited pages, click behavior)"
+            }
+        },
+        "purpose": {
+            "title": "4. Purpose of Data Processing",
+            "intro": "The processing of your personal data is carried out for the following purposes:",
+            "items": {
+                "services": "Provision and improvement of our services",
+                "communication": "Communication with you",
+                "reporting": "Reporting problems to the responsible cantons and companies",
+                "analysis": "Analysis of user behavior to optimize our offering",
+                "legal": "Fulfillment of legal obligations"
+            }
+        },
+        "dataSharing": {
+            "title": "5. Data Sharing with Third Parties",
+            "intro": "Your personal data is only shared with third parties if this is legally permitted or you have consented. Possible recipients are:",
+            "recipients": {
+                "serviceProviders": "Service providers who support us in providing our services (e.g. hosting providers, various partners from different industries)",
+                "clients": "Customers of FIX GmbH who process their reports, e.g. cantons and various companies",
+                "authorities": "Authorities, if we are legally obligated to do so"
+            }
+        },
+        "internationalTransfer": {
+            "title": "6. Data Transfer Abroad",
+            "content": "Should we transfer personal data to service providers abroad, we ensure that an adequate level of data protection is guaranteed, e.g. through contractual agreements or other suitable guarantees."
+        },
+        "cookies": {
+            "title": "7. Cookies and Tracking Technologies",
+            "content": "Our website uses cookies and similar technologies to improve the user experience and analyze the use of our website. You can restrict or prevent the use of cookies in your browser settings."
+        },
+        "storageDuration": {
+            "title": "8. Storage Duration",
+            "content": "We only store your personal data for as long as necessary to fulfill the stated purposes or as required by legal retention periods."
+        },
+        "rights": {
+            "title": "9. Your Rights",
+            "content": "You have the right to receive information about the personal data we store about you. You also have the right to correction, deletion or restriction of the processing of your data as well as the right to data portability. Please contact the above contact address for this purpose."
+        },
+        "changes": {
+            "title": "10. Changes to this Privacy Policy",
+            "content": "We reserve the right to change this privacy policy at any time. The current version is always available on our website."
+        }
     }
 }

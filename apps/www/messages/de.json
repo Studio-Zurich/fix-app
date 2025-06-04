@@ -86,24 +86,39 @@
         "description": "Hilf mit, Deine Gemeinde zu verbessern, indem Du Probleme meldest, die Aufmerksamkeit benötigen. Gemeinsam können wir eine sicherere und angenehmere Umgebung für alle schaffen.",
         "steps": {
             "step1": {
-                "title": "Problem melden",
-                "description": "Problem entdeckt? In Sekunden gemeldet. Deine schnelle Aktion schützt die Gemeinschaft."
+                "title": "Es beginnt alles mit Dir!",
+                "description": "Du siehst etwas, Du meldest es. Deine schnelle Aktion ist der erste Schritt, um Deine Gemeinde zu verbessern."
             },
             "step2": {
-                "title": "Fortschritt verfolgen",
-                "description": "Sieh zu, wie Deine Meldung Wirkung zeigt. Du erhältst ein Update, sobald der Vorfall gelöst wird."
+                "title": "Information ist unterwegs",
+                "description": "Das schickt einen kleinen Vogel zu uns mit all den Informationen, die Du eingegeben hast. Deine Meldung ist jetzt in unserem System."
             },
             "step3": {
-                "title": "Ergebnisse sehen",
-                "description": "Problem gelöst! Deine Meldung hat die Nachbarschaft verbessert."
+                "title": "Intelligente Weiterleitung aktiv",
+                "description": "Unser intelligentes Weiterleitungssystem leitet es an die richtige Abteilung und den Kanton weiter. Wir sorgen dafür, dass die richtigen Leute benachrichtigt werden."
+            },
+            "step4": {
+                "title": "Arbeit im Gange",
+                "description": "Sie haben Deine Meldung erhalten und arbeiten daran. Falls sie weitere Informationen benötigen, werden sie sich direkt bei Dir melden."
+            },
+            "step5": {
+                "title": "Ding, Ding! Update-Zeit",
+                "description": "Du erhältst ein automatisches Update, sobald es abgeschlossen ist. Bleibe über den Fortschritt Deiner Meldung informiert."
+            },
+            "step6": {
+                "title": "Voilà, Gemeinde verbessert!",
+                "description": "Du hast ein bisschen mehr für Deine Gemeinde getan. Danke, dass Du einen Unterschied machst!"
             }
         },
         "processFlow": {
             "title": "Einfluss auf die Gemeinschaft",
             "description": "Mit FIX kann jeder schnell lokale Infrastrukturprobleme melden, die richtigen Behörden zu informieren - ob es um einen blockierten Weg, eine Sicherheitsgefahr oder ein verlorengegangenes Item geht. Durch das Bridge-Gap zwischen der Öffentlichkeit und den lokalen Diensten hilft FIX, Schweizer Gemeinschaften sauberer, sicherer und besser verbunden zu halten.",
-            "step1": "Meldung hilft schnell zu reagieren",
-            "step2": "Verfolge den Fortschritt",
-            "step3": "Gemeinschaft verbessert!"
+            "step1": "Du entdeckst und meldest",
+            "step2": "Information gesendet",
+            "step3": "Intelligente Weiterleitung",
+            "step4": "Behörden arbeiten",
+            "step5": "Updates erhalten",
+            "step6": "Gemeinde verbessert!"
         }
     },
     "AboutUsSection": {
@@ -153,16 +168,139 @@
     },
     "Imprint": {
         "title": "Impressum",
+        "company": {
+            "title": "Firma",
+            "name": "FIX GmbH",
+            "address": "Waldhof 7",
+            "city": "6300 Zug",
+            "country": "Schweiz"
+        },
+        "representatives": {
+            "title": "Vertretungsberechtigte Personen",
+            "ceo": "CEO",
+            "ceoName": "Remigi Rageth",
+            "cto": "CTO",
+            "ctoName": "Alexander Schmidtpeter"
+        },
+        "register": {
+            "title": "Handelsregister",
+            "uid": "UID",
+            "uidValue": "in-gründung"
+        },
+        "contact": {
+            "title": "Kontakt",
+            "phone": "Telefon",
+            "phoneValue": "+41795898252",
+            "email": "E-Mail",
+            "emailValue": "info@fixapp.ch",
+            "web": "Web",
+            "webValue": "https://www.fixapp.ch"
+        },
+        "disclaimer": {
+            "title": "Haftungsausschluss",
+            "content": {
+                "title": "Inhalte",
+                "text": "Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Gewähr für die Aktualität, Vollständigkeit und Richtigkeit der bereitgestellten Informationen. Jegliche Haftungsansprüche gegen uns, die sich auf Schäden materieller oder ideeller Art beziehen – verursacht durch die Nutzung oder Nichtnutzung der dargebotenen Inhalte bzw. durch Nutzung fehlerhafter und unvollständiger Informationen – sind grundsätzlich ausgeschlossen."
+            },
+            "externalLinks": {
+                "title": "Externe Links",
+                "text": "Unsere Webseite enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb übernehmen wir für diese fremden Inhalte auch keine Gewähr. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich."
+            },
+            "copyright": {
+                "title": "Urheberrecht",
+                "text": "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf dieser Website unterliegen dem schweizerischen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts bedürfen unserer schriftlichen Zustimmung."
+            },
+            "changes": {
+                "title": "Änderungen und Irrtümer",
+                "text": "Wir behalten uns ausdrücklich vor, Teile der Seiten oder das gesamte Angebot jederzeit zu ändern, zu ergänzen, zu löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen. Sollten einzelne Formulierungen oder Darstellungen dieses Haftungsausschlusses unwirksam sein, bleiben die übrigen Bestimmungen davon unberührt."
+            }
+        }
+    },
+    "Privacy": {
+        "title": "Datenschutzerklärung",
         "companyName": "FIX App GmbH i.G.",
         "legalForm": "Rechtsform",
         "commercialRegister": "Handelsregister",
         "vatNumber": "UID-Nr.",
         "supervisoryAuthority": "Aufsichtsbehörde",
         "contact": "Kontakt",
-        "address": "Adresse",
         "email": "E-Mail",
         "legalFormValue": "Gesellschaft mit beschränkter Haftung (GmbH) in Gründung",
         "commercialRegisterValue": "Handelsregisteramt des Kantons Zug",
-        "supervisoryAuthorityValue": "Handelsregisteramt des Kantons Zug"
+        "supervisoryAuthorityValue": "Handelsregisteramt des Kantons Zug",
+        "responsibleParty": {
+            "title": "1. Verantwortlicher",
+            "companyName": "FIX GmbH i.G",
+            "address": "Waldhof 7",
+            "city": "6300 Zug",
+            "country": "Switzerland",
+            "email": "E-Mail",
+            "emailValue": "privacy@fixapp.ch",
+            "website": "Webseite",
+            "websiteValue": "https://www.fixapp.ch"
+        },
+        "generalInfo": {
+            "title": "2. Allgemeine Hinweise",
+            "content": "Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung."
+        },
+        "dataCollection": {
+            "title": "3. Erhebung und Verarbeitung personenbezogener Daten",
+            "intro": "Wir erheben und verarbeiten personenbezogene Daten, wenn Sie:",
+            "activities": {
+                "website": "unsere Website besuchen",
+                "service": "unsere service benutzen um Problemen zu melden",
+                "contact": "uns über das Kontaktformular kontaktieren",
+                "services": "unsere Dienstleistungen nutzen"
+            },
+            "dataTypes": {
+                "intro": "Die erhobenen Daten umfassen insbesondere",
+                "name": "Name, Vorname",
+                "email": "E-Mail-Adresse",
+                "phone": "Telefonnummer",
+                "ip": "IP-Adresse",
+                "location": "Geo-location",
+                "usage": "Nutzungsdaten (z. B. besuchte Seiten, Klickverhalten)"
+            }
+        },
+        "purpose": {
+            "title": "4. Zweck der Datenverarbeitung",
+            "intro": "Die Verarbeitung Ihrer personenbezogenen Daten erfolgt zu folgenden Zwecken:",
+            "items": {
+                "services": "Bereitstellung und Verbesserung unserer Dienstleistungen",
+                "communication": "Kommunikation mit Ihnen",
+                "reporting": "Problemen den verantwortlichen Kantonen und Firmen zu melden",
+                "analysis": "Analyse des Nutzerverhaltens zur Optimierung unseres Angebots",
+                "legal": "Erfüllung gesetzlicher Verpflichtungen"
+            }
+        },
+        "dataSharing": {
+            "title": "5. Weitergabe von Daten an Dritte",
+            "intro": "Eine Weitergabe Ihrer personenbezogenen Daten an Dritte erfolgt nur, wenn dies gesetzlich erlaubt ist oder Sie eingewilligt haben. Mögliche Empfänger sind:",
+            "recipients": {
+                "serviceProviders": "Dienstleister, die uns bei der Bereitstellung unserer Dienste unterstützen (z. B. Hosting-Anbieter, diverse Partner aus unterschiedlichen Branchen)",
+                "clients": "Kunden von FIX GmbH die ihre Reports bearbeiten z.b. Kanton und div. Firmen",
+                "authorities": "Behörden, sofern wir gesetzlich dazu verpflichtet sind"
+            }
+        },
+        "internationalTransfer": {
+            "title": "6. Datenübermittlung ins Ausland",
+            "content": "Sollten wir personenbezogene Daten an Dienstleister im Ausland übermitteln, stellen wir sicher, dass ein angemessenes Datenschutzniveau gewährleistet ist, z. B. durch vertragliche Vereinbarungen oder andere geeignete Garantien."
+        },
+        "cookies": {
+            "title": "7. Cookies und Tracking-Technologien",
+            "content": "Unsere Website verwendet Cookies und ähnliche Technologien, um die Nutzererfahrung zu verbessern und die Nutzung unserer Website zu analysieren. Sie können die Verwendung von Cookies in Ihren Browsereinstellungen einschränken oder verhindern."
+        },
+        "storageDuration": {
+            "title": "8. Speicherdauer",
+            "content": "Wir speichern Ihre personenbezogenen Daten nur so lange, wie es für die Erfüllung der genannten Zwecke erforderlich ist oder wie es gesetzliche Aufbewahrungsfristen vorsehen."
+        },
+        "rights": {
+            "title": "9. Ihre Rechte",
+            "content": "Sie haben das Recht, Auskunft über die von uns über Sie gespeicherten personenbezogenen Daten zu erhalten. Zudem haben Sie das Recht auf Berichtigung, Löschung oder Einschränkung der Verarbeitung Ihrer Daten sowie das Recht auf Datenübertragbarkeit. Bitte wenden Sie sich hierzu an die oben genannte Kontaktadresse."
+        },
+        "changes": {
+            "title": "10. Änderungen dieser Datenschutzerklärung",
+            "content": "Wir behalten uns vor, diese Datenschutzerklärung jederzeit zu ändern. Die aktuelle Version ist stets auf unserer Website verfügbar."
+        }
     }
 }

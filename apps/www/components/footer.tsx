@@ -47,6 +47,11 @@ const Footer = () => {
                 {t("imprint")}
               </TypographySpan>
             </Link>
+            <Link href="/datenschutz" className="block">
+              <TypographySpan className="text-background">
+                {t("privacy")}
+              </TypographySpan>
+            </Link>
           </div>
         </div>
         <div className="md:col-start-2">

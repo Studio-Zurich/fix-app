@@ -6,6 +6,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+
       <HowItWorksSection />
       <Vision />
       <FaqSection />
